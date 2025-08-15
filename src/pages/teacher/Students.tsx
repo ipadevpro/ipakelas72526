@@ -169,11 +169,9 @@ const StudentsPage = () => {
   
   const loadClasses = async () => {
     try {
-      console.log('🔄 Loading classes for student management...');
       const response = await classApi.getAll();
       if (response.success) {
         setClasses(response.classes || []);
-        console.log('✅ Loaded classes:', response.classes?.length || 0);
       } else {
         console.error('❌ Failed to load classes:', response.error);
         showNotification('error', response.error || 'Gagal memuat data kelas');
@@ -187,10 +185,8 @@ const StudentsPage = () => {
   const loadStudents = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Loading students...');
       
       const response = await studentsApi.getAll();
-      console.log('👥 Students response:', response);
       
       if (response.success) {
         // Process students data to include class name
@@ -204,7 +200,6 @@ const StudentsPage = () => {
             
             // Skip students without valid username
             if (!studentUsername) {
-              console.warn('⚠️ Skipping student without username:', student);
               return null;
             }
             
@@ -222,25 +217,6 @@ const StudentsPage = () => {
           .filter(Boolean); // Remove null entries
         
         setStudents(processedStudents);
-        console.log('✅ Loaded students:', processedStudents.length);
-        
-        // Log processed students for debugging
-        processedStudents.forEach((student: Student, index: number) => {
-          console.log(`✅ Processed Student ${index + 1}:`, {
-            id: student.id,
-            username: student.username,
-            backendId: student.backendId,
-            fullName: student.fullName
-          });
-        });
-        
-        // Log any problematic students for debugging
-        const problematicStudents = (response.students || []).filter((student: any) => 
-          !student.username && !student.studentUsername
-        );
-        if (problematicStudents.length > 0) {
-          console.warn('⚠️ Found students without username:', problematicStudents);
-        }
       } else {
         console.error('❌ Failed to load students:', response.error);
         showNotification('error', response.error || 'Gagal memuat data siswa');
@@ -267,16 +243,12 @@ const StudentsPage = () => {
     setIsCreating(true);
 
     try {
-      console.log('➕ Creating student:', newStudent);
-      
       const response = await studentsApi.create(
         newStudent.classId,
         newStudent.username,
         newStudent.fullName,
         newStudent.password
       );
-      
-      console.log('📝 Create response:', response);
       
       if (response.success) {
         setNewStudent({ username: '', password: 'pass123', fullName: '', classId: '' });
@@ -311,14 +283,10 @@ const StudentsPage = () => {
     setIsUpdating(true);
 
     try {
-      console.log('✏️ Updating student:', editingStudent.id, editForm);
-      
       const response = await studentsApi.update(
         editingStudent.id,
         editForm.fullName
       );
-      
-      console.log('📝 Update response:', response);
       
       if (response.success) {
         setShowEditForm(false);
@@ -345,18 +313,7 @@ const StudentsPage = () => {
   const confirmDeleteStudent = async () => {
     if (!deletingStudent) return;
     
-    // Comprehensive validation and debugging
-    console.log('🔍 DEBUG: Deleting student object:', {
-      id: deletingStudent.id,
-      username: deletingStudent.username,
-      fullName: deletingStudent.fullName,
-      classId: deletingStudent.classId,
-      backendId: deletingStudent.backendId,
-      typeof_id: typeof deletingStudent.id,
-      id_length: deletingStudent.id?.length,
-      id_stringified: JSON.stringify(deletingStudent.id),
-      full_object: JSON.stringify(deletingStudent)
-    });
+    // Validation before deletion
     
     // Validate student ID before deleting (use the original backend ID)
     if (!deletingStudent.id || 
@@ -374,12 +331,8 @@ const StudentsPage = () => {
     setIsDeleting(true);
 
     try {
-      console.log('🗑️ Deleting student with backend ID:', deletingStudent.id);
-      
       // Use the original backend ID (composite format) for deletion
       const response = await studentsApi.delete(deletingStudent.id);
-      
-      console.log('🗑️ Delete response:', response);
       
       if (response.success) {
         setShowDeleteConfirm(false);

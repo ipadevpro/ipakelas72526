@@ -114,17 +114,14 @@ const Classes = () => {
     try {
       setIsLoading(true);
       setLoadingProgress(20);
-      console.log('🔄 Loading classes...');
       
       const response = await classApi.getAll();
-      console.log('📊 Classes response:', response);
       
       if (response.success) {
         const classesList = response.classes || [];
         setClasses(classesList);
         setFilteredClasses(classesList);
         setLoadingProgress(60);
-        console.log('✅ Loaded classes:', classesList.length);
         
         // Show classes immediately, load stats in background
         setIsLoading(false);
@@ -151,7 +148,6 @@ const Classes = () => {
     
     try {
       setIsLoadingStats(true);
-      console.log('📈 Loading class statistics incrementally...');
       
       // Load stats one by one to show progressive updates
       let completed = 0;
@@ -172,7 +168,6 @@ const Classes = () => {
           
           completed++;
           const progress = Math.round((completed / classesList.length) * 100);
-          console.log(`📊 Loaded stats for ${classItem.name}: ${progress}% complete`);
           
           return { classId: classItem.id, stats };
         } catch (error) {
@@ -205,8 +200,6 @@ const Classes = () => {
         }, i * 100); // 100ms delay between each request
       }
       
-      console.log('✅ Stats loading initiated for all classes');
-      
     } catch (error) {
       console.error('💥 Error loading class statistics:', error);
     } finally {
@@ -223,7 +216,6 @@ const Classes = () => {
     
     try {
       setIsLoadingStats(true);
-      console.log('📈 Loading class statistics...');
       
       const statsPromises = classesList.map(async (classItem) => {
         try {
@@ -252,7 +244,6 @@ const Classes = () => {
       });
       
       setClassStats(statsMap);
-      console.log('✅ Loaded class statistics:', statsMap);
       
     } catch (error) {
       console.error('💥 Error loading class statistics:', error);
@@ -264,7 +255,6 @@ const Classes = () => {
   // Optimized refresh with intelligent reloading
   const handleRefresh = async () => {
     try {
-      console.log('🔄 Refreshing classes data...');
       
       // Quick refresh: only reload stats if classes are already loaded
       if (classes.length > 0) {
@@ -288,15 +278,11 @@ const Classes = () => {
     setIsCreating(true);
 
     try {
-      console.log('➕ Creating class:', newClass);
-      
       const response = await classApi.create(
         newClass.name,
         newClass.subject,
         newClass.description
       );
-      
-      console.log('📝 Create response:', response);
       
       if (response.success) {
         setNewClass({ name: '', subject: '', description: '' });
@@ -332,16 +318,12 @@ const Classes = () => {
     setIsUpdating(true);
 
     try {
-      console.log('✏️ Updating class:', editingClass.id, editForm);
-      
       const response = await classApi.update(
         editingClass.id,
         editForm.name,
         editForm.subject,
         editForm.description
       );
-      
-      console.log('📝 Update response:', response);
       
       if (response.success) {
         setShowEditForm(false);
@@ -371,11 +353,7 @@ const Classes = () => {
     setIsDeleting(true);
 
     try {
-      console.log('🗑️ Deleting class:', deletingClass.id);
-      
       const response = await classApi.delete(deletingClass.id);
-      
-      console.log('🗑️ Delete response:', response);
       
       if (response.success) {
         setShowDeleteConfirm(false);

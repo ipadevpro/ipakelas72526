@@ -81,12 +81,8 @@ const StudentDashboard = () => {
       const user = JSON.parse(userData);
       setUserInfo(user);
       
-      console.log('👤 Loading dashboard for user:', user);
-      
       // Check session credentials first
-      console.log('🔍 Checking session credentials before API calls...');
       if (!hasSessionCredentials()) {
-        console.log('⚠️ No session credentials found, attempting refresh...');
         refreshSessionCredentials();
         
         // Wait a bit for session to refresh
@@ -98,39 +94,18 @@ const StudentDashboard = () => {
         }
       }
       
-      console.log('✅ Session credentials verified, proceeding with API calls...');
-      
       // Load all data sequentially to better handle errors
-      console.log('📡 Fetching gamification data...');
       const gamificationResult = await apiRequest('getGamification', {});
-      console.log('📊 Gamification result:', gamificationResult);
-      
-      console.log('📡 Fetching badges data...');
       const badgesResult = await apiRequest('getBadges', {});
-      console.log('🏅 Badges result:', badgesResult);
-      
-      console.log('📡 Fetching students data...');
       const studentsResult = await apiRequest('getStudentsFromSheet', {});
-      console.log('👥 Students result:', studentsResult);
-      
-      console.log('📡 Fetching attendance data...');
       const attendanceResult = await apiRequest('getAttendance', {});
-      console.log('📅 Attendance result:', attendanceResult);
-      
-      console.log('📡 Fetching grades data...');
       const gradesResult = await apiRequest('getGrades', {});
-      console.log('📊 Grades result:', gradesResult);
-      
-      console.log('📡 Fetching assignments data...');
       const assignmentsResult = await apiRequest('getAssignments', {});
-      console.log('📝 Assignments result:', assignmentsResult);
       
       // Set available badges
       if (badgesResult.success && badgesResult.badges) {
         setAvailableBadges(badgesResult.badges);
-        console.log('✅ Available badges loaded:', badgesResult.badges.length);
       } else {
-        console.log('⚠️ No badges data available');
         setAvailableBadges([]);
       }
       
@@ -142,20 +117,12 @@ const StudentDashboard = () => {
         const gradesData = gradesResult.success ? gradesResult.grades || [] : [];
         const assignmentsData = assignmentsResult.success ? assignmentsResult.assignments || [] : [];
         
-        console.log('📊 Processing data:', {
-          gamificationEntries: gamificationData.length,
-          studentsCount: studentsData.length,
-          attendanceRecords: attendanceData.length,
-          gradesCount: gradesData.length,
-          assignmentsCount: assignmentsData.length
-        });
+
         
         // Find current user's gamification data
         const currentUserData = gamificationData.find(
           (entry: any) => entry.studentUsername === user.username
         );
-        
-        console.log('🎯 Current user gamification data:', currentUserData);
         
         // Calculate real attendance percentage
         const userAttendanceRecords = attendanceData.filter((record: any) => record.studentUsername === user.username);
@@ -163,43 +130,22 @@ const StudentDashboard = () => {
         const presentRecords = userAttendanceRecords.filter((record: any) => record.status === 'present' || record.status === 'hadir').length;
         const realAttendanceRate = totalAttendanceRecords > 0 ? Math.round((presentRecords / totalAttendanceRecords) * 100) : 0;
         
-        console.log('📅 Attendance calculation:', {
-          userAttendanceRecords: userAttendanceRecords.length,
-          totalAttendanceRecords,
-          presentRecords,
-          allAttendanceStatuses: userAttendanceRecords.map((r: any) => r.status),
-          realAttendanceRate
-        });
-        
         // Calculate real average grade with better filtering
         const userGrades = gradesData.filter((grade: any) => {
           const isUserGrade = grade.studentUsername === user.username;
           const hasValidPoints = grade.points !== null && grade.points !== undefined && grade.points !== '' ||
                                 grade.value !== null && grade.value !== undefined && grade.value !== '' ||
                                 grade.score !== null && grade.score !== undefined && grade.score !== '';
-          console.log(`📊 Grade check for ${grade.studentUsername}: isUser=${isUserGrade}, points=${grade.points}, value=${grade.value}, score=${grade.score}, valid=${hasValidPoints}`);
           return isUserGrade && hasValidPoints;
         });
         
-        console.log('📊 User grades found:', userGrades);
-        
         const validGrades = userGrades.map((grade: any) => {
           const points = parseFloat(grade.points) || parseFloat(grade.value) || parseFloat(grade.score) || 0;
-          console.log(`📈 Processing grade: points=${grade.points}, value=${grade.value}, score=${grade.score} -> ${points}`);
           return points;
         }).filter((points: number) => !isNaN(points) && points >= 0);
         
         const totalGradePoints = validGrades.reduce((sum: number, points: number) => sum + points, 0);
         const realAverageGrade = validGrades.length > 0 ? Math.round((totalGradePoints / validGrades.length) * 100) / 100 : 0;
-        
-        console.log('📊 Grade calculation details:', {
-          userGrades: userGrades.length,
-          validGrades: validGrades.length,
-          validGradeValues: validGrades,
-          totalGradePoints,
-          realAverageGrade,
-          sampleRawGrades: userGrades.slice(0, 3)
-        });
         
         // Calculate real completed assignments - check multiple data sources
         const userAssignmentGrades = gradesData.filter((grade: any) => grade.studentUsername === user.username);
@@ -213,23 +159,9 @@ const StudentDashboard = () => {
         
         const realCompletedAssignments = Math.max(uniqueAssignments.size, userAssignmentGrades.length);
         
-        console.log('📝 Assignment calculation:', {
-          userAssignmentGrades: userAssignmentGrades.length,
-          uniqueAssignmentIds: Array.from(uniqueAssignments),
-          uniqueAssignments: uniqueAssignments.size,
-          realCompletedAssignments,
-          sampleGrades: userAssignmentGrades.slice(0, 3)
-        });
+
         
-        console.log('📈 Final calculated stats:', {
-          attendanceRate: realAttendanceRate,
-          averageGrade: realAverageGrade,
-          completedAssignments: realCompletedAssignments,
-          totalAttendanceRecords,
-          presentRecords,
-          userGrades: userGrades.length,
-          validGrades: validGrades.length
-        });
+
         
         // Calculate leaderboard with proper sorting
         const leaderboardData = gamificationData
@@ -247,12 +179,10 @@ const StudentDashboard = () => {
           })
           .sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.points - a.points);
         
-        console.log('🏆 Leaderboard data:', leaderboardData);
         setLeaderboard(leaderboardData.slice(0, 10));
         
         // Calculate user rank
         const userRank = leaderboardData.findIndex((entry: LeaderboardEntry) => entry.username === user.username) + 1;
-        console.log('🥇 User rank:', userRank);
         
         // Calculate user stats with real data
         const userBadges = currentUserData?.badges ? 
@@ -269,7 +199,6 @@ const StudentDashboard = () => {
           completedAssignments: realCompletedAssignments
         };
         
-        console.log('📈 Final user stats with real data:', userStats);
         setStats(userStats);
         
       } else {
@@ -281,8 +210,6 @@ const StudentDashboard = () => {
         const gradesData = gradesResult.success ? gradesResult.grades || [] : [];
         
         if (attendanceData.length > 0 || gradesData.length > 0) {
-          console.log('📊 Attempting to calculate stats from available data...');
-          
           // Try to calculate basic stats even without full gamification data
           const userAttendanceRecords = attendanceData.filter((record: any) => record.studentUsername === user.username);
           const totalAttendanceRecords = userAttendanceRecords.length;
@@ -306,12 +233,6 @@ const StudentDashboard = () => {
           const fallbackAverageGrade = validGrades.length > 0 ? Math.round((totalGradePoints / validGrades.length) * 100) / 100 : 0;
           
           const fallbackCompletedAssignments = userGrades.length;
-          
-          console.log('📊 Fallback stats calculated:', {
-            attendance: fallbackAttendanceRate,
-            averageGrade: fallbackAverageGrade,
-            completedAssignments: fallbackCompletedAssignments
-          });
           
           setStats(prev => ({
             ...prev,

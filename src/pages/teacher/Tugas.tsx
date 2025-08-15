@@ -273,11 +273,9 @@ const TugasPage = () => {
 
   const loadClasses = async () => {
     try {
-      console.log('🔄 Loading classes for assignment management...');
       const response = await classApi.getAll();
       if (response.success) {
         setClasses(response.classes || []);
-        console.log('✅ Loaded classes:', response.classes?.length || 0);
       } else {
         console.error('❌ Failed to load classes:', response.error);
         showNotification('error', response.error || 'Gagal memuat data kelas');
@@ -291,13 +289,10 @@ const TugasPage = () => {
   const loadAssignments = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Loading assignments...');
       
       const response = selectedClassId === 'all' 
         ? await assignmentApi.getAll()
         : await assignmentApi.getByClass(selectedClassId);
-      
-      console.log('📚 Assignments response:', response);
       
       if (response.success) {
         // Process assignments data to include class name and status
@@ -322,7 +317,6 @@ const TugasPage = () => {
           });
         
         setAssignments(processedAssignments);
-        console.log('✅ Processed assignments:', processedAssignments.length);
       } else {
         console.error('❌ Failed to load assignments:', response.error);
         showNotification('error', response.error || 'Gagal memuat data tugas');
@@ -358,8 +352,6 @@ const TugasPage = () => {
     setIsCreating(true);
 
     try {
-      console.log('➕ Creating assignment:', newAssignment);
-      
       const response = await assignmentApi.create(
         newAssignment.classId,
         newAssignment.title,
@@ -367,8 +359,6 @@ const TugasPage = () => {
         newAssignment.dueDate,
         newAssignment.maxPoints
       );
-      
-      console.log('📝 Create response:', response);
       
       if (response.success) {
         setNewAssignment({ title: '', description: '', classId: '', dueDate: '', maxPoints: 100 });
@@ -406,8 +396,6 @@ const TugasPage = () => {
     setIsUpdating(true);
 
     try {
-      console.log('✏️ Updating assignment:', editingAssignment.id, editForm);
-      
       const response = await assignmentApi.update(
         editingAssignment.id,
         editForm.title,
@@ -415,8 +403,6 @@ const TugasPage = () => {
         editForm.dueDate,
         editForm.maxPoints
       );
-      
-      console.log('📝 Update response:', response);
       
       if (response.success) {
         setShowEditForm(false);
@@ -446,11 +432,7 @@ const TugasPage = () => {
     setIsDeleting(true);
 
     try {
-      console.log('🗑️ Deleting assignment:', deletingAssignment.id);
-      
       const response = await assignmentApi.delete(deletingAssignment.id);
-      
-      console.log('🗑️ Delete response:', response);
       
       if (response.success) {
         setShowDeleteConfirm(false);

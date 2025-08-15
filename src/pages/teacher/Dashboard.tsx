@@ -127,7 +127,6 @@ const Dashboard = () => {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      console.log('📊 Loading comprehensive dashboard data...');
       
       // Load basic data first (classes, students, assignments)
       const [
@@ -144,29 +143,22 @@ const Dashboard = () => {
       let classes: ClassItem[] = [];
       if (classesResponse.success) {
         classes = classesResponse.classes || [];
-        console.log('📚 Loaded classes:', classes.length);
       }
 
       // Process Students Data
       let students: Student[] = [];
       if (studentsResponse.success) {
         students = studentsResponse.students || [];
-        console.log('👥 Loaded students:', students.length);
       }
 
       // Process Assignments Data
       let assignments: Assignment[] = [];
       if (assignmentsResponse.success) {
-        console.log('📝 RAW ASSIGNMENTS API RESPONSE:', assignmentsResponse);
-        
         assignments = (assignmentsResponse.assignments || []).map((assignment: any) => ({
           ...assignment,
           className: classes.find(c => c.id === assignment.classId)?.name || 'Unknown Class',
           status: getAssignmentStatus(assignment.dueDate)
         }));
-        console.log('📝 FINAL PROCESSED ASSIGNMENTS:', assignments.length, 'assignments');
-        console.log('📝 Assignment IDs:', assignments.map(a => a.id));
-        console.log('📝 Sample assignment data:', assignments[0]);
       } else {
         console.error('❌ Failed to load assignments:', assignmentsResponse);
       }
@@ -183,7 +175,6 @@ const Dashboard = () => {
       // Process Grades Data with enhanced mapping
       let grades: Grade[] = [];
       if (gradesResponse.success) {
-        console.log('🎯 RAW GRADES API RESPONSE:', gradesResponse);
         
         grades = (gradesResponse.grades || []).map((grade: any) => {
           // Get assignment info for calculating enhanced data
@@ -210,8 +201,6 @@ const Dashboard = () => {
           
           return processedGrade;
         });
-        console.log('🎯 FINAL PROCESSED GRADES:', grades.length, 'grades');
-        console.log('🎯 Sample grade data:', grades[0]);
       } else {
         console.error('❌ Failed to load grades:', gradesResponse);
       }
@@ -220,7 +209,6 @@ const Dashboard = () => {
       let attendanceRecords: AttendanceRecord[] = [];
       if (attendanceResponse.success) {
         attendanceRecords = attendanceResponse.attendance || [];
-        console.log('📋 Loaded attendance records:', attendanceRecords.length);
       }
 
       // Add student count to classes
@@ -251,8 +239,6 @@ const Dashboard = () => {
       setRecentActivities(realActivities);
 
       setLastUpdated(new Date());
-      console.log('✅ Dashboard data loaded successfully');
-      console.log('📊 Final stats:', realStats);
 
     } catch (error) {
       console.error('❌ Error loading dashboard data:', error);
@@ -268,34 +254,12 @@ const Dashboard = () => {
     grades: Grade[], 
     attendanceRecords: AttendanceRecord[]
   ): DashboardStats => {
-    console.log('🔍 DEBUGGING DATA SYNC:', {
-      classesCount: classes.length,
-      studentsCount: students.length,
-      assignmentsCount: assignments.length,
-      gradesCount: grades.length,
-      assignments: assignments.map(a => ({ id: a.id, title: a.title, classId: a.classId })),
-      grades: grades.map(g => ({ 
-        id: g.id, 
-        assignmentId: g.assignmentId, 
-        studentUsername: g.studentUsername, 
-        points: g.points 
-      })),
-      assignmentIds: assignments.map(a => a.id),
-      gradeAssignmentIds: [...new Set(grades.map(g => g.assignmentId))]
-    });
 
     // Calculate average grade using only valid grades
     const validGrades = grades.filter(grade => assignments.find(a => a.id === grade.assignmentId));
     const averageGrade = validGrades.length > 0 
       ? validGrades.reduce((sum, grade) => sum + grade.points, 0) / validGrades.length 
       : 0;
-      
-    console.log('📊 Grade calculation summary:', {
-      totalGradesInDB: grades.length,
-      validGrades: validGrades.length,
-      orphanedGrades: grades.length - validGrades.length,
-      averageFromValidGrades: averageGrade
-    });
 
     // Calculate today's attendance
     const today = new Date().toISOString().split('T')[0];

@@ -25,30 +25,18 @@ let sessionInitialized = false;
  */
 export function initializeSession() {
   if (sessionInitialized) {
-    console.log('🔒 Session already initialized, skipping...');
     return;
   }
 
   try {
     const userData = localStorage.getItem('user');
-    console.log('🔍 Initializing session, userData from localStorage:', userData ? 'found' : 'not found');
     
     if (userData) {
       const user = JSON.parse(userData);
-      console.log('👤 Parsed user data:', { 
-        username: user.username, 
-        role: user.role, 
-        hasPassword: !!user.password 
-      });
       
       // Restore credentials from stored user data
       sessionCredentials.username = user.username || '';
       sessionCredentials.password = user.password || '';
-      
-      console.log('🔐 Session credentials restored:', {
-        username: sessionCredentials.username,
-        hasPassword: !!sessionCredentials.password
-      });
     }
     
     sessionInitialized = true;
@@ -67,8 +55,6 @@ initializeSession();
  * Set current session credentials and save to localStorage
  */
 export function setSessionCredentials(username: string, password: string, userData?: any) {
-  console.log('🔐 Setting session credentials for:', username);
-  
   sessionCredentials.username = username;
   sessionCredentials.password = password;
   
@@ -80,11 +66,8 @@ export function setSessionCredentials(username: string, password: string, userDa
       password: password
     };
     
-    console.log('💾 Saving user data to localStorage with credentials');
     localStorage.setItem('user', JSON.stringify(userWithCredentials));
   }
-  
-  console.log('✅ Session credentials set successfully');
 }
 
 /**
@@ -92,11 +75,6 @@ export function setSessionCredentials(username: string, password: string, userDa
  */
 export function hasSessionCredentials() {
   const hasCredentials = sessionCredentials.username !== '' && sessionCredentials.password !== '';
-  console.log('🔍 Checking session credentials:', {
-    username: sessionCredentials.username,
-    hasPassword: !!sessionCredentials.password,
-    result: hasCredentials
-  });
   return hasCredentials;
 }
 
@@ -119,8 +97,6 @@ export function getCurrentUser() {
  * Clear session credentials and localStorage (manual logout only)
  */
 export function clearSessionCredentials() {
-  console.log('🧹 Clearing session credentials');
-  
   sessionCredentials.username = '';
   sessionCredentials.password = '';
   sessionInitialized = false;
@@ -139,7 +115,6 @@ export function clearSessionCredentials() {
  * Force refresh session credentials from localStorage
  */
 export function refreshSessionCredentials() {
-  console.log('🔄 Refreshing session credentials from localStorage');
   sessionInitialized = false;
   initializeSession();
 }
@@ -162,7 +137,6 @@ export async function apiRequest(
     if (action !== 'login') {
       // Check and refresh session if needed
       if (!hasSessionCredentials()) {
-        console.log('⚠️ No session credentials, attempting to refresh from localStorage...');
         refreshSessionCredentials();
         
         // Check again after refresh
@@ -183,40 +157,14 @@ export async function apiRequest(
       formData.append(key, String(value));
     });
     
-    // Log request untuk debugging (hide password)
-    const debugParams = { ...Object.fromEntries(formData.entries()) };
-    if (debugParams.password) debugParams.password = '********';
-    if (debugParams.studentPassword) debugParams.studentPassword = '********';
-    console.log(`API Request: ${action}`, debugParams);
-    
-    // Extra debugging for delete operations
+    // Extra validation for delete operations
     if (action.includes('delete') || action.includes('Delete')) {
-      console.log('🗑️ DELETE OPERATION DEBUG:');
-      console.log('- Action:', action);
-      console.log('- Original params:', params);
-      console.log('- Form data entries:', Object.fromEntries(formData.entries()));
-      
       // Check for any undefined values in form data
       for (const [key, value] of formData.entries()) {
         if (value === 'undefined' || value === 'null' || value === '') {
           console.warn(`⚠️ Potential issue: ${key} = "${value}"`);
         }
       }
-    }
-
-    // Extra debugging for add student operations
-    if (action === 'addStudent') {
-      console.log('➕ ADD STUDENT OPERATION DEBUG:');
-      console.log('- Action:', action);
-      console.log('- Original params:', params);
-      console.log('- Form data entries (exact order):', Object.fromEntries(formData.entries()));
-      
-      // Show the exact form data that will be sent
-      const formDataArray = [];
-      for (const [key, value] of formData.entries()) {
-        formDataArray.push(`${key}=${value}`);
-      }
-      console.log('- Form data string:', formDataArray.join('&'));
     }
 
     // Kirim request tanpa custom headers
@@ -230,11 +178,9 @@ export async function apiRequest(
     }
 
     const data = await response.json();
-    console.log('API Response:', data);
     
     // If credentials are invalid, clear session
     if (!data.success && data.error === 'Invalid credentials') {
-      console.log('❌ Invalid credentials received, clearing session');
       clearSessionCredentials();
     }
     
@@ -433,7 +379,6 @@ export const studentApi = {
       student_password: password
     };
     
-    console.log('➕ Creating student with multiple password parameters:', params);
     return apiRequest('addStudent', params);
   },
   
@@ -476,11 +421,6 @@ export const studentApi = {
       });
     }
     
-    console.log('🗑️ Attempting to delete student with ID:', studentId);
-    console.log('🗑️ Student ID type:', typeof studentId);
-    console.log('🗑️ Student ID length:', studentId.length);
-    console.log('🗑️ Student ID JSON:', JSON.stringify(studentId));
-    
     // The backend expects the composite ID format (e.g., "classId-username")
     // Let's try different parameter names that the backend might expect
     const params = { 
@@ -488,7 +428,6 @@ export const studentApi = {
       studentId: studentId,             // Try 'studentId'
       studentUsername: studentId        // Try 'studentUsername' 
     };
-    console.log('🗑️ Delete parameters:', params);
     
     return apiRequest('deleteStudent', params);
   }
@@ -761,15 +700,10 @@ export const debugApi = {
       formData.append('username', 'test');
       formData.append('password', 'test');
       
-      console.log('Testing API connection...');
-      
       const response = await fetch(API_URL, {
         method: 'POST',
         body: formData
       });
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         return {
@@ -855,7 +789,6 @@ export const studentsApi = {
       student_password: password
     };
     
-    console.log('➕ Creating student with multiple password parameters:', params);
     return apiRequest('addStudent', params);
   },
   
@@ -896,11 +829,6 @@ export const studentsApi = {
       });
     }
     
-    console.log('🗑️ Attempting to delete student with ID:', studentId);
-    console.log('🗑️ Student ID type:', typeof studentId);
-    console.log('🗑️ Student ID length:', studentId.length);
-    console.log('🗑️ Student ID JSON:', JSON.stringify(studentId));
-    
     // The backend expects the composite ID format (e.g., "classId-username")
     // Let's try different parameter names that the backend might expect
     const params = { 
@@ -908,7 +836,6 @@ export const studentsApi = {
       studentId: studentId,             // Try 'studentId'
       studentUsername: studentId        // Try 'studentUsername' 
     };
-    console.log('🗑️ Delete parameters:', params);
     
     return apiRequest('deleteStudent', params);
   }

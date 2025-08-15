@@ -372,20 +372,14 @@ const GamifikasiPage = () => {
 
   const fetchStudents = async () => {
     try {
-      console.log('🔍 Fetching students data...');
       const [studentsResponse, gamificationResponse] = await Promise.all([
         apiRequest('getStudentsFromSheet', {}),
         gamificationApi.getAll()
       ]);
 
-      console.log('📊 Students response:', studentsResponse);
-      console.log('🎮 Gamification response:', gamificationResponse);
-
       // If students sheet doesn't exist or is empty, create sample data
       if (!studentsResponse.success || (studentsResponse.success && studentsResponse.students?.length === 0)) {
-        console.log('📝 No students found, creating sample data...');
         const createResponse = await apiRequest('createStudentsSheet', {});
-        console.log('🏗️ Create students response:', createResponse);
         
         if (createResponse.success) {
           // Try fetching students again
@@ -397,7 +391,6 @@ const GamifikasiPage = () => {
               retryResponse.students || [],
               gamificationResponse.data || []
             );
-            console.log('✅ Combined student data (after creation):', combinedData);
             setStudents(combinedData);
             showNotification('info', 'Data siswa sampel telah dibuat');
             return;
@@ -412,7 +405,6 @@ const GamifikasiPage = () => {
           studentsResponse.students || [],
           gamificationResponse.data || []
         );
-        console.log('✅ Combined student data:', combinedData);
         setStudents(combinedData);
       } else {
         console.error('❌ Failed to fetch student data:', { studentsResponse, gamificationResponse });
@@ -425,14 +417,9 @@ const GamifikasiPage = () => {
   };
 
   const combineStudentsWithGamification = (studentsFromSheet: any[], gamificationData: GamificationRecord[]): StudentData[] => {
-    console.log('🔄 Combining students with gamification...');
-    console.log('👥 Students from sheet:', studentsFromSheet);
-    console.log('🎮 Gamification data:', gamificationData);
-    
     const combined: StudentData[] = [];
     
     studentsFromSheet.forEach(student => {
-      console.log('👤 Processing student:', student);
       
       const gamificationRecord = gamificationData.find(
         g => g.studentUsername === student.username && g.classId === student.classId
@@ -458,13 +445,9 @@ const GamifikasiPage = () => {
         achievements: [...badgeNames, ...achievements] // Combine badges and achievements for display
       };
       
-      console.log('📝 Created student data:', studentData);
-      console.log('🎖️ Student badges:', badgeNames);
-      console.log('🏆 Student achievements:', achievements);
       combined.push(studentData);
     });
     
-    console.log('✅ Final combined data:', combined);
     return combined;
   };
 
@@ -571,12 +554,7 @@ const GamifikasiPage = () => {
           setSaving(false);
           return;
         }
-        console.log('Awarding badge:', {
-          classId: selectedStudent.classId,
-          studentUsername: selectedStudent.username,
-          badgeId: awardForm.badgeId,
-          badgeName: badge.name
-        });
+
         response = await apiRequest('awardBadge', {
           classId: selectedStudent.classId,
           studentUsername: selectedStudent.username,
@@ -584,12 +562,7 @@ const GamifikasiPage = () => {
           badgeName: badge.name
         });
       } else {
-        console.log('Awarding points:', {
-          classId: selectedStudent.classId,
-          studentUsername: selectedStudent.username,
-          points: awardForm.points,
-          reason: awardForm.reason
-        });
+
         response = await apiRequest('awardPoints', {
           classId: selectedStudent.classId,
           studentUsername: selectedStudent.username,
@@ -598,7 +571,7 @@ const GamifikasiPage = () => {
         });
       }
 
-      console.log('Award response:', response);
+
 
       if (response.success) {
         showNotification('success', `Berhasil memberikan ${awardForm.type === 'badge' ? 'badge' : 'poin'} kepada ${selectedStudent.name}`);
@@ -625,20 +598,11 @@ const GamifikasiPage = () => {
 
     setSaving(true);
     try {
-      console.log('Starting bulk badge assignment:', {
-        badge: selectedBadgeForAssign.name,
-        students: selectedStudentsForBadge.length
-      });
+
 
       const promises = selectedStudentsForBadge.map(studentId => {
         const student = students.find(s => s.id === studentId);
         if (student) {
-          console.log('Assigning badge to student:', {
-            classId: student.classId,
-            studentUsername: student.username,
-            badgeId: selectedBadgeForAssign.id.toString(),
-            badgeName: selectedBadgeForAssign.name
-          });
           return apiRequest('awardBadge', {
             classId: student.classId,
             studentUsername: student.username,
@@ -650,7 +614,7 @@ const GamifikasiPage = () => {
       });
 
       const results = await Promise.all(promises);
-      console.log('Bulk assignment results:', results);
+
       
       const successful = results.filter(r => r.success).length;
       const failed = results.filter(r => !r.success);

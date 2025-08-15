@@ -172,7 +172,6 @@ const PresensiPage = () => {
 
   // Real-time statistics calculation from all records
   const calculateRealTimeStats = (records: AttendanceRecord[]) => {
-    console.log('📊 Calculating real-time stats from', records.length, 'total records');
     
     const stats = {
       totalPresent: 0,
@@ -231,7 +230,6 @@ const PresensiPage = () => {
       dateRange
     };
 
-    console.log('📊 Calculated stats:', finalStats);
     return finalStats;
   };
 
@@ -243,7 +241,7 @@ const PresensiPage = () => {
       showNotification('success', 'Data berhasil dimuat');
       
       // Force refresh statistics after initial load
-      console.log('🔄 Force refreshing statistics after initial data load');
+
     } catch (error) {
       console.error('Error fetching initial data:', error);
       showNotification('error', 'Gagal memuat data');
@@ -294,7 +292,7 @@ const PresensiPage = () => {
         
         // Note: We don't update global statistics here anymore
         // Global stats are managed by fetchAllRecords and useEffect
-        console.log('📅 Loaded attendance for', date, ':', response.attendance.length, 'records');
+  
       }
     } catch (error) {
       console.error('Error fetching attendance:', error);
@@ -303,7 +301,7 @@ const PresensiPage = () => {
 
   const fetchAllRecords = async () => {
     try {
-      console.log('📚 Fetching all attendance records...');
+
       const response = await attendanceApi.getAll();
       if (response.success) {
         const allRecords = response.attendance || [];
@@ -326,20 +324,7 @@ const PresensiPage = () => {
             dateRange: calculatedStats.dateRange
           });
           
-          console.log('📊 Global stats updated after fetch:', {
-            totalRecords: calculatedStats.totalRecords,
-            uniqueDates: calculatedStats.uniqueDatesCount,
-            uniqueStudents: calculatedStats.uniqueStudentsCount,
-            dateRange: calculatedStats.dateRange,
-            stats: {
-              present: calculatedStats.totalPresent,
-              sick: calculatedStats.totalSick,
-              permission: calculatedStats.totalPermission,
-              absent: calculatedStats.totalAbsent
-            }
-          });
         } else {
-          console.log('📚 No records found, resetting stats');
           setStats({
             totalPresent: 0,
             totalSick: 0,
@@ -419,7 +404,7 @@ const PresensiPage = () => {
 
     try {
       setIsSaving(true);
-      console.log('💾 Bulk saving attendance data:', attendanceData);
+
       
       const response = await attendanceApi.update(
         selectedClass,
@@ -436,7 +421,7 @@ const PresensiPage = () => {
         // Then refresh current date data for UI display (without overriding stats)
         await fetchAttendanceForDate(selectedClass, formatDateForAPI(selectedDate));
         
-        console.log('✅ Attendance saved and statistics updated');
+
       } else {
         console.error('❌ Failed bulk save:', response.error);
         showNotification('error', 'Gagal menyimpan presensi: ' + response.error);
@@ -481,7 +466,7 @@ const PresensiPage = () => {
     setRecordsPage(1);
     setHasMoreRecords(attendanceRecords.length > recordsPerPage);
     
-    console.log('📊 Initial records loaded:', initialRecords.length, 'of', attendanceRecords.length);
+
   };
 
   const loadMoreRecords = () => {
@@ -501,7 +486,7 @@ const PresensiPage = () => {
         setRecordsPage(nextPage);
         setHasMoreRecords(endIndex < attendanceRecords.length);
         
-        console.log('📊 More records loaded:', newRecords.length, 'total displayed:', displayedRecords.length + newRecords.length);
+  
       } else {
         setHasMoreRecords(false);
       }
@@ -540,8 +525,7 @@ const PresensiPage = () => {
 
   // Auto-refresh statistics whenever attendance records change
   useEffect(() => {
-    console.log('📊 Attendance records changed, auto-refreshing stats...');
-    console.log('📊 Current attendanceRecords length:', attendanceRecords.length);
+
     
     if (attendanceRecords.length > 0) {
       const calculatedStats = calculateRealTimeStats(attendanceRecords);

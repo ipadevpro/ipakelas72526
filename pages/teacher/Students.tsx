@@ -140,29 +140,16 @@ const StudentsPage = () => {
 
   const debugStudentData = async () => {
     try {
-      console.log('🔍 Debug: Current students in state:', students);
-      
       const response = await studentsApi.getAll();
-      console.log('🔍 Debug: Raw API response:', response);
       
       if (response.success && response.students) {
-        console.log('🔍 Debug: Raw students data:', response.students);
-        
-        response.students.forEach((student: any, index: number) => {
-          console.log(`🔍 Debug: Student ${index + 1}:`, {
-            id: student.id,
-            studentUsername: student.studentUsername,
-            username: student.username,
-            fullName: student.fullName,
-            classId: student.classId,
-            raw: student
-          });
-        });
+        // Only log summary for debugging
+        console.log(`Debug: Found ${response.students.length} students`);
       }
       
       showNotification('success', 'Data siswa telah dicetak ke console. Buka Developer Tools untuk melihat.');
     } catch (error) {
-      console.error('🔍 Debug error:', error);
+      console.error('Debug error:', error);
       showNotification('error', 'Terjadi kesalahan saat debugging');
     }
   };
