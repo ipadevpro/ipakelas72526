@@ -4,6 +4,7 @@ import { Plus, Search, Medal, Trophy, Star, Zap, Target, Users, BarChart, Pencil
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { gamificationApi, badgeApi, levelApi, challengeApi, apiRequest } from '@/lib/api';
+import { processGamificationData, calculateLevelFromPoints } from '@/lib/gamification';
 import React from 'react';
 
 interface GamificationRecord {
@@ -384,7 +385,7 @@ const GamifikasiPage = () => {
         if (createResponse.success) {
           // Try fetching students again
           const retryResponse = await apiRequest('getStudentsFromSheet', {});
-          console.log('🔄 Retry students response:', retryResponse);
+    
           
           if (retryResponse.success && gamificationResponse.success) {
             const combinedData = combineStudentsWithGamification(
@@ -417,38 +418,8 @@ const GamifikasiPage = () => {
   };
 
   const combineStudentsWithGamification = (studentsFromSheet: any[], gamificationData: GamificationRecord[]): StudentData[] => {
-    const combined: StudentData[] = [];
-    
-    studentsFromSheet.forEach(student => {
-      
-      const gamificationRecord = gamificationData.find(
-        g => g.studentUsername === student.username && g.classId === student.classId
-      );
-      
-      // Parse badges from the badges field (comma-separated badge names)
-      const badgeNames = gamificationRecord?.badges ? 
-        gamificationRecord.badges.split(',').filter(b => b.trim()).map(b => b.trim()) : [];
-      
-      // Parse achievements from the achievements field
-      const achievements = gamificationRecord?.achievements ? 
-        gamificationRecord.achievements.split(',').filter(a => a.trim()).map(a => a.trim()) : [];
-      
-      const studentData = {
-        id: `${student.classId}-${student.username}`,
-        name: student.fullName || student.username,
-        username: student.username,
-        class: student.class || 'Unknown Class',
-        classId: student.classId,
-        points: gamificationRecord?.points || 0,
-        level: gamificationRecord?.level || 1,
-        badges: badgeNames.length, // Count of badges
-        achievements: [...badgeNames, ...achievements] // Combine badges and achievements for display
-      };
-      
-      combined.push(studentData);
-    });
-    
-    return combined;
+    // Use unified gamification processing for consistency
+    return processGamificationData(studentsFromSheet, gamificationData);
   };
 
   const refreshData = async () => {
@@ -561,14 +532,29 @@ const GamifikasiPage = () => {
           badgeId: awardForm.badgeId,
           badgeName: badge.name
         });
+        
+        // Auto-update level based on badge points if badge was awarded successfully
+        if (response.success && response.newTotal) {
+          const newLevel = calculateLevelFromPoints(response.newTotal);
+          if (newLevel > selectedStudent.level) {
+            await gamificationApi.updateLevel(selectedStudent.classId, selectedStudent.username, newLevel);
+          }
+        }
       } else {
-
         response = await apiRequest('awardPoints', {
           classId: selectedStudent.classId,
           studentUsername: selectedStudent.username,
           points: awardForm.points,
           reason: awardForm.reason
         });
+        
+        // Auto-update level based on new points total if points were awarded successfully
+        if (response.success && response.newTotal) {
+          const newLevel = calculateLevelFromPoints(response.newTotal);
+          if (newLevel > selectedStudent.level) {
+            await gamificationApi.updateLevel(selectedStudent.classId, selectedStudent.username, newLevel);
+          }
+        }
       }
 
 
@@ -600,15 +586,25 @@ const GamifikasiPage = () => {
     try {
 
 
-      const promises = selectedStudentsForBadge.map(studentId => {
+      const promises = selectedStudentsForBadge.map(async (studentId) => {
         const student = students.find(s => s.id === studentId);
         if (student) {
-          return apiRequest('awardBadge', {
+          const result = await apiRequest('awardBadge', {
             classId: student.classId,
             studentUsername: student.username,
             badgeId: selectedBadgeForAssign.id.toString(),
             badgeName: selectedBadgeForAssign.name
           });
+          
+          // Auto-update level if badge was awarded successfully
+          if (result.success && result.newTotal) {
+            const newLevel = calculateLevelFromPoints(result.newTotal);
+            if (newLevel > student.level) {
+              await gamificationApi.updateLevel(student.classId, student.username, newLevel);
+            }
+          }
+          
+          return result;
         }
         return Promise.resolve({ success: false, error: 'Student not found' });
       });
@@ -622,7 +618,7 @@ const GamifikasiPage = () => {
       if (successful > 0) {
         showNotification('success', `Badge berhasil diberikan kepada ${successful} siswa`);
         if (failed.length > 0) {
-          console.log('Failed assignments:', failed);
+    
           showNotification('warning', `${failed.length} siswa gagal menerima badge`);
         }
         await fetchStudents();
@@ -740,10 +736,7 @@ const GamifikasiPage = () => {
   };
 
   const openBadgeAssignModal = (badge: Badge) => {
-    console.log('🎁 Opening badge assign modal for:', badge.name);
-    console.log('📊 Current students data:', students);
-    console.log('🏫 Available classes:', uniqueClasses);
-    console.log('📈 Available levels:', uniqueLevels);
+
     
     // Check if we have student data
     if (students.length === 0) {
@@ -784,21 +777,18 @@ const GamifikasiPage = () => {
   };
 
   const getFilteredStudentsForAssignment = () => {
-    console.log('🔍 Filtering students for assignment...');
-    console.log('📊 Total students:', students.length);
-    console.log('🏫 Class filter:', classFilter);
-    console.log('📈 Level filter:', levelFilter);
+
     
     const filtered = students.filter(student => {
       const matchesClass = classFilter === 'all' || student.classId === classFilter;
       const matchesLevel = levelFilter === 'all' || student.level.toString() === levelFilter;
       
-      console.log(`👤 Student ${student.name} (${student.classId}): class match=${matchesClass}, level match=${matchesLevel}`);
+
       
       return matchesClass && matchesLevel;
     });
     
-    console.log('✅ Filtered students:', filtered);
+
     return filtered;
   };
 
@@ -821,7 +811,7 @@ const GamifikasiPage = () => {
 
   // Get unique values for filters
   const uniqueClasses = React.useMemo(() => {
-    console.log('🏫 Generating unique classes from students:', students);
+
     
     const classMap = new Map();
     students.forEach(student => {
@@ -834,13 +824,13 @@ const GamifikasiPage = () => {
     });
     
     const classes = Array.from(classMap.values());
-    console.log('📚 Unique classes generated:', classes);
+
     return classes;
   }, [students]);
 
   const uniqueLevels = React.useMemo(() => {
     const levels = [...new Set(students.map(s => s.level))].sort((a, b) => a - b);
-    console.log('📊 Unique levels generated:', levels);
+
     return levels;
   }, [students]);
 
@@ -1365,24 +1355,12 @@ const GamifikasiPage = () => {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredStudents.map((student) => {
                         // Get badges earned by this student
-                        console.log(`🔍 Mapping badges for ${student.name}:`, {
-                          achievements: student.achievements,
-                          availableBadges: badges.map(b => ({ id: b.id, name: b.name }))
-                        });
-                        
                         const studentBadges = student.achievements
                           .map(badgeName => {
                             const badge = badges.find(b => b.name === badgeName);
-                            if (!badge) {
-                              console.log(`❌ Badge not found: "${badgeName}" for ${student.name}`);
-                            } else {
-                              console.log(`✅ Badge found: "${badgeName}" for ${student.name}`);
-                            }
                             return badge;
                           })
                           .filter(Boolean) as Badge[];
-
-                        console.log(`🎖️ Final badges for ${student.name}:`, studentBadges.map(b => b.name));
 
                         return (
                           <motion.tr 

@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Award, Users, Star, Crown, Sword, Sparkles, Map, Compass, Castle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, hasSessionCredentials, refreshSessionCredentials } from '@/lib/api';
+import { 
+  calculateLevelFromPoints, 
+  calculateXPToNextLevel, 
+  processLeaderboardData, 
+  getCurrentUserStats 
+} from '@/lib/gamification';
 
 interface StudentStats {
   points: number;
@@ -163,36 +169,18 @@ const StudentDashboard = () => {
         
 
         
-        // Calculate leaderboard with proper sorting
-        const leaderboardData = gamificationData
-          .filter((entry: any) => entry.studentUsername && (entry.points || entry.points === 0))
-          .map((entry: any) => {
-            const student = studentsData.find((s: any) => s.username === entry.studentUsername);
-            return {
-              username: entry.studentUsername,
-              fullName: student?.fullName || entry.studentUsername,
-              points: parseInt(entry.points) || 0,
-              level: parseInt(entry.level) || 1,
-              badges: entry.badges ? 
-                entry.badges.split(',').filter((b: string) => b.trim()).length : 0
-            };
-          })
-          .sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.points - a.points);
-        
+        // Use unified gamification processing
+        const leaderboardData = processLeaderboardData(gamificationData, studentsData);
         setLeaderboard(leaderboardData.slice(0, 10));
         
-        // Calculate user rank
-        const userRank = leaderboardData.findIndex((entry: LeaderboardEntry) => entry.username === user.username) + 1;
-        
-        // Calculate user stats with real data
-        const userBadges = currentUserData?.badges ? 
-          currentUserData.badges.split(',').filter((b: string) => b.trim()) : [];
+        // Get current user's gamification stats with unified logic
+        const currentUserGameStats = getCurrentUserStats(gamificationData, user.username);
         
         const userStats = {
-          points: parseInt(currentUserData?.points) || 0,
-          level: parseInt(currentUserData?.level) || 1,
-          badges: userBadges,
-          rank: userRank || (leaderboardData.length + 1),
+          points: currentUserGameStats?.points || 0,
+          level: currentUserGameStats?.level || 1,
+          badges: currentUserGameStats?.badges || [],
+          rank: currentUserGameStats?.rank || (leaderboardData.length + 1),
           totalStudents: studentsData.length,
           attendance: realAttendanceRate,
           averageGrade: realAverageGrade,
@@ -277,13 +265,16 @@ const StudentDashboard = () => {
     const hpMultiplier = stats.level * 20;
     const mpMultiplier = stats.level * 15;
     
+    // Use unified XP calculation for progress bar
+    const xpProgress = calculateXPToNextLevel(stats.points);
+    
     return {
       hp: Math.min(baseHp + hpMultiplier, (baseHp + hpMultiplier) * (stats.attendance / 100)),
       maxHp: baseHp + hpMultiplier,
       mp: Math.min(baseMp + mpMultiplier, (baseMp + mpMultiplier) * (stats.averageGrade / 100)),
       maxMp: baseMp + mpMultiplier,
-      exp: stats.points % 1000,
-      expToNext: 1000,
+      exp: xpProgress.currentLevelXP,
+      expToNext: xpProgress.nextLevelXP,
       attack: Math.floor(stats.completedAssignments * 2 + stats.level * 3),
       defense: Math.floor(stats.attendance / 10 + stats.level * 2),
       intelligence: Math.floor(stats.averageGrade / 5 + stats.level * 2),

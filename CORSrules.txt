@@ -1,0 +1,66 @@
+
+Teknik Bypass CORS: Google Apps Script (GAS) Web App + GitHub Pages
+
+=============================================
+1. FRONTEND (GitHub Pages / HTML + JS)
+=============================================
+
+- Gunakan fetch POST sederhana dengan body tipe "application/x-www-form-urlencoded".
+  Jangan pakai raw JSON atau custom header.
+  
+Contoh:
+fetch(URL, {
+  method: "POST",
+  body: new URLSearchParams({
+    action: "getInventaris",
+    username: "nama_user",
+    password: "password_user"
+  })
+})
+
+- Jangan set header "Content-Type" ke "application/json"
+- Jangan pakai custom headers (seperti Authorization, X-Requested-With, dsb)
+
+=============================================
+2. BACKEND (Google Apps Script)
+=============================================
+
+- Gunakan fungsi doPost(e) untuk menerima request POST.
+
+Contoh:
+function doPost(e) {
+  const action = e.parameter.action;
+  const username = e.parameter.username;
+  const password = e.parameter.password;
+  // proses aksi berdasarkan parameter
+}
+
+- Ambil data dari e.parameter, bukan dari e.postData.contents kecuali untuk data besar (JSON string)
+- Tidak perlu set header CORS manual (tidak perlu setHeader("Access-Control-Allow-Origin", "*"))
+
+=============================================
+3. DEPLOYMENT SETTING (GAS Web App)
+=============================================
+
+- Saat klik "Deploy" > "Manage Deployments":
+  - Execute As: **Me (pemilik script)**
+  - Access: **Anyone (even anonymous)**
+
+=============================================
+4. KENAPA BERHASIL?
+=============================================
+
+Karena:
+- Body POST sederhana (x-www-form-urlencoded)
+- Tidak memicu preflight OPTIONS
+- Tidak ada custom headers
+- Google secara otomatis izinkan CORS untuk request sederhana
+
+=============================================
+5. CATATAN TAMBAHAN
+=============================================
+
+- Jika pakai application/json atau Authorization Header => HARUS tangani CORS manual dan OPTIONS
+- Jika ingin aman dan ringan, tetap gunakan URLSearchParams
+
+=============================================

@@ -150,7 +150,7 @@ const NilaiPage = () => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      console.log('=== FETCHING INITIAL DATA ===');
+  
       
       // Fetch all necessary data
       await Promise.all([
@@ -160,7 +160,7 @@ const NilaiPage = () => {
         fetchGrades()
       ]);
       
-      console.log('=== INITIAL DATA FETCH COMPLETE ===');
+
     } catch (err) {
       console.error('Error in fetchInitialData:', err);
       setError('Gagal mengambil data. Silakan refresh halaman.');
@@ -171,12 +171,9 @@ const NilaiPage = () => {
 
   const fetchClasses = async () => {
     try {
-      console.log('Fetching classes...');
-      const response = await classApi.getAll();
-      console.log('Classes API response:', response);
-      if (response.success) {
-        setClasses(response.classes || []);
-        console.log('Classes set to state:', response.classes);
+          const response = await classApi.getAll();
+    if (response.success) {
+      setClasses(response.classes || []);
       } else {
         console.error('Failed to fetch classes:', response.error);
       }
@@ -187,12 +184,9 @@ const NilaiPage = () => {
 
   const fetchAssignments = async () => {
     try {
-      console.log('Fetching assignments...');
-      const response = await assignmentApi.getAll();
-      console.log('Assignments API response:', response);
-      if (response.success) {
-        setAssignments(response.assignments || []);
-        console.log('Assignments set to state:', response.assignments);
+          const response = await assignmentApi.getAll();
+    if (response.success) {
+      setAssignments(response.assignments || []);
       } else {
         console.error('Failed to fetch assignments:', response.error);
       }

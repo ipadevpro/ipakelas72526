@@ -530,12 +530,7 @@ const PresensiPage = () => {
     if (attendanceRecords.length > 0) {
       const calculatedStats = calculateRealTimeStats(attendanceRecords);
       
-      console.log('📊 Setting new global stats:', {
-        totalPresent: calculatedStats.totalPresent,
-        totalSick: calculatedStats.totalSick,
-        totalPermission: calculatedStats.totalPermission,
-        totalAbsent: calculatedStats.totalAbsent
-      });
+
       
       setStats({
         totalPresent: calculatedStats.totalPresent,
@@ -551,9 +546,7 @@ const PresensiPage = () => {
         dateRange: calculatedStats.dateRange
       });
       
-      console.log('✅ Global statistics updated successfully');
     } else {
-      console.log('📊 No records found, resetting stats to zero');
       setStats({
         totalPresent: 0,
         totalSick: 0,
@@ -573,7 +566,7 @@ const PresensiPage = () => {
   // Update statistics when class selection changes (not for initial load)
   useEffect(() => {
     if (attendanceRecords.length > 0 && selectedClass) {
-      console.log('📊 Class selection changed, updating stats for class:', selectedClass);
+
       // Statistics will be calculated in the component render
     }
   }, [selectedClass]);
@@ -581,7 +574,7 @@ const PresensiPage = () => {
   // Auto-refresh records when switching to records tab
   useEffect(() => {
     if (activeTab === 'records') {
-      console.log('📋 Switched to records tab, ensuring data is fresh...');
+
       // Only fetch if we don't have recent data
       if (attendanceRecords.length === 0) {
         fetchAllRecords();
