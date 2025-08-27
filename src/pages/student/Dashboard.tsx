@@ -41,6 +41,76 @@ interface RPGStats {
   wisdom: number;
 }
 
+interface AssignmentGrade {
+  assignmentId: string;
+  assignmentTitle: string;
+  assignmentDescription?: string;
+  dueDate?: string;
+  maxPoints: number;
+  score: number;
+  feedback?: string;
+  submittedAt?: string;
+  status: 'completed' | 'late' | 'missing';
+}
+
+// Helper function to process assignment grades
+const processAssignmentGrades = (
+  assignments: any[], 
+  grades: any[], 
+  username: string
+): AssignmentGrade[] => {
+  const assignmentGrades: AssignmentGrade[] = [];
+  
+  // Get user's grades
+  const userGrades = grades.filter((grade: any) => grade.studentUsername === username);
+  
+  // Process each assignment
+  assignments.forEach((assignment: any) => {
+    // Find grade for this assignment
+    const grade = userGrades.find((g: any) => 
+      g.assignmentId === assignment.id || 
+      g.assignment === assignment.title ||
+      g.assignmentTitle === assignment.title
+    );
+    
+    if (grade) {
+      // Parse score from various possible fields
+      const score = parseFloat(grade.points) || parseFloat(grade.value) || parseFloat(grade.score) || 0;
+      const maxPoints = parseFloat(assignment.maxPoints) || parseFloat(assignment.points) || 100;
+      
+      // Determine status based on score and due date
+      let status: 'completed' | 'late' | 'missing' = 'completed';
+      if (assignment.dueDate && grade.submittedAt) {
+        const dueDate = new Date(assignment.dueDate);
+        const submittedDate = new Date(grade.submittedAt);
+        if (submittedDate > dueDate) {
+          status = 'late';
+        }
+      }
+      
+      assignmentGrades.push({
+        assignmentId: assignment.id || assignment.assignmentId || '',
+        assignmentTitle: assignment.title || assignment.name || 'Tugas',
+        assignmentDescription: assignment.description,
+        dueDate: assignment.dueDate,
+        maxPoints: maxPoints,
+        score: score,
+        feedback: grade.feedback,
+        submittedAt: grade.submittedAt,
+        status: status
+      });
+    }
+  });
+  
+  // Sort by submission date (newest first) or by assignment title
+  return assignmentGrades.sort((a, b) => {
+    if (a.submittedAt && b.submittedAt) {
+      return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+    }
+    return a.assignmentTitle.localeCompare(b.assignmentTitle);
+  });
+};
+
 const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -58,6 +128,7 @@ const StudentDashboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [availableBadges, setAvailableBadges] = useState<any[]>([]);
+  const [assignmentGrades, setAssignmentGrades] = useState<AssignmentGrade[]>([]);
   
   useEffect(() => {
     // Add delay to ensure session is properly initialized
@@ -165,6 +236,13 @@ const StudentDashboard = () => {
         
         const realCompletedAssignments = Math.max(uniqueAssignments.size, userAssignmentGrades.length);
         
+        // Process assignment grades for detailed view
+        const processedAssignmentGrades = processAssignmentGrades(
+          assignmentsData, 
+          gradesData, 
+          user.username
+        );
+        setAssignmentGrades(processedAssignmentGrades);
 
         
 
@@ -577,6 +655,173 @@ const StudentDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Assignment Grades Detail */}
+        {assignmentGrades.length > 0 && (
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
+            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <Award className="w-6 h-6 text-blue-400" />
+              Nilai Tugas 📝
+              <span className="ml-auto text-sm bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full border border-blue-500/30">
+                {assignmentGrades.length} Tugas
+              </span>
+            </h2>
+            
+            <div className="grid gap-4">
+              {assignmentGrades.map((assignment, index) => {
+                const percentage = Math.round((assignment.score / assignment.maxPoints) * 100);
+                const getGradeColor = (percentage: number) => {
+                  if (percentage >= 90) return 'from-green-500 to-emerald-500';
+                  if (percentage >= 80) return 'from-blue-500 to-cyan-500';
+                  if (percentage >= 70) return 'from-yellow-500 to-orange-500';
+                  if (percentage >= 60) return 'from-orange-500 to-red-500';
+                  return 'from-red-500 to-pink-500';
+                };
+                
+                const getStatusIcon = (status: string) => {
+                  switch (status) {
+                    case 'completed': return '✅';
+                    case 'late': return '⏰';
+                    case 'missing': return '❌';
+                    default: return '📝';
+                  }
+                };
+                
+                const getStatusText = (status: string) => {
+                  switch (status) {
+                    case 'completed': return 'Selesai';
+                    case 'late': return 'Terlambat';
+                    case 'missing': return 'Belum Dikerjakan';
+                    default: return 'Unknown';
+                  }
+                };
+
+                return (
+                  <div 
+                    key={assignment.assignmentId || index}
+                    className="bg-slate-700/30 rounded-xl p-5 border border-slate-600/50 hover:bg-slate-700/50 transition-all duration-300 hover:border-purple-500/50"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      {/* Assignment Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="text-2xl">{getStatusIcon(assignment.status)}</div>
+                          <div>
+                            <h3 className="text-lg font-bold text-white truncate">
+                              {assignment.assignmentTitle}
+                            </h3>
+                            <div className="flex items-center gap-4 text-sm text-slate-400">
+                              <span>{getStatusText(assignment.status)}</span>
+                              {assignment.dueDate && (
+                                <span>Due: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
+                              )}
+                              {assignment.submittedAt && (
+                                <span>Dikerjakan: {new Date(assignment.submittedAt).toLocaleDateString('id-ID')}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {assignment.assignmentDescription && (
+                          <p className="text-sm text-slate-300 mb-3 line-clamp-2">
+                            {assignment.assignmentDescription}
+                          </p>
+                        )}
+                        
+                        {assignment.feedback && (
+                          <div className="bg-slate-800/50 rounded-lg p-3 mb-3">
+                            <p className="text-xs text-slate-400 mb-1">💬 Feedback:</p>
+                            <p className="text-sm text-slate-300">{assignment.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Score Display */}
+                      <div className="flex flex-col items-center lg:items-end gap-3">
+                        <div className="text-center lg:text-right">
+                          <div className="text-3xl font-bold text-white mb-1">
+                            {assignment.score}
+                          </div>
+                          <div className="text-sm text-slate-400">
+                            dari {assignment.maxPoints}
+                          </div>
+                        </div>
+                        
+                        {/* Percentage Circle */}
+                        <div className="relative w-16 h-16">
+                          <svg className="w-16 h-16 transform -rotate-90">
+                            <circle
+                              cx="32"
+                              cy="32"
+                              r="28"
+                              stroke="rgb(51 65 85)"
+                              strokeWidth="4"
+                              fill="transparent"
+                            />
+                            <circle
+                              cx="32"
+                              cy="32"
+                              r="28"
+                              stroke={percentage >= 90 ? '#10b981' : percentage >= 80 ? '#3b82f6' : percentage >= 70 ? '#f59e0b' : percentage >= 60 ? '#f97316' : '#ef4444'}
+                              strokeWidth="4"
+                              fill="transparent"
+                              strokeDasharray={`${2 * Math.PI * 28}`}
+                              strokeDashoffset={`${2 * Math.PI * 28 * (1 - percentage / 100)}`}
+                              style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">
+                              {percentage}%
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Grade Badge */}
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${getGradeColor(percentage)} text-white`}>
+                          {percentage >= 90 ? 'A' : 
+                           percentage >= 80 ? 'B' : 
+                           percentage >= 70 ? 'C' : 
+                           percentage >= 60 ? 'D' : 'E'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Assignment Summary */}
+            <div className="mt-6 pt-6 border-t border-slate-600/50">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div className="bg-slate-700/30 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-green-400">
+                    {assignmentGrades.filter(a => a.status === 'completed').length}
+                  </div>
+                  <div className="text-xs text-slate-400">Selesai Tepat Waktu</div>
+                </div>
+                <div className="bg-slate-700/30 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-yellow-400">
+                    {assignmentGrades.filter(a => a.status === 'late').length}
+                  </div>
+                  <div className="text-xs text-slate-400">Terlambat</div>
+                </div>
+                <div className="bg-slate-700/30 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-blue-400">
+                    {Math.round(assignmentGrades.reduce((sum, a) => sum + (a.score / a.maxPoints * 100), 0) / assignmentGrades.length)}%
+                  </div>
+                  <div className="text-xs text-slate-400">Rata-rata</div>
+                </div>
+                <div className="bg-slate-700/30 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-purple-400">
+                    {assignmentGrades.reduce((sum, a) => sum + a.score, 0)}
+                  </div>
+                  <div className="text-xs text-slate-400">Total Poin</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Trophy Collection */}
         {stats.badges.length > 0 ? (
