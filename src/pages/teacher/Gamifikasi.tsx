@@ -1353,7 +1353,7 @@ const GamifikasiPage = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredStudents.map((student) => {
+                      {filteredStudents.map((student, index) => {
                         // Get badges earned by this student
                         const studentBadges = student.achievements
                           .map(badgeName => {
@@ -1364,7 +1364,7 @@ const GamifikasiPage = () => {
 
                         return (
                           <motion.tr 
-                            key={student.id} 
+                            key={`${student.id}-${index}`} 
                             className="hover:bg-gray-50"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}

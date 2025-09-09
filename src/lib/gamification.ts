@@ -80,7 +80,16 @@ export const processGamificationData = (
   studentsFromSheet: any[], 
   gamificationData: GamificationData[]
 ): ProcessedStudentData[] => {
-  return studentsFromSheet.map(student => {
+  // Deduplicate students based on classId + username to prevent duplicate keys
+  const uniqueStudents = studentsFromSheet.reduce((acc: any[], student: any) => {
+    const key = `${student.classId || 'no-class'}-${student.username}`;
+    if (!acc.some(s => `${s.classId || 'no-class'}-${s.username}` === key)) {
+      acc.push(student);
+    }
+    return acc;
+  }, []);
+
+  const processedStudents = uniqueStudents.map(student => {
     const gamificationRecord = gamificationData.find(
       g => g.studentUsername === student.username && g.classId === student.classId
     );
@@ -104,7 +113,7 @@ export const processGamificationData = (
       gamificationRecord.achievements.split(',').filter(a => a.trim()).map(a => a.trim()) : [];
     
     return {
-      id: `${student.classId}-${student.username}`,
+      id: `${student.classId || 'no-class'}-${student.username}`,
       name: student.fullName || student.username,
       username: student.username,
       class: student.class || 'Unknown Class',
@@ -115,6 +124,15 @@ export const processGamificationData = (
       achievements: [...badgeNames, ...achievements] // Combine badges and achievements for display
     };
   });
+
+  // Check for duplicate IDs and log warning if found
+  const ids = processedStudents.map(s => s.id);
+  const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+  if (duplicateIds.length > 0) {
+    console.warn('⚠️ Duplicate student IDs detected:', duplicateIds);
+  }
+
+  return processedStudents;
 };
 
 // Process leaderboard data with consistent logic

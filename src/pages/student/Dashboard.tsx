@@ -126,6 +126,8 @@ const StudentDashboard = () => {
     completedAssignments: 0
   });
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [classLeaderboard, setClassLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [showClassLeaderboard, setShowClassLeaderboard] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [availableBadges, setAvailableBadges] = useState<any[]>([]);
   const [assignmentGrades, setAssignmentGrades] = useState<AssignmentGrade[]>([]);
@@ -251,6 +253,29 @@ const StudentDashboard = () => {
         const leaderboardData = processLeaderboardData(gamificationData, studentsData);
         setLeaderboard(leaderboardData.slice(0, 10));
         
+        // Process class-based leaderboard if user has classId
+        if (user.classId) {
+          // Filter gamification data for current user's class
+          const classGamificationData = gamificationData.filter((entry: any) => {
+            // Find student data to get their classId
+            const student = studentsData.find((s: any) => s.username === entry.studentUsername);
+            return student && student.classId === user.classId;
+          });
+          
+          // Filter students data for current user's class
+          const classStudentsData = studentsData.filter((student: any) => 
+            student.classId === user.classId
+          );
+          
+          const classLeaderboardData = processLeaderboardData(classGamificationData, classStudentsData);
+          setClassLeaderboard(classLeaderboardData.slice(0, 10));
+          
+          console.log(`🏫 Class leaderboard loaded: ${classLeaderboardData.length} students in class ${user.classId}`);
+        } else {
+          console.log('⚠️ User has no classId, class leaderboard not available');
+          setClassLeaderboard([]);
+        }
+        
         // Get current user's gamification stats with unified logic
         const currentUserGameStats = getCurrentUserStats(gamificationData, user.username);
         
@@ -363,6 +388,24 @@ const StudentDashboard = () => {
   const characterClass = getCharacterClass(stats.level, stats.averageGrade);
   const rpgStats = getRPGStats();
   
+  // Dynamic rank calculation based on current leaderboard view
+  const getCurrentDisplayRank = () => {
+    if (showClassLeaderboard && classLeaderboard.length > 0) {
+      const userInClassRank = classLeaderboard.findIndex(student => student.username === userInfo?.username);
+      return userInClassRank >= 0 ? userInClassRank + 1 : classLeaderboard.length + 1;
+    }
+    return stats.rank;
+  };
+
+  const getCurrentLeaderboardContext = () => {
+    if (showClassLeaderboard && classLeaderboard.length > 0) {
+      // Try to get class name from user info if available
+      const className = userInfo?.className || userInfo?.class || 'Kelas';
+      return `di ${className} (${classLeaderboard.length} siswa)`;
+    }
+    return `di Kerajaan (${stats.totalStudents} siswa)`;
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-4">
@@ -434,7 +477,7 @@ const StudentDashboard = () => {
                       {characterClass.name}
                     </span>
                     <span className="text-purple-300">
-                      Ranking #{stats.rank > 0 ? stats.rank : '?'} di Kerajaan
+                      Ranking #{getCurrentDisplayRank() > 0 ? getCurrentDisplayRank() : '?'} {getCurrentLeaderboardContext()}
                     </span>
                   </div>
                   <p className="text-purple-200">
@@ -527,14 +570,52 @@ const StudentDashboard = () => {
 
           {/* Guild Rankings (Leaderboard) */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-yellow-400" />
-              Hall of Fame 🏰
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Trophy className="w-6 h-6 text-yellow-400" />
+                Hall of Fame 🏰
+              </h2>
+              
+              {/* Toggle between Global and Class leaderboard */}
+              {classLeaderboard.length > 0 && (
+                <div className="flex bg-slate-700/50 rounded-lg p-1 border border-purple-500/30">
+                  <button
+                    onClick={() => setShowClassLeaderboard(false)}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                      !showClassLeaderboard
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : 'text-purple-300 hover:text-white hover:bg-purple-700/50'
+                    }`}
+                  >
+                    🌍 Global
+                  </button>
+                  <button
+                    onClick={() => setShowClassLeaderboard(true)}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                      showClassLeaderboard
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : 'text-purple-300 hover:text-white hover:bg-purple-700/50'
+                    }`}
+                  >
+                    🏫 Kelas
+                  </button>
+                </div>
+              )}
+            </div>
             
-            {leaderboard.length > 0 ? (
-              <div className="space-y-3">
-                {leaderboard.slice(0, 8).map((student, index) => (
+            {(showClassLeaderboard ? classLeaderboard : leaderboard).length > 0 ? (
+              <div>
+                {/* Leaderboard scope indicator */}
+                <div className="mb-4 text-center">
+                  <span className="text-xs text-purple-300 bg-purple-900/30 px-2 py-1 rounded-full border border-purple-500/30">
+                    {showClassLeaderboard 
+                      ? `🏫 Ranking Kelas (${classLeaderboard.length} siswa)`
+                      : `🌍 Ranking Global (${leaderboard.length} siswa)`}
+                  </span>
+                </div>
+                
+                <div className="space-y-3">
+                  {(showClassLeaderboard ? classLeaderboard : leaderboard).slice(0, 8).map((student, index) => (
                   <div 
                     key={student.username}
                     className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-102 ${
@@ -563,12 +644,17 @@ const StudentDashboard = () => {
                       <span className="text-sm font-bold">{student.badges}</span>
                     </div>
                   </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-center py-8">
                 <Castle className="w-12 h-12 mx-auto mb-4 text-slate-400" />
-                <p className="text-slate-400">Hall of Fame lagi kosong nih...</p>
+                <p className="text-slate-400">
+                  {showClassLeaderboard 
+                    ? 'Hall of Fame kelas lagi kosong nih...' 
+                    : 'Hall of Fame lagi kosong nih...'}
+                </p>
               </div>
             )}
             
