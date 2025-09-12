@@ -131,6 +131,10 @@ const StudentDashboard = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [availableBadges, setAvailableBadges] = useState<any[]>([]);
   const [assignmentGrades, setAssignmentGrades] = useState<AssignmentGrade[]>([]);
+  const [showProgressMap, setShowProgressMap] = useState(false);
+  const [showClassmates, setShowClassmates] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [classmates, setClassmates] = useState<any[]>([]);
   
   useEffect(() => {
     // Add delay to ensure session is properly initialized
@@ -246,6 +250,24 @@ const StudentDashboard = () => {
         );
         setAssignmentGrades(processedAssignmentGrades);
 
+        // Load classmates data
+        if (user.classId && studentsData.length > 0) {
+          const classmatesData = studentsData
+            .filter((student: any) => student.classId === user.classId && student.username !== user.username)
+            .map((student: any) => {
+              const studentGameData = gamificationData.find((g: any) => g.studentUsername === student.username);
+              return {
+                ...student,
+                points: studentGameData?.points || 0,
+                level: studentGameData?.level || 1,
+                badges: studentGameData?.badges || []
+              };
+            })
+            .sort((a: any, b: any) => b.points - a.points);
+          
+          setClassmates(classmatesData);
+        }
+
         
 
         
@@ -352,6 +374,18 @@ const StudentDashboard = () => {
   const handleRefresh = () => {
     loadDashboardData(true);
   };
+
+  const handleProgressMap = () => {
+    setShowProgressMap(true);
+  };
+
+  const handleClassmates = () => {
+    setShowClassmates(true);
+  };
+
+  const handleAchievements = () => {
+    setShowAchievements(true);
+  };
   
   const getCharacterClass = (level: number, averageGrade: number) => {
     if (level >= 10 && averageGrade >= 90) return { name: 'Archmage', icon: '🧙‍♂️', color: 'from-purple-600 to-indigo-800' };
@@ -408,16 +442,16 @@ const StudentDashboard = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="relative mb-6">
+            <div className="animate-spin w-16 h-16 border-3 border-purple-500/20 border-t-purple-500 rounded-full mx-auto"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-purple-400" />
             </div>
           </div>
-          <p className="text-white font-bold text-lg">⚡ Lagi loading nih...</p>
-          <p className="text-purple-300 text-sm mt-2">Bentar ya, data lagi di-sync ✨</p>
+          <h2 className="text-xl font-semibold text-white mb-2">Loading dashboard ✨</h2>
+          <p className="text-purple-300 text-sm">Tunggu sebentar ya...</p>
         </div>
       </div>
     );
@@ -455,15 +489,14 @@ const StudentDashboard = () => {
 
       <div className="relative z-10 space-y-6 p-4 sm:p-6 lg:p-8">
         {/* Character Profile Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-8 text-white border border-purple-500/30">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20"></div>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-6 text-white border border-purple-500/20">
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex items-center gap-6">
                 {/* Character Avatar */}
-                <div className={`relative w-24 h-24 rounded-full bg-gradient-to-br ${characterClass.color} flex items-center justify-center text-4xl border-4 border-white/30 shadow-2xl`}>
+                <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br ${characterClass.color} flex items-center justify-center text-3xl border-2 border-white/20`}>
                   {characterClass.icon}
-                  <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">
+                  <div className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-medium px-1.5 py-0.5 rounded-full">
                     {stats.level}
                   </div>
                 </div>
@@ -491,13 +524,13 @@ const StudentDashboard = () => {
               {/* Quick Stats */}
               <div className="flex gap-4">
                 <div className="text-center bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <Crown className="w-6 h-6 mx-auto mb-1 text-yellow-400" />
-                  <div className="text-2xl font-bold">{stats.points.toLocaleString()}</div>
+                  <Crown className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
+                  <div className="text-xl font-bold">{stats.points.toLocaleString()}</div>
                   <div className="text-xs text-purple-300">Total XP</div>
                 </div>
                 <div className="text-center bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <Award className="w-6 h-6 mx-auto mb-1 text-orange-400" />
-                  <div className="text-2xl font-bold">{stats.badges.length}</div>
+                  <Award className="w-5 h-5 mx-auto mb-1 text-orange-400" />
+                  <div className="text-xl font-bold">{stats.badges.length}</div>
                   <div className="text-xs text-purple-300">Trofi</div>
                 </div>
               </div>
@@ -614,34 +647,40 @@ const StudentDashboard = () => {
                   </span>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {(showClassLeaderboard ? classLeaderboard : leaderboard).slice(0, 8).map((student, index) => (
                   <div 
                     key={student.username}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-102 ${
+                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                       student.username === userInfo?.username 
-                        ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 border border-purple-400/50' 
-                        : 'bg-slate-700/30 hover:bg-slate-700/50'
+                        ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-400/30' 
+                        : 'bg-slate-700/20 hover:bg-slate-700/30'
                     }`}
                   >
-                    <div className="text-2xl min-w-[2rem] text-center">
+                    <div className="text-lg min-w-[2rem] text-center">
                       {index === 0 && '👑'}
                       {index === 1 && '🥈'}
                       {index === 2 && '🥉'}
-                      {index > 2 && `#${index + 1}`}
+                      {index > 2 && <span className="font-medium text-slate-400">#${index + 1}</span>}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium truncate ${
                         student.username === userInfo?.username ? 'text-white' : 'text-slate-300'
                       }`}>
                         {student.fullName}
-                        {student.username === userInfo?.username && ' (Kamu)'}
+                        {student.username === userInfo?.username && (
+                          <span className="ml-2 text-xs bg-purple-500/80 px-2 py-0.5 rounded-full">
+                            Kamu
+                          </span>
+                        )}
                       </p>
-                      <p className="text-xs text-slate-400">{student.points.toLocaleString()} XP • Lv.{student.level}</p>
+                      <p className="text-xs text-slate-400">
+                        {student.points.toLocaleString()} XP • Lv.{student.level}
+                      </p>
                     </div>
                     <div className="flex items-center gap-1 text-yellow-400">
                       <Award className="w-4 h-4" />
-                      <span className="text-sm font-bold">{student.badges}</span>
+                      <span className="text-sm font-medium">{student.badges}</span>
                     </div>
                   </div>
                   ))}
@@ -1013,7 +1052,7 @@ const StudentDashboard = () => {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Button 
-            className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium border border-blue-500/50"
+            className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-colors duration-200"
             onClick={handleRefresh}
             disabled={refreshing}
           >
@@ -1023,27 +1062,355 @@ const StudentDashboard = () => {
             </div>
           </Button>
           
-          <Button className="h-16 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium border border-green-500/50">
+          <Button 
+            className="h-16 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium transition-colors duration-200"
+            onClick={handleProgressMap}
+          >
             <div className="text-center">
               <Map className="w-6 h-6 mx-auto mb-1" />
               <span className="text-sm">Peta Progress</span>
             </div>
           </Button>
           
-          <Button className="h-16 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium border border-purple-500/50">
+          <Button 
+            className="h-16 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium transition-colors duration-200"
+            onClick={handleClassmates}
+          >
             <div className="text-center">
               <Users className="w-6 h-6 mx-auto mb-1" />
               <span className="text-sm">Teman Kelas</span>
             </div>
           </Button>
           
-          <Button className="h-16 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-medium border border-orange-500/50">
+          <Button 
+            className="h-16 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-medium transition-colors duration-200"
+            onClick={handleAchievements}
+          >
             <div className="text-center">
               <Star className="w-6 h-6 mx-auto mb-1" />
               <span className="text-sm">Achievement</span>
             </div>
           </Button>
         </div>
+
+        {/* Progress Map Modal */}
+        {showProgressMap && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Map className="w-6 h-6 text-green-400" />
+                  🗺️ Peta Progress Belajar
+                </h2>
+                <button
+                  onClick={() => setShowProgressMap(false)}
+                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Attendance Progress */}
+                <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl">
+                      📚
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Kehadiran</h3>
+                      <p className="text-green-300 text-sm">Rajin hadir kelas</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-400 mb-2">{stats.attendance}%</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
+                        style={{ width: `${stats.attendance}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {stats.attendance >= 90 ? "🌟 Perfect Attendance!" : 
+                       stats.attendance >= 80 ? "👍 Great Job!" : 
+                       "💪 Keep Going!"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Grade Progress */}
+                <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-2xl">
+                      📊
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Nilai</h3>
+                      <p className="text-blue-300 text-sm">Prestasi akademik</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-400 mb-2">{stats.averageGrade}</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                        style={{ width: `${Math.min(stats.averageGrade, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {stats.averageGrade >= 90 ? "🏆 Outstanding!" : 
+                       stats.averageGrade >= 80 ? "⭐ Excellent!" : 
+                       "📈 Improving!"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Assignment Progress */}
+                <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-2xl">
+                      📝
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Tugas</h3>
+                      <p className="text-purple-300 text-sm">Tugas selesai</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-400 mb-2">{stats.completedAssignments}</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                        style={{ width: `${Math.min((stats.completedAssignments / Math.max(stats.completedAssignments, 10)) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {stats.completedAssignments >= 15 ? "🔥 Super Productive!" : 
+                       stats.completedAssignments >= 5 ? "💪 Good Progress!" : 
+                       "🚀 Let's Go!"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Level Progress */}
+                <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">
+                      {characterClass.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Level</h3>
+                      <p className="text-yellow-300 text-sm">{characterClass.name}</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-yellow-400 mb-2">Level {stats.level}</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"
+                        style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {rpgStats.exp}/{rpgStats.expToNext} XP to next level
+                    </p>
+                  </div>
+                </div>
+
+                {/* Badge Collection */}
+                <div className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border border-orange-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-2xl">
+                      🏆
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Badges</h3>
+                      <p className="text-orange-300 text-sm">Koleksi trofi</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-orange-400 mb-2">{stats.badges.length}</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
+                        style={{ width: `${Math.min((stats.badges.length / Math.max(availableBadges.length, 1)) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {stats.badges.length}/{availableBadges.length} badges earned
+                    </p>
+                  </div>
+                </div>
+
+                {/* Rank Progress */}
+                <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-2xl">
+                      👑
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Ranking</h3>
+                      <p className="text-indigo-300 text-sm">Posisi di kelas</p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-indigo-400 mb-2">#{getCurrentDisplayRank()}</div>
+                    <div className="w-full bg-slate-700 rounded-full h-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                        style={{ width: `${Math.max(100 - (getCurrentDisplayRank() / Math.max(stats.totalStudents, 1)) * 100, 10)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2">
+                      {getCurrentLeaderboardContext()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Classmates Modal */}
+        {showClassmates && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Users className="w-6 h-6 text-purple-400" />
+                  👥 Teman Sekelas
+                </h2>
+                <button
+                  onClick={() => setShowClassmates(false)}
+                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {classmates.length > 0 ? (
+                <div className="grid gap-4">
+                  {classmates.map((classmate, index) => (
+                    <div 
+                      key={classmate.username}
+                      className="bg-slate-700/30 rounded-xl p-4 border border-slate-600/50 hover:bg-slate-700/50 transition-all"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-2xl">
+                          {classmate.fullName?.charAt(0) || classmate.name?.charAt(0) || '👤'}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-white">
+                            {classmate.fullName || classmate.name}
+                          </h3>
+                          <p className="text-slate-400 text-sm">@{classmate.username}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <span className="text-sm text-yellow-400 flex items-center gap-1">
+                              <Crown className="w-4 h-4" />
+                              {classmate.points} XP
+                            </span>
+                            <span className="text-sm text-purple-400">
+                              Level {classmate.level}
+                            </span>
+                            <span className="text-sm text-orange-400 flex items-center gap-1">
+                              <Award className="w-4 h-4" />
+                              {classmate.badges.length} badges
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-slate-300">#{index + 1}</div>
+                          <div className="text-xs text-slate-400">Rank di kelas</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+                  <p className="text-slate-400 text-lg">Belum ada teman sekelas</p>
+                  <p className="text-slate-500 text-sm">Data teman sekelas akan muncul di sini</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Achievements Modal */}
+        {showAchievements && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Star className="w-6 h-6 text-orange-400" />
+                  🏆 Achievement Center
+                </h2>
+                <button
+                  onClick={() => setShowAchievements(false)}
+                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {availableBadges.map((badge, index) => {
+                  const isEarned = stats.badges.includes(badge.name);
+                  return (
+                    <div 
+                      key={index}
+                      className={`relative rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 border ${
+                        isEarned 
+                          ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30 hover:shadow-2xl' 
+                          : 'bg-slate-700/30 border-slate-600/50 hover:bg-slate-700/50'
+                      }`}
+                    >
+                      <div className={`text-6xl mb-4 ${isEarned ? '' : 'opacity-30 grayscale'}`}>
+                        {badge.icon || '🏆'}
+                      </div>
+                      <h3 className={`text-lg font-bold mb-2 ${isEarned ? 'text-white' : 'text-slate-400'}`}>
+                        {badge.name}
+                      </h3>
+                      {badge.description && (
+                        <p className={`text-sm mb-3 ${isEarned ? 'text-slate-300' : 'text-slate-500'}`}>
+                          {badge.description}
+                        </p>
+                      )}
+                      {badge.pointValue && (
+                        <div className={`text-sm font-medium ${isEarned ? 'text-yellow-300' : 'text-slate-500'}`}>
+                          +{badge.pointValue} XP
+                        </div>
+                      )}
+                      {isEarned && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            ✓
+                          </div>
+                        </div>
+                      )}
+                      {!isEarned && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent rounded-2xl flex items-center justify-center">
+                          <div className="text-slate-400 text-sm font-medium bg-slate-800/80 px-3 py-1 rounded-full">
+                            🔒 Locked
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {availableBadges.length === 0 && (
+                <div className="text-center py-12">
+                  <Star className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+                  <p className="text-slate-400 text-lg">Belum ada achievement tersedia</p>
+                  <p className="text-slate-500 text-sm">Achievement akan muncul seiring waktu</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
