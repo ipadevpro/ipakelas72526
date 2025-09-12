@@ -165,10 +165,10 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }: {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className={`bg-white rounded-xl shadow-2xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden mx-4`}
+          className={`bg-white rounded-xl shadow-2xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden mx-4 flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h3>
             <button
               onClick={onClose}
@@ -177,8 +177,10 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }: {
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
-          <div className="px-4 sm:px-6 py-3 sm:py-4 overflow-y-auto">
-            {children}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-4 sm:px-6 py-3 sm:py-4">
+              {children}
+            </div>
           </div>
         </motion.div>
       </motion.div>
@@ -858,7 +860,7 @@ const EventsPage = () => {
           onClose={() => setShowCreateModal(false)}
           title="Tambah Kegiatan Baru"
         >
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-4 sm:space-y-6 min-h-0">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Kelas <span className="text-red-500">*</span>
@@ -968,7 +970,7 @@ const EventsPage = () => {
           onClose={() => setShowEditModal(false)}
           title="Edit Kegiatan"
         >
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-4 sm:space-y-6 min-h-0">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Kelas <span className="text-red-500">*</span>
@@ -1079,7 +1081,7 @@ const EventsPage = () => {
           title="Detail Kegiatan"
         >
           {selectedEvent && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 min-h-0">
               <div className="grid gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-2">Judul</label>
@@ -1157,7 +1159,7 @@ const EventsPage = () => {
           title="Konfirmasi Hapus"
         >
           {selectedEvent && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 min-h-0">
               <div className="flex items-center text-amber-600 mb-4">
                 <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
                 <span className="font-medium text-sm sm:text-base">Peringatan!</span>

@@ -11,6 +11,24 @@ import {
 import { classApi, studentsApi as studentApi, attendanceApi } from '../../lib/api';
 import * as XLSX from 'xlsx';
 
+// Add custom styles for hiding scrollbar
+const scrollbarHideStyle = `
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = scrollbarHideStyle;
+  document.head.appendChild(style);
+}
+
 // Enhanced interfaces
 interface Class {
   id: string;
@@ -1091,46 +1109,46 @@ const PresensiPage = () => {
 
         {/* Enhanced Tab Navigation */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-xl">
-          <div className="flex border-b border-gray-200/50 overflow-x-auto">
+          <div className="flex border-b border-gray-200/50 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setActiveTab('daily')}
-              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
+              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
                 activeTab === 'daily'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm">Presensi Harian</span>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm truncate">Presensi Harian</span>
               </div>
             </button>
             
             <button
               onClick={() => setActiveTab('records')}
-              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
+              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
                 activeTab === 'records'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm">Riwayat Presensi</span>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm truncate">Riwayat</span>
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('class-recap')}
-              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
+              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
                 activeTab === 'class-recap'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <PieChart className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm">Rekap Per Kelas</span>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                <PieChart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm truncate">Rekap</span>
               </div>
             </button>
           </div>
@@ -1139,7 +1157,8 @@ const PresensiPage = () => {
             {activeTab === 'daily' && (
               <div className="space-y-4 sm:space-y-6">
                 {/* Controls */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700">
                       Pilih Kelas
@@ -1158,37 +1177,41 @@ const PresensiPage = () => {
                     </select>
                   </div>
 
-                  <div className="space-y-2">
+                    <div className="space-y-2 sm:col-span-2 lg:col-span-1">
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700">
                       Tanggal
                     </label>
                     <div className="flex gap-2">
                       <button
                         onClick={goToPreviousDay}
-                        className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors"
+                          className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors flex-shrink-0"
                       >
                         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                       
-                      <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl">
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl min-w-0">
+                          <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
-                          <span className="text-gray-900 font-medium text-xs sm:text-sm lg:text-base truncate">
-                            {formatDate(selectedDate)}
+                            <span className="text-gray-900 font-medium text-xs sm:text-sm truncate">
+                              {new Date(selectedDate).toLocaleDateString('id-ID', { 
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
                           </span>
                         </div>
                       </div>
                       
                       <button
                         onClick={goToNextDay}
-                        className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors"
+                          className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors flex-shrink-0"
                       >
                         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                    <div className="space-y-2 sm:col-span-2 lg:col-span-1">
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700">
                       Aksi Cepat
                     </label>
@@ -1207,6 +1230,7 @@ const PresensiPage = () => {
                       >
                         Semua Hadir
                       </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1223,7 +1247,7 @@ const PresensiPage = () => {
                       </div>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div>
                       {isLoadingStudents ? (
                         <div className="p-4 sm:p-6">
                           <LoadingSkeleton />
@@ -1235,7 +1259,49 @@ const PresensiPage = () => {
                           <p className="text-xs sm:text-sm text-gray-500">Silakan pilih kelas yang memiliki siswa</p>
                         </div>
                       ) : (
-                        <div className="overflow-x-auto">
+                        <>
+                          {/* Mobile View */}
+                          <div className="block sm:hidden">
+                            <div className="space-y-3 p-4">
+                              {students.map((student, index) => (
+                                <motion.div
+                                  key={student.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  className="bg-gray-50 rounded-xl p-4 space-y-3"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                      {index + 1}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-sm font-medium text-gray-900 truncate">{student.fullName}</div>
+                                      <div className="text-xs text-gray-500 truncate">{student.username}</div>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {(['present', 'sick', 'permission', 'absent'] as AttendanceStatus[]).map((status) => (
+                                      <button
+                                        key={status}
+                                        onClick={() => setAttendanceData(prev => ({ ...prev, [student.username]: status }))}
+                                        className={`px-3 py-2 text-xs font-medium rounded-lg transition-all text-center ${
+                                          attendanceData[student.username] === status
+                                            ? `${statusConfig[status].color} text-white shadow-md`
+                                            : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                                        }`}
+                                      >
+                                        {statusConfig[status].label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Desktop View */}
+                          <div className="hidden sm:block overflow-x-auto">
                           <table className="w-full min-w-[600px]">
                             <thead className="bg-gray-50">
                               <tr>
@@ -1295,6 +1361,7 @@ const PresensiPage = () => {
                             </tbody>
                           </table>
                         </div>
+                        </>
                       )}
                     </div>
 
@@ -1679,7 +1746,7 @@ const PresensiPage = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-lg mx-4"
+            className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
           >
             <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Export Data Presensi</h3>
             
