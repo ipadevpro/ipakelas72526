@@ -408,11 +408,9 @@ const GamifikasiPage = () => {
         );
         setStudents(combinedData);
       } else {
-        console.error('❌ Failed to fetch student data:', { studentsResponse, gamificationResponse });
         showNotification('error', 'Gagal memuat data siswa');
       }
     } catch (error) {
-      console.error('💥 Error fetching students:', error);
       showNotification('error', 'Terjadi kesalahan saat memuat data siswa');
     }
   };
@@ -623,7 +621,6 @@ const GamifikasiPage = () => {
         }
         await fetchStudents();
       } else {
-        console.error('All assignments failed:', failed);
         showNotification('error', 'Gagal memberikan badge ke semua siswa');
       }
 
@@ -792,12 +789,35 @@ const GamifikasiPage = () => {
     return filtered;
   };
 
-  // Filtered data
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.class.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filtered data with error handling
+  const filteredStudents = React.useMemo(() => {
+    try {
+      if (!Array.isArray(students)) {
+        return [];
+      }
+      
+      return students.filter(student => {
+        if (!student || typeof student !== 'object') {
+          return false;
+        }
+        
+        try {
+          const name = student.name || '';
+          const username = student.username || '';
+          const studentClass = student.class || '';
+          const query = (searchQuery || '').toLowerCase();
+          
+          return name.toLowerCase().includes(query) ||
+                 username.toLowerCase().includes(query) ||
+                 studentClass.toLowerCase().includes(query);
+        } catch (error) {
+          return false;
+        }
+      });
+    } catch (error) {
+      return [];
+    }
+  }, [students, searchQuery]);
 
   // Statistics
   const stats = {
@@ -1353,9 +1373,44 @@ const GamifikasiPage = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredStudents.map((student, index) => {
+                      {filteredStudents.length === 0 && searchQuery.trim() !== '' ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-12 text-center">
+                            <div className="flex flex-col items-center">
+                              <Search className="w-12 h-12 text-gray-300 mb-4" />
+                              <p className="text-lg font-medium text-gray-900">Tidak ada hasil pencarian</p>
+                              <p className="text-sm text-gray-500">
+                                Tidak ditemukan siswa dengan kata kunci "{searchQuery}"
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSearchQuery('')}
+                                className="mt-4"
+                              >
+                                Hapus pencarian
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : filteredStudents.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-12 text-center">
+                            <div className="flex flex-col items-center">
+                              <Users className="w-12 h-12 text-gray-300 mb-4" />
+                              <p className="text-lg font-medium text-gray-900">Belum ada data siswa</p>
+                              <p className="text-sm text-gray-500">Data siswa akan muncul setelah sistem dimuat</p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredStudents.map((student, index) => {
+                        // Safety check for student data
+                        if (!student) return null;
+                        
                         // Get badges earned by this student
-                        const studentBadges = student.achievements
+                        const achievements = student.achievements || [];
+                        const studentBadges = achievements
                           .map(badgeName => {
                             const badge = badges.find(b => b.name === badgeName);
                             return badge;
@@ -1373,25 +1428,25 @@ const GamifikasiPage = () => {
                               <div className="flex items-center">
                                 <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                                   <span className="text-sm font-medium text-purple-600">
-                                    {student.name.charAt(0).toUpperCase()}
+                                    {(student.name || 'N').charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                                 <div className="ml-3">
-                                  <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                                  <div className="text-sm text-gray-500">{student.username}</div>
+                                  <div className="text-sm font-medium text-gray-900">{student.name || 'Nama tidak tersedia'}</div>
+                                  <div className="text-sm text-gray-500">{student.username || 'Username tidak tersedia'}</div>
                                 </div>
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {student.class}
+                              {student.class || 'Kelas tidak tersedia'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white ${getLevelColor(student.level)}`}>
-                                Level {student.level}
+                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white ${getLevelColor(student.level || 1)}`}>
+                                Level {student.level || 1}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {student.points.toLocaleString()}
+                              {(student.points || 0).toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center gap-1 flex-wrap max-w-xs">
@@ -1447,16 +1502,11 @@ const GamifikasiPage = () => {
                             </td>
                           </motion.tr>
                         );
-                      })}
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
-                {students.length === 0 && (
-                  <div className="text-center py-12">
-                    <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada data siswa</p>
-                  </div>
-                )}
               </div>
             )}
           </motion.div>
@@ -1894,17 +1944,6 @@ const GamifikasiPage = () => {
                 </div>
               </div>
 
-              {/* Debug Information */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mb-4 p-3 bg-gray-100 rounded-lg text-xs">
-                  <strong>🐛 Debug Info:</strong><br/>
-                  Total Siswa: {students.length}<br/>
-                  Kelas Unik: {uniqueClasses.length} ({uniqueClasses.map(c => c.name).join(', ')})<br/>
-                  Level Unik: {uniqueLevels.length} ({uniqueLevels.join(', ')})<br/>
-                  Filter Aktif: Kelas={classFilter}, Level={levelFilter}<br/>
-                  Siswa Terfilter: {getFilteredStudentsForAssignment().length}
-                </div>
-              )}
 
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">

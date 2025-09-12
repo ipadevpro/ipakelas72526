@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   UserCheck, Calendar, ChevronLeft, ChevronRight, 
   Download, RefreshCw, Users, CheckCircle, 
-  XCircle, AlertTriangle, Heart, BarChart3, Save
+  XCircle, AlertTriangle, Heart, BarChart3, Save, PieChart
 } from 'lucide-react';
 import { classApi, studentsApi as studentApi, attendanceApi } from '../../lib/api';
 import * as XLSX from 'xlsx';
@@ -39,6 +39,20 @@ type AttendanceStatus = 'present' | 'sick' | 'permission' | 'absent';
 
 interface AttendanceStatusMap {
   [studentUsername: string]: AttendanceStatus;
+}
+
+interface ClassRecap {
+  classId: string;
+  className: string;
+  totalStudents: number;
+  totalRecords: number;
+  presentCount: number;
+  sickCount: number;
+  permissionCount: number;
+  absentCount: number;
+  attendanceRate: number;
+  uniqueDates: number;
+  dateRange: string;
 }
 
 // Status configuration
@@ -106,7 +120,8 @@ const NotificationToast = ({ notification, onClose }: {
 
 const PresensiPage = () => {
   // Enhanced state management
-  const [activeTab, setActiveTab] = useState<'daily' | 'records'>('daily');
+  const [activeTab, setActiveTab] = useState<'daily' | 'records' | 'class-recap'>('daily');
+  const [classRecaps, setClassRecaps] = useState<ClassRecap[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>('');
@@ -128,6 +143,8 @@ const PresensiPage = () => {
 
   // Modal states
   const [showExportModal, setShowExportModal] = useState(false);
+  const [exportType, setExportType] = useState<'all' | 'class' | 'recap'>('all');
+  const [selectedExportClass, setSelectedExportClass] = useState<string>('');
 
   // Notification state
   const [notification, setNotification] = useState<{
@@ -168,6 +185,88 @@ const PresensiPage = () => {
       month: 'long', 
       day: 'numeric'
     });
+  };
+
+  // Calculate class-based attendance recap
+  const calculateClassRecaps = (records: AttendanceRecord[], classes: Class[], students: Student[]) => {
+    const recapMap = new Map<string, ClassRecap>();
+    
+    // Initialize recap for each class
+    classes.forEach(cls => {
+      const classStudents = students.filter(s => s.classId === cls.id);
+      recapMap.set(cls.id, {
+        classId: cls.id,
+        className: cls.name,
+        totalStudents: classStudents.length,
+        totalRecords: 0,
+        presentCount: 0,
+        sickCount: 0,
+        permissionCount: 0,
+        absentCount: 0,
+        attendanceRate: 0,
+        uniqueDates: 0,
+        dateRange: ''
+      });
+    });
+    
+    // Process records by class
+    const classDatesMap = new Map<string, Set<string>>();
+    
+    records.forEach(record => {
+      const recap = recapMap.get(record.classId);
+      if (recap) {
+        recap.totalRecords++;
+        
+        // Count by status
+        switch (record.status) {
+          case 'present':
+            recap.presentCount++;
+            break;
+          case 'sick':
+            recap.sickCount++;
+            break;
+          case 'permission':
+            recap.permissionCount++;
+            break;
+          case 'absent':
+            recap.absentCount++;
+            break;
+        }
+        
+        // Track unique dates per class
+        if (!classDatesMap.has(record.classId)) {
+          classDatesMap.set(record.classId, new Set());
+        }
+        classDatesMap.get(record.classId)!.add(record.date);
+      }
+    });
+    
+    // Calculate attendance rates and date ranges
+    Array.from(recapMap.values()).forEach(recap => {
+      // Calculate attendance rate
+      if (recap.totalRecords > 0) {
+        recap.attendanceRate = Math.round((recap.presentCount / recap.totalRecords) * 100);
+      }
+      
+      // Set unique dates count
+      const dates = classDatesMap.get(recap.classId);
+      recap.uniqueDates = dates ? dates.size : 0;
+      
+      // Calculate date range
+      if (dates && dates.size > 0) {
+        const sortedDates = Array.from(dates).sort();
+        const firstDate = new Date(sortedDates[0]).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        const lastDate = new Date(sortedDates[sortedDates.length - 1]).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        
+        if (sortedDates.length === 1) {
+          recap.dateRange = firstDate;
+        } else {
+          recap.dateRange = `${firstDate} - ${lastDate}`;
+        }
+      }
+    });
+    
+    return Array.from(recapMap.values()).sort((a, b) => a.className.localeCompare(b.className));
   };
 
   // Real-time statistics calculation from all records
@@ -280,6 +379,18 @@ const PresensiPage = () => {
     }
   };
 
+  const fetchAllStudents = async () => {
+    try {
+      const response = await studentApi.getAll();
+      if (response.success) {
+        return response.students || [];
+      }
+    } catch (error) {
+      console.error('Error fetching all students:', error);
+    }
+    return [];
+  };
+
   const fetchAttendanceForDate = async (classId: string, date: string) => {
     try {
       const response = await attendanceApi.getByClass(classId, date);
@@ -306,6 +417,17 @@ const PresensiPage = () => {
       if (response.success) {
         const allRecords = response.attendance || [];
         setAttendanceRecords(allRecords);
+        
+        // Get all students for class recap calculation
+        const allStudents = await fetchAllStudents();
+        
+        // Calculate class recaps
+        if (allRecords.length > 0 && classes.length > 0) {
+          const recaps = calculateClassRecaps(allRecords, classes, allStudents);
+          setClassRecaps(recaps);
+        } else {
+          setClassRecaps([]);
+        }
         
         // Immediately calculate and update global statistics
         if (allRecords.length > 0) {
@@ -434,8 +556,186 @@ const PresensiPage = () => {
     }
   };
 
+  // Create structured Excel export with student summary
+  const createStudentSummaryExport = async (classId?: string) => {
+    // Get all students for the selected class or all classes
+    const allStudents = await fetchAllStudents();
+    const targetStudents = classId 
+      ? allStudents.filter((s: any) => s.classId === classId)
+      : allStudents;
+
+    // Filter records by class if specified
+    const targetRecords = classId 
+      ? attendanceRecords.filter(r => r.classId === classId)
+      : attendanceRecords;
+
+    // Get class info
+    const classInfo = classId 
+      ? classes.find(c => c.id === classId)
+      : null;
+
+    // Create student summary data
+    const studentSummary = targetStudents.map((student: any, index: number) => {
+      const studentRecords = targetRecords.filter(r => r.studentUsername === student.username);
+      
+      const presentCount = studentRecords.filter(r => r.status === 'present').length;
+      const sickCount = studentRecords.filter(r => r.status === 'sick').length;
+      const permissionCount = studentRecords.filter(r => r.status === 'permission').length;
+      const absentCount = studentRecords.filter(r => r.status === 'absent').length;
+      const totalRecords = studentRecords.length;
+      
+      const attendanceRate = totalRecords > 0 ? Math.round((presentCount / totalRecords) * 100) : 0;
+
+      return {
+        'No': index + 1,
+        'Nama Siswa': student.fullName,
+        'Username': student.username,
+        'Kelas': classInfo ? classInfo.name : (classes.find(c => c.id === student.classId)?.name || 'Unknown'),
+        'Total Hari': totalRecords,
+        'Hadir': presentCount,
+        'Sakit': sickCount,
+        'Izin': permissionCount,
+        'Alfa': absentCount,
+        'Persentase Kehadiran': `${attendanceRate}%`
+      };
+    });
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet([]);
+    
+    // Add title
+    const title = classInfo 
+      ? `REKAP PRESENSI SISWA - ${classInfo.name.toUpperCase()}`
+      : 'REKAP PRESENSI SISWA - SEMUA KELAS';
+    
+    XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: 'A1' });
+    
+    // Add class info
+    let currentRow = 3;
+    if (classInfo) {
+      XLSX.utils.sheet_add_aoa(ws, [['Kelas:', classInfo.name]], { origin: `A${currentRow}` });
+      currentRow++;
+      XLSX.utils.sheet_add_aoa(ws, [['Jumlah Siswa:', targetStudents.length]], { origin: `A${currentRow}` });
+      currentRow++;
+    } else {
+      XLSX.utils.sheet_add_aoa(ws, [['Total Siswa:', targetStudents.length]], { origin: `A${currentRow}` });
+      currentRow++;
+      XLSX.utils.sheet_add_aoa(ws, [['Total Kelas:', classes.length]], { origin: `A${currentRow}` });
+      currentRow++;
+    }
+    
+    // Add export date
+    XLSX.utils.sheet_add_aoa(ws, [['Tanggal Export:', new Date().toLocaleDateString('id-ID')]], { origin: `A${currentRow}` });
+    currentRow += 2;
+    
+    // Add table headers
+    const headers = ['No', 'Nama Siswa', 'Username', 'Kelas', 'Total Hari', 'Hadir', 'Sakit', 'Izin', 'Alfa', 'Persentase Kehadiran'];
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${currentRow}` });
+    currentRow++;
+    
+    // Add student data
+    studentSummary.forEach((student: any) => {
+      const row = [
+        student['No'],
+        student['Nama Siswa'],
+        student['Username'],
+        student['Kelas'],
+        student['Total Hari'],
+        student['Hadir'],
+        student['Sakit'],
+        student['Izin'],
+        student['Alfa'],
+        student['Persentase Kehadiran']
+      ];
+      XLSX.utils.sheet_add_aoa(ws, [row], { origin: `A${currentRow}` });
+      currentRow++;
+    });
+    
+    // Add summary statistics
+    currentRow += 1;
+    const totalRecords = targetRecords.length;
+    const totalPresent = targetRecords.filter(r => r.status === 'present').length;
+    const totalSick = targetRecords.filter(r => r.status === 'sick').length;
+    const totalPermission = targetRecords.filter(r => r.status === 'permission').length;
+    const totalAbsent = targetRecords.filter(r => r.status === 'absent').length;
+    const overallAttendanceRate = totalRecords > 0 ? Math.round((totalPresent / totalRecords) * 100) : 0;
+    
+    XLSX.utils.sheet_add_aoa(ws, [['RINGKASAN KESELURUHAN']], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Total Records:', totalRecords]], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Total Hadir:', totalPresent]], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Total Sakit:', totalSick]], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Total Izin:', totalPermission]], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Total Alfa:', totalAbsent]], { origin: `A${currentRow}` });
+    currentRow++;
+    XLSX.utils.sheet_add_aoa(ws, [['Tingkat Kehadiran Keseluruhan:', `${overallAttendanceRate}%`]], { origin: `A${currentRow}` });
+    
+    // Set column widths
+    ws['!cols'] = [
+      { width: 5 },   // No
+      { width: 25 },  // Nama Siswa
+      { width: 15 },  // Username
+      { width: 15 },  // Kelas
+      { width: 12 },  // Total Hari
+      { width: 8 },   // Hadir
+      { width: 8 },   // Sakit
+      { width: 8 },   // Izin
+      { width: 8 },   // Alfa
+      { width: 18 }   // Persentase
+    ];
+    
+    // Add worksheet to workbook
+    const sheetName = classInfo ? classInfo.name : 'Semua Kelas';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    
+    // Generate filename
+    const fileName = classInfo 
+      ? `rekap_presensi_${classInfo.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`
+      : `rekap_presensi_semua_kelas_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    // Download file
+    XLSX.writeFile(wb, fileName);
+  };
+
   // Export functionality
-  const handleExport = () => {
+  const handleExport = async () => {
+    try {
+      if (exportType === 'recap' && activeTab === 'class-recap' && classRecaps.length > 0) {
+        // Export class recap data
+        const exportData = classRecaps.map(recap => ({
+          'Nama Kelas': recap.className,
+          'Total Siswa': recap.totalStudents,
+          'Total Records': recap.totalRecords,
+          'Hari Aktif': recap.uniqueDates,
+          'Periode': recap.dateRange,
+          'Hadir': recap.presentCount,
+          'Sakit': recap.sickCount,
+          'Izin': recap.permissionCount,
+          'Alfa': recap.absentCount,
+          'Tingkat Kehadiran (%)': recap.attendanceRate,
+          'Partisipasi (%)': recap.totalRecords > 0 && recap.totalStudents > 0 ? 
+            Math.round(recap.totalRecords / (recap.totalStudents * recap.uniqueDates) * 100) : 0
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Rekap Per Kelas');
+        XLSX.writeFile(wb, `rekap_presensi_per_kelas_${new Date().toISOString().split('T')[0]}.xlsx`);
+      } else if (exportType === 'class' && selectedExportClass) {
+        // Export student summary for selected class
+        await createStudentSummaryExport(selectedExportClass);
+      } else if (exportType === 'all') {
+        // Export student summary for all classes
+        await createStudentSummaryExport();
+      } else {
+        // Fallback: Export regular attendance records
     const exportData = attendanceRecords.map(record => ({
       Tanggal: record.date,
       Kelas: classes.find(c => c.id === record.classId)?.name || 'Unknown',
@@ -448,9 +748,14 @@ const PresensiPage = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Data Presensi');
     XLSX.writeFile(wb, `presensi_${new Date().toISOString().split('T')[0]}.xlsx`);
+      }
     
     setShowExportModal(false);
     showNotification('success', 'Data berhasil diekspor');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      showNotification('error', 'Gagal mengekspor data');
+    }
   };
 
   // Lazy loading functions for records tab
@@ -574,9 +879,18 @@ const PresensiPage = () => {
   // Auto-refresh records when switching to records tab
   useEffect(() => {
     if (activeTab === 'records') {
-
       // Only fetch if we don't have recent data
       if (attendanceRecords.length === 0) {
+        fetchAllRecords();
+      }
+    }
+  }, [activeTab]);
+
+  // Auto-refresh class recaps when switching to class-recap tab
+  useEffect(() => {
+    if (activeTab === 'class-recap') {
+      // Ensure we have fresh data for class recaps
+      if (classRecaps.length === 0 && attendanceRecords.length > 0 && classes.length > 0) {
         fetchAllRecords();
       }
     }
@@ -638,7 +952,11 @@ const PresensiPage = () => {
               </button>
               
               <button
-                onClick={() => setShowExportModal(true)}
+                      onClick={() => {
+                        setExportType(activeTab === 'class-recap' ? 'recap' : 'all');
+                        setSelectedExportClass('');
+                        setShowExportModal(true);
+                      }}
                 className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg text-xs sm:text-sm"
               >
                 <Download className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -776,7 +1094,7 @@ const PresensiPage = () => {
           <div className="flex border-b border-gray-200/50 overflow-x-auto">
             <button
               onClick={() => setActiveTab('daily')}
-              className={`flex-1 px-4 sm:px-6 py-3 sm:py-4 text-center font-medium rounded-tl-2xl transition-all whitespace-nowrap ${
+              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
                 activeTab === 'daily'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
@@ -790,7 +1108,7 @@ const PresensiPage = () => {
             
             <button
               onClick={() => setActiveTab('records')}
-              className={`flex-1 px-4 sm:px-6 py-3 sm:py-4 text-center font-medium rounded-tr-2xl transition-all whitespace-nowrap ${
+              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
                 activeTab === 'records'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
@@ -799,6 +1117,20 @@ const PresensiPage = () => {
               <div className="flex items-center justify-center gap-1 sm:gap-2">
                 <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="text-xs sm:text-sm">Riwayat Presensi</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('class-recap')}
+              className={`flex-1 px-3 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all whitespace-nowrap ${
+                activeTab === 'class-recap'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-1 sm:gap-2">
+                <PieChart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm">Rekap Per Kelas</span>
               </div>
             </button>
           </div>
@@ -1023,7 +1355,11 @@ const PresensiPage = () => {
                       <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                     <Button
-                      onClick={() => setShowExportModal(true)}
+                      onClick={() => {
+                        setExportType('all');
+                        setSelectedExportClass('');
+                        setShowExportModal(true);
+                      }}
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2"
                     >
                       <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -1149,34 +1485,313 @@ const PresensiPage = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === 'class-recap' && (
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                      Rekap Presensi Per Kelas
+                    </CardTitle>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                      {classRecaps.length > 0 ? (
+                        <>Menampilkan statistik presensi untuk {classRecaps.length} kelas • Data real-time</>
+                      ) : (
+                        'Belum ada data rekap per kelas'
+                      )}
+                    </p>
+          </div>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      onClick={fetchAllRecords}
+                      className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors"
+                      title="Refresh data"
+                    >
+                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                    <Button
+                      onClick={() => {
+                        setExportType('recap');
+                        setSelectedExportClass('');
+                        setShowExportModal(true);
+                      }}
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2"
+                    >
+                      <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Export Rekap</span>
+                      <span className="sm:hidden">Export</span>
+                    </Button>
+        </div>
+      </div>
+
+                {classRecaps.length === 0 ? (
+                  <div className="bg-white rounded-2xl border shadow-lg p-8 sm:p-12 text-center">
+                    <PieChart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-base sm:text-lg font-medium text-gray-900">Belum ada data rekap kelas</p>
+                    <p className="text-xs sm:text-sm text-gray-500">Data akan muncul setelah presensi dilakukan di berbagai kelas</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:gap-6">
+                    {classRecaps.map((recap, index) => (
+                      <motion.div
+                        key={recap.classId}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white rounded-2xl border shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                      >
+                        {/* Class Header */}
+                        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                              <h3 className="text-lg sm:text-xl font-bold">{recap.className}</h3>
+                              <p className="text-purple-100 text-sm">
+                                {recap.totalStudents} siswa • {recap.uniqueDates} hari tercatat • {recap.totalRecords} total records
+                              </p>
+                              {recap.dateRange && (
+                                <p className="text-purple-200 text-xs mt-1">
+                                  Periode: {recap.dateRange}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-center bg-white/20 rounded-xl p-3">
+                                <div className="text-2xl font-bold">{recap.attendanceRate}%</div>
+                                <div className="text-xs text-purple-200">Tingkat Kehadiran</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Statistics Grid */}
+                        <div className="p-4 sm:p-6">
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                              <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                              <div className="text-2xl font-bold text-green-700">{recap.presentCount}</div>
+                              <div className="text-xs text-green-600">Hadir</div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {recap.totalRecords > 0 ? Math.round((recap.presentCount / recap.totalRecords) * 100) : 0}%
+                              </div>
+                            </div>
+
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                              <Heart className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                              <div className="text-2xl font-bold text-blue-700">{recap.sickCount}</div>
+                              <div className="text-xs text-blue-600">Sakit</div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {recap.totalRecords > 0 ? Math.round((recap.sickCount / recap.totalRecords) * 100) : 0}%
+                              </div>
+                            </div>
+
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
+                              <AlertTriangle className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
+                              <div className="text-2xl font-bold text-yellow-700">{recap.permissionCount}</div>
+                              <div className="text-xs text-yellow-600">Izin</div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {recap.totalRecords > 0 ? Math.round((recap.permissionCount / recap.totalRecords) * 100) : 0}%
+                              </div>
+                            </div>
+
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                              <XCircle className="w-6 h-6 text-red-600 mx-auto mb-2" />
+                              <div className="text-2xl font-bold text-red-700">{recap.absentCount}</div>
+                              <div className="text-xs text-red-600">Alfa</div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {recap.totalRecords > 0 ? Math.round((recap.absentCount / recap.totalRecords) * 100) : 0}%
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-700">Distribusi Kehadiran</span>
+                              <span className="text-sm text-gray-500">{recap.totalRecords} total records</span>
+                            </div>
+                            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full flex">
+                                {recap.totalRecords > 0 && (
+                                  <>
+                                    <div 
+                                      className="bg-green-500 transition-all duration-500"
+                                      style={{ width: `${(recap.presentCount / recap.totalRecords) * 100}%` }}
+                                    ></div>
+                                    <div 
+                                      className="bg-blue-500 transition-all duration-500"
+                                      style={{ width: `${(recap.sickCount / recap.totalRecords) * 100}%` }}
+                                    ></div>
+                                    <div 
+                                      className="bg-yellow-500 transition-all duration-500"
+                                      style={{ width: `${(recap.permissionCount / recap.totalRecords) * 100}%` }}
+                                    ></div>
+                                    <div 
+                                      className="bg-red-500 transition-all duration-500"
+                                      style={{ width: `${(recap.absentCount / recap.totalRecords) * 100}%` }}
+                                    ></div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                              <span>Hadir: {recap.presentCount}</span>
+                              <span>Sakit: {recap.sickCount}</span>
+                              <span>Izin: {recap.permissionCount}</span>
+                              <span>Alfa: {recap.absentCount}</span>
+                            </div>
+                          </div>
+
+                          {/* Class Summary */}
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
+                              <div>
+                                <div className="text-lg font-bold text-gray-900">{recap.totalStudents}</div>
+                                <div className="text-xs text-gray-600">Total Siswa</div>
+                              </div>
+                              <div>
+                                <div className="text-lg font-bold text-gray-900">{recap.uniqueDates}</div>
+                                <div className="text-xs text-gray-600">Hari Aktif</div>
+                              </div>
+                              <div className="col-span-2 sm:col-span-1">
+                                <div className="text-lg font-bold text-gray-900">
+                                  {recap.totalRecords > 0 && recap.totalStudents > 0 ? 
+                                    Math.round(recap.totalRecords / (recap.totalStudents * recap.uniqueDates) * 100) : 0}%
+                                </div>
+                                <div className="text-xs text-gray-600">Partisipasi</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Export Modal */}
+      {/* Enhanced Export Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md mx-4"
+            className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-lg mx-4"
           >
             <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Export Data Presensi</h3>
-            <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
-              Data akan diekspor dalam format Excel (.xlsx)
-            </p>
+            
+            {/* Export Type Selection */}
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Pilih Jenis Export:</label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="exportType"
+                    value="all"
+                    checked={exportType === 'all'}
+                    onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
+                    className="mr-3 text-blue-600"
+                  />
+                  <div>
+                    <div className="font-medium text-gray-900">Rekap Semua Kelas</div>
+                    <div className="text-xs text-gray-500">Ringkasan per siswa dari semua kelas</div>
+                  </div>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="exportType"
+                    value="class"
+                    checked={exportType === 'class'}
+                    onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
+                    className="mr-3 text-blue-600"
+                  />
+                  <div>
+                    <div className="font-medium text-gray-900">Rekap Per Kelas</div>
+                    <div className="text-xs text-gray-500">Ringkasan per siswa untuk kelas tertentu</div>
+                  </div>
+                </label>
+                
+                {activeTab === 'class-recap' && (
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="exportType"
+                      value="recap"
+                      checked={exportType === 'recap'}
+                      onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
+                      className="mr-3 text-blue-600"
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900">Statistik Kelas</div>
+                      <div className="text-xs text-gray-500">Data statistik rekap per kelas</div>
+                    </div>
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Class Selection (when exportType is 'class') */}
+            {exportType === 'class' && (
+              <div className="mb-4 sm:mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Pilih Kelas:</label>
+                <select
+                  value={selectedExportClass}
+                  onChange={(e) => setSelectedExportClass(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  required
+                >
+                  <option value="">Pilih Kelas...</option>
+                  {classes.map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Format Information */}
+            <div className="mb-4 sm:mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-medium text-blue-900 mb-2">Format Export:</h4>
+              <div className="text-xs text-blue-800 space-y-1">
+                {exportType === 'all' && (
+                  <div>• Rekap per siswa dari semua kelas dengan judul, keterangan, tabel rapi, dan ringkasan</div>
+                )}
+                {exportType === 'class' && (
+                  <div>• Rekap per siswa untuk kelas terpilih dengan judul, keterangan kelas, tabel rapi, dan ringkasan</div>
+                )}
+                {exportType === 'recap' && (
+                  <div>• Data statistik dan persentase per kelas</div>
+                )}
+                <div>• Format: Excel (.xlsx)</div>
+                <div>• Kolom: No, Nama, Username, Kelas, Total Hari, Hadir, Sakit, Izin, Alfa, Persentase</div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button
-                onClick={() => setShowExportModal(false)}
+                onClick={() => {
+                  setShowExportModal(false);
+                  setExportType('all');
+                  setSelectedExportClass('');
+                }}
                 className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium order-2 sm:order-1"
               >
                 Batal
               </button>
               <button
                 onClick={handleExport}
-                className="flex-1 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-xs sm:text-sm font-medium order-1 sm:order-2"
+                disabled={exportType === 'class' && !selectedExportClass}
+                className="flex-1 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm font-medium order-1 sm:order-2"
               >
-                Export
+                Export Data
               </button>
             </div>
           </motion.div>
