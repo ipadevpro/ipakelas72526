@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { gamificationApi, badgeApi, levelApi, challengeApi, apiRequest } from '@/lib/api';
 import { processGamificationData, calculateLevelFromPoints } from '@/lib/gamification';
+import { testCORSConnection, generateCORSReport } from '@/utils/corsDebug';
 import React from 'react';
 
 interface GamificationRecord {
@@ -269,12 +270,14 @@ const GamifikasiPage = () => {
   const [showCreateLevelModal, setShowCreateLevelModal] = useState(false);
   const [showAwardModal, setShowAwardModal] = useState(false);
   const [showBadgeAssignModal, setShowBadgeAssignModal] = useState(false);
+  const [showBulkPointsModal, setShowBulkPointsModal] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [editingLevel, setEditingLevel] = useState<Level | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
   const [selectedBadgeForAssign, setSelectedBadgeForAssign] = useState<Badge | null>(null);
   const [selectedStudentsForBadge, setSelectedStudentsForBadge] = useState<string[]>([]);
+  const [selectedStudentsForBulkPoints, setSelectedStudentsForBulkPoints] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -312,6 +315,11 @@ const GamifikasiPage = () => {
     type: 'points' as 'points' | 'badge',
     points: 10,
     badgeId: '',
+    reason: ''
+  });
+
+  const [bulkPointsForm, setBulkPointsForm] = useState({
+    points: 10,
     reason: ''
   });
 
@@ -423,6 +431,32 @@ const GamifikasiPage = () => {
   const refreshData = async () => {
     await fetchData();
     showNotification('success', 'Data berhasil diperbarui');
+  };
+
+  const debugCORS = async () => {
+    showNotification('info', 'Menjalankan test CORS...');
+    try {
+      const testResult = await testCORSConnection();
+      if (testResult.success) {
+        showNotification('success', 'CORS test berhasil! API dapat diakses.');
+      } else {
+        showNotification('error', `CORS test gagal: ${testResult.error}`);
+        
+        // Generate detailed report
+        const report = await generateCORSReport();
+        console.log(report);
+        
+        // Show additional info in notification
+        if (testResult.corsIssue) {
+          setTimeout(() => {
+            showNotification('warning', 'Periksa console untuk panduan perbaikan CORS');
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      showNotification('error', 'Gagal menjalankan test CORS');
+      console.error('CORS debug error:', error);
+    }
   };
 
   // CRUD Operations
@@ -635,6 +669,68 @@ const GamifikasiPage = () => {
     }
   };
 
+  const handleBulkPointsAward = async () => {
+    if (selectedStudentsForBulkPoints.length === 0) {
+      showNotification('error', 'Pilih minimal satu siswa');
+      return;
+    }
+
+    if (bulkPointsForm.points <= 0) {
+      showNotification('error', 'Jumlah poin harus lebih dari 0');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const promises = selectedStudentsForBulkPoints.map(async (studentId) => {
+        const student = students.find(s => s.id === studentId);
+        if (student) {
+          const result = await apiRequest('awardPoints', {
+            classId: student.classId,
+            studentUsername: student.username,
+            points: bulkPointsForm.points,
+            reason: bulkPointsForm.reason
+          });
+          
+          // Auto-update level if points were awarded successfully
+          if (result.success && result.newTotal) {
+            const newLevel = calculateLevelFromPoints(result.newTotal);
+            if (newLevel > student.level) {
+              await gamificationApi.updateLevel(student.classId, student.username, newLevel);
+            }
+          }
+          
+          return result;
+        }
+        return Promise.resolve({ success: false, error: 'Student not found' });
+      });
+
+      const results = await Promise.all(promises);
+      
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success);
+      
+      if (successful > 0) {
+        showNotification('success', `Poin berhasil diberikan kepada ${successful} siswa`);
+        if (failed.length > 0) {
+          showNotification('warning', `${failed.length} siswa gagal menerima poin`);
+        }
+        await fetchStudents();
+      } else {
+        showNotification('error', 'Gagal memberikan poin ke semua siswa');
+      }
+
+      setShowBulkPointsModal(false);
+      setSelectedStudentsForBulkPoints([]);
+      setBulkPointsForm({ points: 10, reason: '' });
+    } catch (error) {
+      console.error('Bulk points award error:', error);
+      showNotification('error', 'Terjadi kesalahan saat memberikan poin');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Helper functions
   const openEditBadge = (badge: Badge) => {
     setEditingBadge(badge);
@@ -754,8 +850,36 @@ const GamifikasiPage = () => {
     setShowBadgeAssignModal(true);
   };
 
+  const openBulkPointsModal = () => {
+    // Check if we have student data
+    if (students.length === 0) {
+      showNotification('warning', 'Tidak ada data siswa. Silakan refresh halaman.');
+      return;
+    }
+    
+    // Check if we have class data
+    if (uniqueClasses.length === 0) {
+      showNotification('warning', 'Tidak ada kelas terdeteksi. Pastikan siswa memiliki data kelas yang valid.');
+      return;
+    }
+    
+    setClassFilter('all'); // Reset filter
+    setLevelFilter('all'); // Reset filter
+    setSelectedStudentsForBulkPoints([]); // Reset selection
+    setBulkPointsForm({ points: 10, reason: '' }); // Reset form
+    setShowBulkPointsModal(true);
+  };
+
   const handleStudentSelection = (studentId: string) => {
     setSelectedStudentsForBadge(prev => 
+      prev.includes(studentId) 
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
+
+  const handleBulkPointsStudentSelection = (studentId: string) => {
+    setSelectedStudentsForBulkPoints(prev => 
       prev.includes(studentId) 
         ? prev.filter(id => id !== studentId)
         : [...prev, studentId]
@@ -773,6 +897,17 @@ const GamifikasiPage = () => {
     }
   };
 
+  const handleSelectAllBulkPointsStudents = () => {
+    const filteredStudents = getFilteredStudentsForBulkPoints();
+    const allSelected = filteredStudents.every(student => selectedStudentsForBulkPoints.includes(student.id));
+    
+    if (allSelected) {
+      setSelectedStudentsForBulkPoints(prev => prev.filter(id => !filteredStudents.some(s => s.id === id)));
+    } else {
+      setSelectedStudentsForBulkPoints(prev => [...new Set([...prev, ...filteredStudents.map(s => s.id)])]);
+    }
+  };
+
   const getFilteredStudentsForAssignment = () => {
 
     
@@ -786,6 +921,17 @@ const GamifikasiPage = () => {
     });
     
 
+    return filtered;
+  };
+
+  const getFilteredStudentsForBulkPoints = () => {
+    const filtered = students.filter(student => {
+      const matchesClass = classFilter === 'all' || student.classId === classFilter;
+      const matchesLevel = levelFilter === 'all' || student.level.toString() === levelFilter;
+      
+      return matchesClass && matchesLevel;
+    });
+    
     return filtered;
   };
 
@@ -933,6 +1079,15 @@ const GamifikasiPage = () => {
               <p className="text-gray-600">Kelola sistem penghargaan dan motivasi siswa</p>
             </div>
             <div className="flex items-center gap-3">
+              <Button 
+                onClick={debugCORS}
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
+              >
+                <AlertCircle className="w-4 h-4" />
+                Debug CORS
+              </Button>
               <Button 
                 onClick={refreshData}
                 variant="outline" 
@@ -1359,19 +1514,31 @@ const GamifikasiPage = () => {
 
             {/* Students Tab */}
             {activeTab === 'students' && (
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Siswa</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poin</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Badge Diperoleh</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                      </tr>
-                    </thead>
+              <div className="space-y-4">
+                {/* Bulk Actions */}
+                <div className="flex justify-end">
+                  <Button 
+                    onClick={openBulkPointsModal}
+                    className="flex items-center gap-2"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Bulk Reward Poin
+                  </Button>
+                </div>
+
+                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Siswa</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poin</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Badge Diperoleh</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                      </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredStudents.length === 0 && searchQuery.trim() !== '' ? (
                         <tr>
@@ -1506,6 +1673,7 @@ const GamifikasiPage = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
                 </div>
               </div>
             )}
@@ -2011,6 +2179,162 @@ const GamifikasiPage = () => {
               </div>
             </>
           )}
+        </div>
+      </Modal>
+
+      {/* Bulk Points Award Modal */}
+      <Modal
+        isOpen={showBulkPointsModal}
+        onClose={() => {
+          setShowBulkPointsModal(false);
+          setSelectedStudentsForBulkPoints([]);
+          setBulkPointsForm({ points: 10, reason: '' });
+        }}
+        title="Bulk Reward Poin"
+        size="large"
+      >
+        <div className="p-6">
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Zap className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Berikan Poin ke Multiple Siswa</p>
+                <p className="text-sm text-gray-500">Pilih siswa dan tentukan jumlah poin yang akan diberikan</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Filter Kelas</label>
+              <select
+                value={classFilter}
+                onChange={(e) => setClassFilter(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="all">Semua kelas ({students.length} siswa)</option>
+                {uniqueClasses.map((classData) => (
+                  <option key={classData.id} value={classData.id}>
+                    {classData.name} ({students.filter(s => s.classId === classData.id).length} siswa)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Filter Level</label>
+              <select
+                value={levelFilter}
+                onChange={(e) => setLevelFilter(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="all">Semua level</option>
+                {uniqueLevels.map((level) => (
+                  <option key={level} value={level.toString()}>
+                    Level {level} ({students.filter(s => s.level === level).length} siswa)
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Jumlah Poin <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="number"
+                value={bulkPointsForm.points}
+                onChange={(e) => setBulkPointsForm(prev => ({ ...prev, points: parseInt(e.target.value) || 0 }))}
+                placeholder="10"
+                min="1"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Alasan (Opsional)</label>
+              <Input
+                value={bulkPointsForm.reason}
+                onChange={(e) => setBulkPointsForm(prev => ({ ...prev, reason: e.target.value }))}
+                placeholder="Alasan pemberian poin"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Pilih Siswa ({getFilteredStudentsForBulkPoints().length} tersedia)
+              </label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSelectAllBulkPointsStudents}
+              >
+                {getFilteredStudentsForBulkPoints().every(student => selectedStudentsForBulkPoints.includes(student.id)) ? 'Batal Pilih Semua' : 'Pilih Semua'}
+              </Button>
+            </div>
+            <div className="max-h-60 overflow-y-auto border rounded-lg">
+              {getFilteredStudentsForBulkPoints().map((student) => (
+                <div key={student.id} className="flex items-center gap-3 p-3 hover:bg-gray-50">
+                  <input
+                    type="checkbox"
+                    checked={selectedStudentsForBulkPoints.includes(student.id)}
+                    onChange={() => handleBulkPointsStudentSelection(student.id)}
+                    className="rounded border-gray-300"
+                  />
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-purple-600">
+                        {student.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{student.name}</p>
+                      <p className="text-xs text-gray-500">{student.class} • Level {student.level} • {student.points} poin</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {getFilteredStudentsForBulkPoints().length === 0 && (
+                <div className="p-4 text-center text-gray-500">
+                  Tidak ada siswa yang sesuai filter
+                </div>
+              )}
+            </div>
+          </div>
+
+          {selectedStudentsForBulkPoints.length > 0 && (
+            <div className="mb-4 p-3 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>{selectedStudentsForBulkPoints.length} siswa dipilih</strong> akan menerima <strong>{bulkPointsForm.points} poin</strong> masing-masing
+                {bulkPointsForm.reason && <span> untuk: {bulkPointsForm.reason}</span>}
+              </p>
+            </div>
+          )}
+
+          <div className="flex gap-3 mt-6 pt-6 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowBulkPointsModal(false);
+                setSelectedStudentsForBulkPoints([]);
+                setBulkPointsForm({ points: 10, reason: '' });
+              }}
+              className="flex-1"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleBulkPointsAward}
+              disabled={saving || selectedStudentsForBulkPoints.length === 0 || bulkPointsForm.points <= 0}
+              className="flex-1 flex items-center gap-2"
+            >
+              <Zap className="w-4 h-4" />
+              {saving ? 'Memberikan...' : `Berikan ${bulkPointsForm.points} Poin ke ${selectedStudentsForBulkPoints.length} Siswa`}
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>
