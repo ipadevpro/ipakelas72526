@@ -59,9 +59,16 @@ const StudentsPage = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [displayedStudents, setDisplayedStudents] = useState<Student[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Lazy loading states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const studentsPerPage = 20; // Load 20 students at a time
   
   // Modal States
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -122,7 +129,61 @@ const StudentsPage = () => {
     }
     
     setFilteredStudents(filtered);
+    
+    // Reset pagination when filters change
+    setCurrentPage(1);
+    setHasMoreData(true);
+    
+    // Load initial page of filtered data
+    loadDisplayedStudents(filtered, 1);
   }, [searchTerm, students, selectedClassId]);
+
+  // Load students for display with pagination
+  const loadDisplayedStudents = (sourceStudents: Student[], page: number) => {
+    const startIndex = 0;
+    const endIndex = page * studentsPerPage;
+    const newDisplayedStudents = sourceStudents.slice(startIndex, endIndex);
+    
+    setDisplayedStudents(newDisplayedStudents);
+    setHasMoreData(endIndex < sourceStudents.length);
+  };
+
+  // Load more students (infinite scroll)
+  const loadMoreStudents = () => {
+    if (isLoadingMore || !hasMoreData) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate network delay for better UX
+    setTimeout(() => {
+      const nextPage = currentPage + 1;
+      const startIndex = currentPage * studentsPerPage;
+      const endIndex = nextPage * studentsPerPage;
+      const newStudents = filteredStudents.slice(startIndex, endIndex);
+      
+      if (newStudents.length > 0) {
+        setDisplayedStudents(prev => [...prev, ...newStudents]);
+        setCurrentPage(nextPage);
+        setHasMoreData(endIndex < filteredStudents.length);
+      } else {
+        setHasMoreData(false);
+      }
+      
+      setIsLoadingMore(false);
+    }, 300);
+  };
+
+  // Infinite scroll handler
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    
+    // Check if user has scrolled near the bottom (within 100px)
+    if (scrollHeight - scrollTop <= clientHeight + 100) {
+      if (hasMoreData && !isLoadingMore) {
+        loadMoreStudents();
+      }
+    }
+  };
 
   // Auto-hide notification after 5 seconds
   useEffect(() => {
@@ -217,6 +278,10 @@ const StudentsPage = () => {
           .filter(Boolean); // Remove null entries
         
         setStudents(processedStudents);
+        
+        // Reset pagination after loading new data
+        setCurrentPage(1);
+        setHasMoreData(processedStudents.length > studentsPerPage);
       } else {
         console.error('❌ Failed to load students:', response.error);
         showNotification('error', response.error || 'Gagal memuat data siswa');
@@ -469,7 +534,7 @@ const StudentsPage = () => {
                   ))}
                 </select>
                 <Badge variant="outline" className="text-xs sm:text-sm whitespace-nowrap">
-                  {filteredStudents.length} Siswa
+                  {displayedStudents.length} dari {filteredStudents.length} Siswa
                 </Badge>
               </div>
             </div>
@@ -482,29 +547,33 @@ const StudentsPage = () => {
         <Card className="border-0 shadow-lg overflow-hidden">
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50/50">
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Siswa
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Username
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Kelas
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Bergabung
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStudents.length > 0 ? (
-                  filteredStudents.map((student, index) => (
+            <div 
+              className="max-h-[600px] overflow-y-auto"
+              onScroll={handleScroll}
+            >
+              <table className="w-full">
+                <thead className="sticky top-0 bg-gray-50/50 z-10">
+                  <tr className="border-b border-gray-200">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Siswa
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Username
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Kelas
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bergabung
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Aksi
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {displayedStudents.length > 0 ? (
+                    displayedStudents.map((student, index) => (
                     <motion.tr
                       key={student.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -593,7 +662,38 @@ const StudentsPage = () => {
                       </td>
                     </motion.tr>
                   ))
-                ) : (
+                  ) : null}
+                  
+                  {/* Loading more indicator */}
+                  {isLoadingMore && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                          <span className="text-sm text-gray-600">Memuat data...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  
+                  {/* Load more button */}
+                  {!isLoadingMore && hasMoreData && displayedStudents.length > 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 text-center">
+                        <Button
+                          variant="outline"
+                          onClick={loadMoreStudents}
+                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Muat {Math.min(studentsPerPage, filteredStudents.length - displayedStudents.length)} Siswa Lagi
+                        </Button>
+                      </td>
+                    </tr>
+                  )}
+                  
+                  {/* No data state */}
+                  {displayedStudents.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center">
@@ -621,16 +721,20 @@ const StudentsPage = () => {
                       </div>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Mobile Card View */}
           <div className="md:hidden">
-            {filteredStudents.length > 0 ? (
-              <div className="p-4 space-y-3">
-                {filteredStudents.map((student, index) => (
+            {displayedStudents.length > 0 ? (
+              <div 
+                className="p-4 space-y-3 max-h-[600px] overflow-y-auto"
+                onScroll={handleScroll}
+              >
+                {displayedStudents.map((student, index) => (
                   <motion.div
                     key={student.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -713,6 +817,30 @@ const StudentsPage = () => {
                     </div>
                   </motion.div>
                 ))}
+                
+                {/* Loading more indicator for mobile */}
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                      <span className="text-sm text-gray-600">Memuat data...</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Load more button for mobile */}
+                {!isLoadingMore && hasMoreData && displayedStudents.length > 0 && (
+                  <div className="flex justify-center py-4">
+                    <Button
+                      variant="outline"
+                      onClick={loadMoreStudents}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Muat {Math.min(studentsPerPage, filteredStudents.length - displayedStudents.length)} Siswa Lagi
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-6 text-center">
@@ -740,6 +868,31 @@ const StudentsPage = () => {
               </div>
             )}
           </div>
+          
+          {/* Pagination Info Footer */}
+          {displayedStudents.length > 0 && (
+            <div className="border-t bg-gray-50/30 px-4 sm:px-6 py-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-gray-600 gap-2">
+                <span>
+                  Menampilkan {displayedStudents.length} dari {filteredStudents.length} siswa
+                  {filteredStudents.length !== students.length && (
+                    <span className="text-gray-500"> (difilter dari {students.length} total)</span>
+                  )}
+                </span>
+                {!hasMoreData && filteredStudents.length > studentsPerPage && (
+                  <span className="text-green-600 font-medium flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Semua data telah dimuat
+                  </span>
+                )}
+                {hasMoreData && !isLoadingMore && (
+                  <span className="text-blue-600 font-medium">
+                    {filteredStudents.length - displayedStudents.length} siswa lagi tersedia
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
       </AnimatedContainer>
 

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { gamificationApi, badgeApi, levelApi, challengeApi, apiRequest } from '@/lib/api';
 import { processGamificationData, calculateLevelFromPoints } from '@/lib/gamification';
-import { testCORSConnection, generateCORSReport } from '@/utils/corsDebug';
 import React from 'react';
 
 interface GamificationRecord {
@@ -433,31 +432,6 @@ const GamifikasiPage = () => {
     showNotification('success', 'Data berhasil diperbarui');
   };
 
-  const debugCORS = async () => {
-    showNotification('info', 'Menjalankan test CORS...');
-    try {
-      const testResult = await testCORSConnection();
-      if (testResult.success) {
-        showNotification('success', 'CORS test berhasil! API dapat diakses.');
-      } else {
-        showNotification('error', `CORS test gagal: ${testResult.error}`);
-        
-        // Generate detailed report
-        const report = await generateCORSReport();
-        console.log(report);
-        
-        // Show additional info in notification
-        if (testResult.corsIssue) {
-          setTimeout(() => {
-            showNotification('warning', 'Periksa console untuk panduan perbaikan CORS');
-          }, 3000);
-        }
-      }
-    } catch (error) {
-      showNotification('error', 'Gagal menjalankan test CORS');
-      console.error('CORS debug error:', error);
-    }
-  };
 
   // CRUD Operations
   const handleSaveBadge = async () => {
@@ -1079,15 +1053,6 @@ const GamifikasiPage = () => {
               <p className="text-gray-600">Kelola sistem penghargaan dan motivasi siswa</p>
             </div>
             <div className="flex items-center gap-3">
-              <Button 
-                onClick={debugCORS}
-                variant="outline" 
-                size="sm"
-                className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
-              >
-                <AlertCircle className="w-4 h-4" />
-                Debug CORS
-              </Button>
               <Button 
                 onClick={refreshData}
                 variant="outline" 

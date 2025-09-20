@@ -138,7 +138,7 @@ const NotificationToast = ({ notification, onClose }: {
 
 const PresensiPage = () => {
   // Enhanced state management
-  const [activeTab, setActiveTab] = useState<'daily' | 'records' | 'class-recap'>('daily');
+  const [activeTab, setActiveTab] = useState<'daily' | 'class-recap'>('daily');
   const [classRecaps, setClassRecaps] = useState<ClassRecap[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -147,12 +147,6 @@ const PresensiPage = () => {
   const [attendanceData, setAttendanceData] = useState<AttendanceStatusMap>({});
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   
-  // Pagination and lazy loading for records tab
-  const [displayedRecords, setDisplayedRecords] = useState<AttendanceRecord[]>([]);
-  const [recordsPage, setRecordsPage] = useState(1);
-  const [isLoadingMoreRecords, setIsLoadingMoreRecords] = useState(false);
-  const [hasMoreRecords, setHasMoreRecords] = useState(true);
-  const recordsPerPage = 20; // Load 20 records at a time
   
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
@@ -203,6 +197,50 @@ const PresensiPage = () => {
       month: 'long', 
       day: 'numeric'
     });
+  };
+
+  // Check if class has attendance data for specific date
+  const hasAttendanceData = (classId: string, date: Date) => {
+    const dateString = formatDateForAPI(date);
+    return attendanceRecords.some(record => 
+      record.classId === classId && record.date === dateString
+    );
+  };
+
+  // Get attendance status for a class on specific date
+  const getClassAttendanceStatus = (classId: string, date: Date) => {
+    const dateString = formatDateForAPI(date);
+    const classRecordsForDate = attendanceRecords.filter(record => 
+      record.classId === classId && record.date === dateString
+    );
+    
+    const recordedCount = classRecordsForDate.length;
+    
+    if (recordedCount === 0) {
+      return { status: 'not-taken', count: 0, total: 0 };
+    }
+
+    // Get unique students for this class from attendance records to estimate total
+    const uniqueStudentsInClass = [...new Set(
+      attendanceRecords
+        .filter(r => r.classId === classId)
+        .map(r => r.studentUsername)
+    )].length;
+    
+    // Use loaded students count if available, otherwise estimate from records
+    const totalStudents = (selectedClass === classId && students.length > 0) 
+      ? students.length 
+      : uniqueStudentsInClass;
+    
+    if (totalStudents === 0) {
+      return { status: 'partial', count: recordedCount, total: recordedCount };
+    }
+    
+    if (recordedCount >= totalStudents) {
+      return { status: 'complete', count: recordedCount, total: totalStudents };
+    } else {
+      return { status: 'partial', count: recordedCount, total: totalStudents };
+    }
   };
 
   // Calculate class-based attendance recap
@@ -776,75 +814,6 @@ const PresensiPage = () => {
     }
   };
 
-  // Lazy loading functions for records tab
-  const loadInitialRecords = () => {
-    if (attendanceRecords.length === 0) {
-      setDisplayedRecords([]);
-      setHasMoreRecords(false);
-      return;
-    }
-    
-    const initialRecords = attendanceRecords.slice(0, recordsPerPage);
-    setDisplayedRecords(initialRecords);
-    setRecordsPage(1);
-    setHasMoreRecords(attendanceRecords.length > recordsPerPage);
-    
-
-  };
-
-  const loadMoreRecords = () => {
-    if (isLoadingMoreRecords || !hasMoreRecords) return;
-    
-    setIsLoadingMoreRecords(true);
-    
-    // Simulate network delay for better UX
-    setTimeout(() => {
-      const nextPage = recordsPage + 1;
-      const startIndex = recordsPage * recordsPerPage;
-      const endIndex = nextPage * recordsPerPage;
-      const newRecords = attendanceRecords.slice(startIndex, endIndex);
-      
-      if (newRecords.length > 0) {
-        setDisplayedRecords(prev => [...prev, ...newRecords]);
-        setRecordsPage(nextPage);
-        setHasMoreRecords(endIndex < attendanceRecords.length);
-        
-  
-      } else {
-        setHasMoreRecords(false);
-      }
-      
-      setIsLoadingMoreRecords(false);
-    }, 300);
-  };
-
-  const resetRecordsPagination = () => {
-    setDisplayedRecords([]);
-    setRecordsPage(1);
-    setHasMoreRecords(true);
-    setIsLoadingMoreRecords(false);
-  };
-
-  // Infinite scroll handler
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    
-    // Check if user has scrolled near the bottom (within 100px)
-    if (scrollHeight - scrollTop <= clientHeight + 100) {
-      if (hasMoreRecords && !isLoadingMoreRecords) {
-        loadMoreRecords();
-      }
-    }
-  };
-
-  // Load initial records when attendance records change
-  useEffect(() => {
-    if (attendanceRecords.length > 0) {
-      loadInitialRecords();
-    } else {
-      resetRecordsPagination();
-    }
-  }, [attendanceRecords]);
 
   // Auto-refresh statistics whenever attendance records change
   useEffect(() => {
@@ -894,15 +863,6 @@ const PresensiPage = () => {
     }
   }, [selectedClass]);
 
-  // Auto-refresh records when switching to records tab
-  useEffect(() => {
-    if (activeTab === 'records') {
-      // Only fetch if we don't have recent data
-      if (attendanceRecords.length === 0) {
-        fetchAllRecords();
-      }
-    }
-  }, [activeTab]);
 
   // Auto-refresh class recaps when switching to class-recap tab
   useEffect(() => {
@@ -1123,20 +1083,6 @@ const PresensiPage = () => {
                 <span className="text-xs sm:text-sm truncate">Presensi Harian</span>
               </div>
             </button>
-            
-            <button
-              onClick={() => setActiveTab('records')}
-              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
-                activeTab === 'records'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-xs sm:text-sm truncate">Riwayat</span>
-              </div>
-            </button>
 
             <button
               onClick={() => setActiveTab('class-recap')}
@@ -1156,6 +1102,49 @@ const PresensiPage = () => {
           <div className="p-4 sm:p-6">
             {activeTab === 'daily' && (
               <div className="space-y-4 sm:space-y-6">
+                {/* Overview Status untuk Semua Kelas */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200/50">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">
+                    Status Presensi Semua Kelas - {formatDate(selectedDate).split(',')[0]}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {classes.map((cls) => {
+                      const status = getClassAttendanceStatus(cls.id, selectedDate);
+                      return (
+                        <div 
+                          key={cls.id}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                            selectedClass === cls.id 
+                              ? 'bg-blue-100 border-blue-300' 
+                              : 'bg-white border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => handleClassSelect(cls.id)}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-xs sm:text-sm font-medium text-gray-900 truncate flex-1 mr-2">
+                              {cls.name}
+                            </h4>
+                            {status.status === 'complete' && (
+                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                            )}
+                            {status.status === 'partial' && (
+                              <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+                            )}
+                            {status.status === 'not-taken' && (
+                              <XCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {status.status === 'complete' && `✓ Lengkap (${status.count}/${status.total})`}
+                            {status.status === 'partial' && `⚠ Sebagian (${status.count}/${status.total})`}
+                            {status.status === 'not-taken' && '○ Belum diambil'}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Controls */}
                 <div className="space-y-4 sm:space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1163,18 +1152,60 @@ const PresensiPage = () => {
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700">
                       Pilih Kelas
                     </label>
-                    <select
-                      value={selectedClass}
-                      onChange={(e) => handleClassSelect(e.target.value)}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base"
-                    >
-                      <option value="">Pilih Kelas...</option>
-                      {classes.map((cls) => (
-                        <option key={cls.id} value={cls.id}>
-                          {cls.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="space-y-3">
+                      <select
+                        value={selectedClass}
+                        onChange={(e) => handleClassSelect(e.target.value)}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base"
+                      >
+                        <option value="">Pilih Kelas...</option>
+                        {classes.map((cls) => (
+                          <option key={cls.id} value={cls.id}>
+                            {cls.name}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      {/* Status Presensi untuk Kelas Terpilih */}
+                      {selectedClass && (
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">
+                              Status Presensi:
+                            </span>
+                            {(() => {
+                              const attendanceStatus = getClassAttendanceStatus(selectedClass, selectedDate);
+                              
+                              if (attendanceStatus.status === 'complete') {
+                                return (
+                                  <Badge className="bg-green-100 text-green-700 border-green-200">
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Lengkap ({attendanceStatus.count}/{attendanceStatus.total})
+                                  </Badge>
+                                );
+                              } else if (attendanceStatus.status === 'partial') {
+                                return (
+                                  <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                                    <AlertTriangle className="w-3 h-3 mr-1" />
+                                    Sebagian ({attendanceStatus.count}/{attendanceStatus.total})
+                                  </Badge>
+                                );
+                              } else {
+                                return (
+                                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">
+                                    <XCircle className="w-3 h-3 mr-1" />
+                                    Belum Diambil
+                                  </Badge>
+                                );
+                              }
+                            })()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {formatDate(selectedDate).split(',')[0]}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                     <div className="space-y-2 sm:col-span-2 lg:col-span-1">
@@ -1393,165 +1424,6 @@ const PresensiPage = () => {
               </div>
             )}
 
-            {activeTab === 'records' && (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                      Riwayat Presensi
-                    </CardTitle>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                      {attendanceRecords.length > 0 ? (
-                        displayedRecords.length < attendanceRecords.length ? (
-                          <>Menampilkan {displayedRecords.length} dari {attendanceRecords.length} records • Scroll ke bawah untuk muat lebih banyak</>
-                        ) : (
-                          <>Total {attendanceRecords.length} records • Semua data sudah dimuat</>
-                        )
-                      ) : (
-                        'Belum ada data presensi'
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <button
-                      onClick={fetchAllRecords}
-                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
-                      title="Refresh data"
-                    >
-                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                    <Button
-                      onClick={() => {
-                        setExportType('all');
-                        setSelectedExportClass('');
-                        setShowExportModal(true);
-                      }}
-                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2"
-                    >
-                      <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                      <span className="hidden sm:inline">Export Data</span>
-                      <span className="sm:hidden">Export</span>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl border shadow-lg overflow-hidden">
-                  <div 
-                    className="overflow-x-auto max-h-80 sm:max-h-96 overflow-y-auto"
-                    onScroll={handleScroll}
-                  >
-                    <table className="w-full min-w-[700px]">
-                      <thead className="bg-gray-50 sticky top-0">
-                        <tr>
-                          <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tanggal
-                          </th>
-                          <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kelas
-                          </th>
-                          <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Siswa
-                          </th>
-                          <th className="px-4 sm:px-6 py-2 sm:py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Catatan
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {displayedRecords.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-                              <div className="flex flex-col items-center">
-                                <BarChart3 className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mb-3" />
-                                <p className="text-base sm:text-lg font-medium text-gray-900">Belum ada data presensi</p>
-                                <p className="text-xs sm:text-sm text-gray-500">Data akan muncul setelah presensi dilakukan</p>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          displayedRecords.map((record, index) => (
-                            <motion.tr 
-                              key={record.id} 
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.02 }}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {new Date(record.date).toLocaleDateString('id-ID')}
-                              </td>
-                              <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {classes.find(c => c.id === record.classId)?.name || 'Unknown'}
-                              </td>
-                              <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {record.studentUsername}
-                              </td>
-                              <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
-                                <Badge 
-                                  variant="outline"
-                                  className={`text-xs ${
-                                    statusConfig[record.status as AttendanceStatus]?.bgColor || 'bg-gray-100'
-                                  } ${
-                                    statusConfig[record.status as AttendanceStatus]?.textColor || 'text-gray-700'
-                                  } border-transparent`}
-                                >
-                                  {statusConfig[record.status as AttendanceStatus]?.label || record.status}
-                                </Badge>
-                              </td>
-                              <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                                {record.notes || '-'}
-                              </td>
-                            </motion.tr>
-                          ))
-                        )}
-                        
-                        {/* Loading more indicator */}
-                        {isLoadingMoreRecords && (
-                          <tr>
-                            <td colSpan={5} className="px-4 sm:px-6 py-3 sm:py-4 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-                                <span className="text-xs sm:text-sm text-gray-600">Memuat data...</span>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  {/* Records Summary Footer */}
-                  <div className="border-t bg-gray-50/30 px-4 sm:px-6 py-2 sm:py-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-gray-600 gap-2">
-                      <span>
-                        Menampilkan {displayedRecords.length} dari {attendanceRecords.length} records
-                      </span>
-                      {!hasMoreRecords && attendanceRecords.length > recordsPerPage && (
-                        <span className="text-green-600 font-medium flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          Semua data telah dimuat
-                        </span>
-                      )}
-                      {hasMoreRecords && !isLoadingMoreRecords && (
-                        <Button
-                          onClick={loadMoreRecords}
-                          variant="outline"
-                          size="sm"
-                          className="text-blue-600 border-blue-200 hover:bg-blue-50 text-xs px-3 py-1"
-                        >
-                          <RefreshCw className="w-3 h-3 mr-1" />
-                          Load More
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {activeTab === 'class-recap' && (
               <div className="space-y-4 sm:space-y-6">

@@ -29,6 +29,7 @@ interface DashboardStats {
   totalAssignments: number;
   averageGrade: number;
   todayAttendance: number;
+  todayTotalRecords: number;
   pendingGrades: number;
   overdueAssignments: number;
   activeStudents: number;
@@ -102,6 +103,7 @@ const Dashboard = () => {
     totalAssignments: 0,
     averageGrade: 0,
     todayAttendance: 0,
+    todayTotalRecords: 0,
     pendingGrades: 0,
     overdueAssignments: 0,
     activeStudents: 0
@@ -209,6 +211,18 @@ const Dashboard = () => {
       let attendanceRecords: AttendanceRecord[] = [];
       if (attendanceResponse.success) {
         attendanceRecords = attendanceResponse.attendance || [];
+        console.log('📋 Loaded attendance records:', {
+          total: attendanceRecords.length,
+          sample: attendanceRecords.slice(0, 5).map(r => ({
+            date: r.date,
+            status: r.status,
+            student: r.studentUsername,
+            class: r.classId
+          })),
+          uniqueDates: [...new Set(attendanceRecords.map(r => r.date))].slice(0, 10)
+        });
+      } else {
+        console.error('❌ Failed to load attendance:', attendanceResponse);
       }
 
       // Add student count to classes
@@ -261,11 +275,36 @@ const Dashboard = () => {
       ? validGrades.reduce((sum, grade) => sum + grade.points, 0) / validGrades.length 
       : 0;
 
-    // Calculate today's attendance
-    const today = new Date().toISOString().split('T')[0];
-    const todayAttendance = attendanceRecords.filter(record => 
-      record.date === today && record.status === 'present'
-    ).length;
+    // Calculate today's attendance with comprehensive date handling
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    const todayLocal = today.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const todayDisplay = today.toLocaleDateString('id-ID');
+    
+    console.log('🗓️ Today date formats:', { todayStr, todayLocal, todayDisplay });
+    
+    const todayAttendanceRecords = attendanceRecords.filter(record => {
+      // Handle different date formats
+      const recordDate = record.date;
+      const recordDateStr = typeof recordDate === 'string' ? recordDate.split('T')[0] : recordDate;
+      const isToday = recordDateStr === todayStr || recordDateStr === todayLocal;
+      
+      if (isToday) {
+        console.log('📅 Found today attendance:', { recordDate: recordDateStr, status: record.status, student: record.studentUsername });
+      }
+      
+      return isToday;
+    });
+    
+    const todayAttendance = todayAttendanceRecords.filter(record => record.status === 'present').length;
+    const todayTotalRecords = todayAttendanceRecords.length;
+    
+    console.log('📊 Today attendance calculation:', {
+      todayAttendance,
+      todayTotalRecords,
+      totalAttendanceRecords: attendanceRecords.length,
+      todayRecords: todayAttendanceRecords.map(r => ({ date: r.date, status: r.status, student: r.studentUsername }))
+    });
 
     // Calculate overdue assignments
     const now = new Date();
@@ -323,23 +362,37 @@ const Dashboard = () => {
       }
     });
     
-    console.log('📊 DETAILED Pending grades calculation:', {
-      totalAssignments: assignments.length,
-      totalGrades: grades.length,
-      finalPendingGrades: pendingGrades,
-      detailedBreakdown: detailedPendingInfo,
-      orphanedGrades: grades.filter(g => !assignments.find(a => a.id === g.assignmentId)),
-      validGrades: grades.filter(g => assignments.find(a => a.id === g.assignmentId))
-    });
-
-    // Calculate active students (students with recent activity)
+    // Calculate active students (students with recent activity) - improved date handling
     const recentDate = new Date();
     recentDate.setDate(recentDate.getDate() - 7); // Last 7 days
     const activeStudents = [...new Set(
       attendanceRecords
-        .filter(record => new Date(record.date) >= recentDate)
+        .filter(record => {
+          // Handle different date formats
+          const recordDate = record.date;
+          const recordDateStr = typeof recordDate === 'string' ? recordDate.split('T')[0] : recordDate;
+          const recordDateObj = new Date(recordDateStr);
+          return recordDateObj >= recentDate && record.status === 'present';
+        })
         .map(record => record.studentUsername)
     )].length;
+
+    console.log('📊 DETAILED Dashboard statistics:', {
+      totalAssignments: assignments.length,
+      totalGrades: grades.length,
+      totalAttendance: attendanceRecords.length,
+      finalPendingGrades: pendingGrades,
+      todayAttendance: todayAttendance,
+      activeStudents: activeStudents,
+      detailedBreakdown: detailedPendingInfo,
+      orphanedGrades: grades.filter(g => !assignments.find(a => a.id === g.assignmentId)),
+      validGrades: grades.filter(g => assignments.find(a => a.id === g.assignmentId)),
+      attendanceSample: attendanceRecords.slice(0, 3).map(r => ({
+        date: r.date,
+        status: r.status,
+        student: r.studentUsername
+      }))
+    });
 
     const finalStats = {
       totalClasses: classes.length,
@@ -347,6 +400,7 @@ const Dashboard = () => {
       totalAssignments: assignments.length,
       averageGrade: Math.round(averageGrade * 10) / 10,
       todayAttendance,
+      todayTotalRecords,
       pendingGrades,
       overdueAssignments,
       activeStudents
@@ -382,23 +436,32 @@ const Dashboard = () => {
         };
       });
 
-    // Recent attendance (today and yesterday)
+    // Recent attendance (today and yesterday) with better date handling
     const recentAttendance = attendanceRecords
       .filter(record => {
-        const recordDate = new Date(record.date);
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
-        return recordDate >= yesterday;
+        
+        // Handle different date formats
+        const recordDate = record.date;
+        const recordDateStr = typeof recordDate === 'string' ? recordDate.split('T')[0] : recordDate;
+        const recordDateObj = new Date(recordDateStr);
+        
+        return recordDateObj >= yesterday && recordDateObj <= today;
       })
-      .slice(0, 3)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5) // Increase to show more recent attendance
       .map(record => {
         const student = students.find(s => s.username === record.studentUsername);
         const className = classes.find(c => c.id === record.classId)?.name;
+        const isToday = record.date === new Date().toISOString().split('T')[0] || 
+                       record.date === new Date().toLocaleDateString('en-CA');
+        
         return {
           id: `attendance-${record.id}`,
           type: 'attendance' as const,
-          title: `Presensi ${className} - ${getStatusText(record.status)}`,
+          title: `${className} - ${getStatusText(record.status)}${isToday ? ' (Hari ini)' : ''}`,
           time: formatTimeAgo(record.date),
           student: student?.fullName || record.studentUsername,
           className,
@@ -697,22 +760,24 @@ const Dashboard = () => {
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0">
                           <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 space-y-1">
                           <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                             {classItem.name}
                           </h3>
-                          <div className="flex flex-wrap items-center gap-2 mt-1">
-                            {classItem.subject && (
-                              <Badge variant="secondary" className="text-xs">
-                                {classItem.subject}
-                              </Badge>
-                            )}
-                            <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
-                              <Users className="w-3 h-3" />
-                              <span>{classItem.studentCount || 0} siswa</span>
+                          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-2">
+                            <div className="flex items-center gap-2">
+                              {classItem.subject && (
+                                <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                                  {classItem.subject}
+                                </Badge>
+                              )}
+                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <Users className="w-3 h-3 flex-shrink-0" />
+                                <span>{classItem.studentCount || 0} siswa</span>
+                              </div>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1 truncate">
+                          <p className="text-xs text-gray-500 line-clamp-1 sm:line-clamp-2">
                             {classItem.description || 'Tidak ada deskripsi'}
                           </p>
                         </div>
@@ -772,26 +837,28 @@ const Dashboard = () => {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`}>
                           <IconComponent className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-medium text-gray-900 line-clamp-2">
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 leading-tight line-clamp-2">
                             {activity.title}
                           </p>
-                          {activity.student && (
-                            <p className="text-xs text-gray-600 truncate mt-1">
-                              <Users className="w-3 h-3 inline mr-1" />
-                              {activity.student}
+                          <div className="space-y-0.5">
+                            {activity.student && (
+                              <p className="text-xs text-gray-600 truncate flex items-center gap-1">
+                                <Users className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{activity.student}</span>
+                              </p>
+                            )}
+                            {activity.className && !activity.student && (
+                              <p className="text-xs text-gray-600 truncate flex items-center gap-1">
+                                <BookOpen className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{activity.className}</span>
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              <span>{activity.time}</span>
                             </p>
-                          )}
-                          {activity.className && !activity.student && (
-                            <p className="text-xs text-gray-600 truncate mt-1">
-                              <BookOpen className="w-3 h-3 inline mr-1" />
-                              {activity.className}
-                            </p>
-                          )}
-                          <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {activity.time}
-                          </p>
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -823,7 +890,7 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {[
                 { 
                   title: 'Buat Tugas', 
@@ -831,7 +898,7 @@ const Dashboard = () => {
                   color: 'bg-orange-500',
                   stat: `${stats.totalAssignments} aktif`,
                   urgent: stats.overdueAssignments > 0,
-                  urgentText: `${stats.overdueAssignments} lewat deadline`
+                  urgentText: `${stats.overdueAssignments} terlambat`
                 },
                 { 
                   title: 'Input Nilai', 
@@ -839,14 +906,17 @@ const Dashboard = () => {
                   color: 'bg-green-500',
                   stat: `Rata-rata ${stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : '0'}`,
                   urgent: stats.pendingGrades > 0,
-                  urgentText: stats.pendingGrades > 0 ? `${stats.pendingGrades} siswa belum dinilai` : undefined
+                  urgentText: stats.pendingGrades > 0 ? `${stats.pendingGrades} belum dinilai` : undefined
                 },
                 { 
                   title: 'Catat Presensi', 
                   icon: Clock, 
                   color: 'bg-blue-500',
-                  stat: `${stats.todayAttendance} hadir hari ini`,
-                  urgent: false
+                  stat: stats.todayTotalRecords > 0 
+                    ? `${stats.todayAttendance}/${stats.todayTotalRecords} hadir`
+                    : 'Belum ada presensi',
+                  urgent: false,
+                  urgentText: stats.todayTotalRecords === 0 ? 'Mulai catat' : undefined
                 },
                 { 
                   title: 'Kelola Siswa', 
@@ -854,7 +924,7 @@ const Dashboard = () => {
                   color: 'bg-purple-500',
                   stat: `${stats.totalStudents} total`,
                   urgent: false,
-                  urgentText: `${stats.activeStudents} aktif minggu ini`
+                  urgentText: `${stats.activeStudents} aktif`
                 }
               ].map((action) => (
                 <motion.div
@@ -864,7 +934,7 @@ const Dashboard = () => {
                 >
                   <Button
                     variant="outline"
-                    className={`h-20 sm:h-24 flex-col space-y-1 sm:space-y-2 hover:shadow-md transition-all duration-200 w-full relative ${
+                    className={`h-24 sm:h-28 flex-col justify-between hover:shadow-md transition-all duration-200 w-full relative p-3 ${
                       action.urgent ? 'border-red-200 bg-red-50' : ''
                     }`}
                     onClick={() => handleQuickAction(action.title)}
@@ -872,14 +942,24 @@ const Dashboard = () => {
                     {action.urgent && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                     )}
-                    <div className={`p-1.5 sm:p-2 rounded-lg ${action.color} text-white`}>
+                    
+                    {/* Icon Section */}
+                    <div className={`p-2 rounded-lg ${action.color} text-white flex-shrink-0`}>
                       <action.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <div className="text-center">
-                      <span className="text-xs leading-tight font-medium">{action.title}</span>
-                      <p className="text-xs text-gray-500 mt-1">{action.stat}</p>
+                    
+                    {/* Text Section */}
+                    <div className="text-center space-y-1 flex-1 flex flex-col justify-end min-h-0">
+                      <span className="text-xs font-medium text-gray-900 leading-tight break-words hyphens-auto">
+                        {action.title}
+                      </span>
+                      <p className="text-xs text-gray-500 leading-tight break-words">
+                        {action.stat}
+                      </p>
                       {action.urgent && action.urgentText && (
-                        <p className="text-xs text-red-600 font-medium">{action.urgentText}</p>
+                        <p className="text-xs text-red-600 font-medium leading-tight break-words">
+                          {action.urgentText}
+                        </p>
                       )}
                     </div>
                   </Button>
@@ -888,20 +968,20 @@ const Dashboard = () => {
             </div>
             
             {/* Summary Alerts */}
-            <div className="mt-4 sm:mt-6 space-y-2">
+            <div className="mt-4 sm:mt-6 space-y-3">
               {/* Data Issues Alert */}
               {dataIssues && (
-                <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <div className="flex items-start gap-3 p-3 sm:p-4 bg-orange-50 border border-orange-200 rounded-lg">
                   <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-xs sm:text-sm text-orange-800 font-medium">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <p className="text-xs sm:text-sm text-orange-800 font-medium leading-tight">
                       Masalah Sinkronisasi Data Terdeteksi
                     </p>
-                    <p className="text-xs text-orange-700 mt-1">
+                    <p className="text-xs text-orange-700 leading-relaxed">
                       Ditemukan <span className="font-medium">{dataIssues.orphanedGrades} nilai</span> yang mereferensikan tugas yang sudah tidak ada. 
                       Ini bisa menyebabkan perhitungan "siswa belum dinilai" tidak akurat.
                     </p>
-                    <p className="text-xs text-orange-600 mt-2">
+                    <p className="text-xs text-orange-600 leading-relaxed">
                       💡 <strong>Solusi:</strong> Hapus nilai lama yang tidak valid di halaman Nilai, atau buat ulang tugas yang hilang.
                     </p>
                   </div>
@@ -909,27 +989,27 @@ const Dashboard = () => {
               )}
               
               {stats.overdueAssignments > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
                   <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-red-800">
+                  <p className="text-xs sm:text-sm text-red-800 leading-tight">
                     <span className="font-medium">{stats.overdueAssignments} tugas</span> telah melewati deadline
                   </p>
                 </div>
               )}
               
               {stats.pendingGrades > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <Clock className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-yellow-800">
+                  <p className="text-xs sm:text-sm text-yellow-800 leading-tight">
                     <span className="font-medium">{stats.pendingGrades} siswa</span> belum dinilai pada tugas yang ada
                   </p>
                 </div>
               )}
               
               {stats.totalClasses > 0 && stats.totalStudents > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
                   <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-green-800">
+                  <p className="text-xs sm:text-sm text-green-800 leading-tight">
                     Sistem berjalan normal • <span className="font-medium">{stats.activeStudents} siswa</span> aktif minggu ini
                   </p>
                 </div>
