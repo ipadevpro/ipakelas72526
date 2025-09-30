@@ -109,6 +109,7 @@ const NilaiPage = () => {
   
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -128,6 +129,16 @@ const NilaiPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
+
+  // Bulk grading states
+  const [bulkAssignmentId, setBulkAssignmentId] = useState<string>('');
+  const [bulkGrades, setBulkGrades] = useState<Array<{
+    studentUsername: string;
+    studentName: string;
+    points: string;
+    feedback: string;
+  }>>([]);
 
   useEffect(() => {
     fetchInitialData();
@@ -454,6 +465,13 @@ const NilaiPage = () => {
       if (response.success) {
         await fetchGrades();
         setShowAddModal(false);
+        
+        // Dispatch event for auto-complete check
+        const gradeUpdateEvent = new CustomEvent('gradeUpdated', {
+          detail: { assignmentId: formData.assignmentId }
+        });
+        window.dispatchEvent(gradeUpdateEvent);
+        
         setFormData({ id: '', assignmentId: '', studentUsername: '', points: '', feedback: '' });
         showNotification('success', 'Nilai berhasil ditambahkan!');
       } else {
@@ -487,6 +505,13 @@ const NilaiPage = () => {
       if (response.success) {
         await fetchGrades();
         setShowEditModal(false);
+        
+        // Dispatch event for auto-complete check
+        const gradeUpdateEvent = new CustomEvent('gradeUpdated', {
+          detail: { assignmentId: formData.assignmentId }
+        });
+        window.dispatchEvent(gradeUpdateEvent);
+        
         showNotification('success', 'Nilai berhasil diperbarui!');
       } else {
         setError(response.error || 'Gagal mengubah nilai');
@@ -899,6 +924,121 @@ const NilaiPage = () => {
     setShowAddModal(true);
   };
 
+  // Bulk grading functions
+  const handleOpenBulkModal = () => {
+    setBulkAssignmentId(selectedAssignmentId !== 'all' ? selectedAssignmentId : '');
+    setBulkGrades([]);
+    setShowBulkModal(true);
+  };
+
+  const handleBulkAssignmentChange = (assignmentId: string) => {
+    setBulkAssignmentId(assignmentId);
+    
+    if (assignmentId) {
+      // Get assignment to find its class
+      const assignment = assignments.find(a => a.id === assignmentId);
+      if (assignment) {
+        // Get students for this assignment's class
+        const classStudents = students.filter(s => s.classId === assignment.classId);
+        
+        // Get existing grades for this assignment
+        const existingGrades = grades.filter(g => g.assignmentId === assignmentId);
+        const gradedStudentUsernames = new Set(existingGrades.map(g => g.studentUsername));
+        
+        // Filter out students who already have grades
+        const ungradedStudents = classStudents.filter(s => !gradedStudentUsernames.has(s.username));
+        
+        // Initialize bulk grades array
+        const initialBulkGrades = ungradedStudents.map(student => ({
+          studentUsername: student.username,
+          studentName: student.fullName,
+          points: '',
+          feedback: ''
+        }));
+        
+        setBulkGrades(initialBulkGrades);
+      }
+    } else {
+      setBulkGrades([]);
+    }
+  };
+
+  const handleBulkGradeChange = (index: number, field: 'points' | 'feedback', value: string) => {
+    setBulkGrades(prev => prev.map((grade, i) => 
+      i === index ? { ...grade, [field]: value } : grade
+    ));
+  };
+
+  const handleBulkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!bulkAssignmentId) {
+      showNotification('error', 'Pilih tugas terlebih dahulu');
+      return;
+    }
+
+    // Filter out empty grades
+    const validGrades = bulkGrades.filter(grade => grade.points.trim() !== '');
+    
+    if (validGrades.length === 0) {
+      showNotification('error', 'Masukkan minimal satu nilai');
+      return;
+    }
+
+    // Validate points
+    const invalidGrades = validGrades.filter(grade => {
+      const points = parseFloat(grade.points);
+      return isNaN(points) || points < 0 || points > 100;
+    });
+
+    if (invalidGrades.length > 0) {
+      showNotification('error', 'Semua nilai harus berupa angka antara 0-100');
+      return;
+    }
+
+    setIsBulkSubmitting(true);
+    
+    try {
+      // Submit each grade individually using URLSearchParams (CORS compliant)
+      const submitPromises = validGrades.map(async (grade) => {
+        const response = await gradeApi.create(
+          bulkAssignmentId,
+          grade.studentUsername,
+          parseFloat(grade.points),
+          grade.feedback
+        );
+        return response;
+      });
+
+      const results = await Promise.all(submitPromises);
+      
+      // Check if all submissions were successful
+      const failedSubmissions = results.filter(result => !result.success);
+      
+      if (failedSubmissions.length === 0) {
+        showNotification('success', `${validGrades.length} nilai berhasil disimpan!`);
+        
+        // Dispatch event for auto-complete check
+        const gradeUpdateEvent = new CustomEvent('gradeUpdated', {
+          detail: { assignmentId: bulkAssignmentId }
+        });
+        window.dispatchEvent(gradeUpdateEvent);
+        
+        setShowBulkModal(false);
+        setBulkGrades([]);
+        setBulkAssignmentId('');
+        await fetchGrades(); // Refresh grades data
+      } else {
+        showNotification('error', `${failedSubmissions.length} dari ${validGrades.length} nilai gagal disimpan`);
+      }
+    } catch (error) {
+      console.error('Error in bulk submit:', error);
+      showNotification('error', 'Terjadi kesalahan saat menyimpan nilai');
+    } finally {
+      setIsBulkSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -991,6 +1131,14 @@ const NilaiPage = () => {
               >
                 <Download className="w-4 h-4" />
                 <span>{isExporting ? 'Mengekspor...' : 'Ekspor Excel'}</span>
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleOpenBulkModal} 
+                className="flex gap-1 items-center border-green-200 text-green-700 hover:bg-green-50"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Bulk Nilai</span>
               </Button>
               <Button 
                 onClick={handleOpenAddModal} 
@@ -1766,6 +1914,207 @@ const NilaiPage = () => {
                         'Simpan'
                       )}
                     </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Bulk Grading Modal */}
+        {showBulkModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              <div className="p-4 sm:p-6 border-b">
+                <h2 className="text-lg sm:text-xl font-bold">Bulk Input Nilai</h2>
+                <p className="text-sm text-gray-600 mt-1">Input nilai untuk beberapa siswa sekaligus</p>
+              </div>
+              
+              <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
+                <div className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
+                  {/* Assignment Selection */}
+                  <div className="space-y-2">
+                    <label htmlFor="bulk-assignment" className="text-sm font-medium">
+                      Pilih Tugas *
+                    </label>
+                    <select
+                      id="bulk-assignment"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={bulkAssignmentId}
+                      onChange={(e) => handleBulkAssignmentChange(e.target.value)}
+                      required
+                    >
+                      <option value="">Pilih Tugas</option>
+                      {assignments.map(assignment => (
+                        <option key={assignment.id} value={assignment.id}>
+                          {assignment.title} - {getClassName(assignment.classId)} (Max: {assignment.maxPoints || 100})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Students Table */}
+                  {bulkGrades.length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Daftar Siswa ({bulkGrades.length} siswa belum dinilai)
+                      </label>
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="max-h-96 overflow-y-auto">
+                          <table className="w-full">
+                            <thead className="bg-gray-50 sticky top-0">
+                              <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  No
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Nama Siswa
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Username
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Nilai (0-100) *
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Feedback
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                              {bulkGrades.map((grade, index) => (
+                                <tr key={grade.studentUsername} className="hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    {index + 1}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {grade.studentName}
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-500">
+                                    {grade.studentUsername}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="100"
+                                      step="0.1"
+                                      value={grade.points}
+                                      onChange={(e) => handleBulkGradeChange(index, 'points', e.target.value)}
+                                      placeholder="0-100"
+                                      className="w-20 h-8 text-sm"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <Input
+                                      type="text"
+                                      value={grade.feedback}
+                                      onChange={(e) => handleBulkGradeChange(index, 'feedback', e.target.value)}
+                                      placeholder="Feedback (opsional)"
+                                      className="w-full h-8 text-sm"
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      
+                      {/* Quick Actions */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const points = prompt('Masukkan nilai yang sama untuk semua siswa (0-100):');
+                            if (points && !isNaN(parseFloat(points)) && parseFloat(points) >= 0 && parseFloat(points) <= 100) {
+                              setBulkGrades(prev => prev.map(grade => ({ ...grade, points })));
+                            }
+                          }}
+                          className="text-xs"
+                        >
+                          Set Nilai Sama
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const feedback = prompt('Masukkan feedback yang sama untuk semua siswa:');
+                            if (feedback) {
+                              setBulkGrades(prev => prev.map(grade => ({ ...grade, feedback })));
+                            }
+                          }}
+                          className="text-xs"
+                        >
+                          Set Feedback Sama
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setBulkGrades(prev => prev.map(grade => ({ ...grade, points: '', feedback: '' })));
+                          }}
+                          className="text-xs text-red-600 hover:text-red-700"
+                        >
+                          Reset Semua
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {bulkAssignmentId && bulkGrades.length === 0 && (
+                    <div className="text-center py-8">
+                      <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
+                      <p className="text-gray-600 font-medium">Semua siswa sudah dinilai!</p>
+                      <p className="text-sm text-gray-500">Pilih tugas lain untuk menilai siswa yang belum dinilai.</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Modal Footer */}
+                <div className="border-t p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div className="text-sm text-gray-600">
+                      {bulkGrades.length > 0 && (
+                        <span>
+                          {bulkGrades.filter(g => g.points.trim() !== '').length} dari {bulkGrades.length} siswa akan dinilai
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setShowBulkModal(false)}
+                        className="flex-1 sm:flex-none h-9 text-sm"
+                        disabled={isBulkSubmitting}
+                      >
+                        Batal
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        className="flex-1 sm:flex-none h-9 text-sm bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                        disabled={isBulkSubmitting || bulkGrades.filter(g => g.points.trim() !== '').length === 0}
+                      >
+                        {isBulkSubmitting ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Menyimpan...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Simpan Semua Nilai
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </form>

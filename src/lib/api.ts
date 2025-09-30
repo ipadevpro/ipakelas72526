@@ -444,7 +444,11 @@ export const assignmentApi = {
     apiRequest('addAssignment', { classId, title, description, dueDate, maxPoints }),
   update: (id: string, title: string, description: string, dueDate: string, maxPoints: number = 100) => 
     apiRequest('updateAssignment', { id, title, description, dueDate, maxPoints }),
-  delete: (id: string) => apiRequest('deleteAssignment', { id })
+  updateStatus: (id: string, status: string) => 
+    apiRequest('updateAssignmentStatus', { id, status }),
+  delete: (id: string) => apiRequest('deleteAssignment', { id }),
+  getGrades: (assignmentId: string) => apiRequest('getGrades', { assignmentId }),
+  getStudentsByClass: (classId: string) => apiRequest('getStudents', { classId })
 };
 
 /**

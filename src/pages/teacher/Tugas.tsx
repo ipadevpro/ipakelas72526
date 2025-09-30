@@ -118,6 +118,26 @@ const TugasPage = () => {
       loadAssignments();
     }
   }, [classes, selectedClassId]);
+
+  // Monitor for grade changes to auto-complete assignments
+  useEffect(() => {
+    const handleGradeUpdate = (event: CustomEvent) => {
+      const { assignmentId } = event.detail;
+      if (assignmentId) {
+        // Delay to ensure grade is saved before checking
+        setTimeout(() => {
+          checkAutoComplete(assignmentId);
+        }, 1000);
+      }
+    };
+
+    // Listen for grade update events
+    window.addEventListener('gradeUpdated', handleGradeUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('gradeUpdated', handleGradeUpdate as EventListener);
+    };
+  }, [assignments]);
   
   // Auto-hide notification after 5 seconds
   useEffect(() => {
@@ -241,6 +261,57 @@ const TugasPage = () => {
       }
     } catch (error) {
       showNotification('error', 'Gagal menduplikasi tugas');
+    }
+  };
+
+  // Complete assignment function
+  const handleCompleteAssignment = async (assignment: Assignment) => {
+    try {
+      const response = await assignmentApi.updateStatus(assignment.id, 'completed');
+      
+      if (response.success) {
+        showNotification('success', `Tugas "${assignment.title}" telah ditandai selesai!`);
+        await loadAssignments();
+      } else {
+        showNotification('error', response.error || 'Gagal menandai tugas selesai');
+      }
+    } catch (error) {
+      showNotification('error', 'Terjadi kesalahan saat menandai tugas selesai');
+    }
+  };
+
+  // Check if all students have been graded for an assignment
+  const checkAutoComplete = async (assignmentId: string) => {
+    try {
+      // Get grades for this assignment
+      const gradesResponse = await assignmentApi.getGrades(assignmentId);
+      // Get students for this assignment's class
+      const assignment = assignments.find(a => a.id === assignmentId);
+      if (!assignment) return;
+      
+      const studentsResponse = await assignmentApi.getStudentsByClass(assignment.classId);
+      
+      if (gradesResponse.success && studentsResponse.success) {
+        const grades = gradesResponse.grades || [];
+        const students = studentsResponse.students || [];
+        
+        // Check if all students have grades
+        const gradedStudents = grades.map((g: any) => g.studentUsername);
+        const allStudents = students.map((s: any) => s.username);
+        
+        const allGraded = allStudents.every((studentUsername: string) => 
+          gradedStudents.includes(studentUsername)
+        );
+        
+        if (allGraded && assignment.status !== 'completed') {
+          // Auto-complete the assignment
+          await assignmentApi.updateStatus(assignmentId, 'completed');
+          showNotification('success', `Tugas "${assignment.title}" otomatis ditandai selesai karena semua siswa sudah dinilai!`);
+          await loadAssignments();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking auto-complete:', error);
     }
   };
 
@@ -869,11 +940,22 @@ const TugasPage = () => {
                           >
                             <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
+                          {assignment.status !== 'completed' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCompleteAssignment(assignment)}
+                              className="hover:bg-green-50 hover:text-green-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                              title="Tandai Selesai"
+                            >
+                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDuplicateAssignment(assignment)}
-                            className="hover:bg-green-50 hover:text-green-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                            className="hover:bg-purple-50 hover:text-purple-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
                             title="Duplikasi Tugas"
                           >
                             <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
