@@ -270,13 +270,17 @@ const GamifikasiPage = () => {
   const [showAwardModal, setShowAwardModal] = useState(false);
   const [showBadgeAssignModal, setShowBadgeAssignModal] = useState(false);
   const [showBulkPointsModal, setShowBulkPointsModal] = useState(false);
+  const [showClassLeaderboardModal, setShowClassLeaderboardModal] = useState(false);
+  const [showBadgeRecipientsModal, setShowBadgeRecipientsModal] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null);
   const [editingLevel, setEditingLevel] = useState<Level | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
   const [selectedBadgeForAssign, setSelectedBadgeForAssign] = useState<Badge | null>(null);
+  const [selectedBadgeForRecipients, setSelectedBadgeForRecipients] = useState<Badge | null>(null);
   const [selectedStudentsForBadge, setSelectedStudentsForBadge] = useState<string[]>([]);
   const [selectedStudentsForBulkPoints, setSelectedStudentsForBulkPoints] = useState<string[]>([]);
+  const [selectedClassForLeaderboard, setSelectedClassForLeaderboard] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -844,6 +848,16 @@ const GamifikasiPage = () => {
     setShowBulkPointsModal(true);
   };
 
+  const openClassLeaderboardModal = (classData: any) => {
+    setSelectedClassForLeaderboard(classData);
+    setShowClassLeaderboardModal(true);
+  };
+
+  const openBadgeRecipientsModal = (badge: Badge) => {
+    setSelectedBadgeForRecipients(badge);
+    setShowBadgeRecipientsModal(true);
+  };
+
   const handleStudentSelection = (studentId: string) => {
     setSelectedStudentsForBadge(prev => 
       prev.includes(studentId) 
@@ -979,6 +993,18 @@ const GamifikasiPage = () => {
       return <span className="text-2xl">{icon}</span>;
     }
     return <Trophy className="w-6 h-6 text-yellow-500" />;
+  };
+
+  // Get students who have received a specific badge
+  const getStudentsWithBadge = (badgeName: string) => {
+    return students.filter(student => 
+      student.achievements && student.achievements.includes(badgeName)
+    );
+  };
+
+  // Get badge recipient count
+  const getBadgeRecipientCount = (badgeName: string) => {
+    return getStudentsWithBadge(badgeName).length;
   };
 
   const getLevelColor = (level: number) => {
@@ -1237,34 +1263,109 @@ const GamifikasiPage = () => {
                   </motion.div>
                 </div>
 
-                {/* Top Students */}
-                <div className="bg-white rounded-lg border shadow-sm p-6">
-                  <h3 className="text-lg font-medium mb-4">Leaderboard Siswa</h3>
-                  <div className="space-y-3">
-                    {filteredStudents
-                      .sort((a, b) => b.points - a.points)
-                      .slice(0, 10)
-                      .map((student, index) => (
-                        <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                              index === 0 ? 'bg-yellow-500' : 
-                              index === 1 ? 'bg-gray-400' : 
-                              index === 2 ? 'bg-amber-600' : 'bg-gray-300'
-                            }`}>
-                              {index + 1}
+                {/* Leaderboards */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Global Top Students */}
+                  <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-yellow-500" />
+                      Top 10 Global
+                    </h3>
+                    <div className="space-y-3">
+                      {filteredStudents
+                        .sort((a, b) => b.points - a.points)
+                        .slice(0, 10)
+                        .map((student, index) => (
+                          <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                                index === 0 ? 'bg-yellow-500' : 
+                                index === 1 ? 'bg-gray-400' : 
+                                index === 2 ? 'bg-amber-600' : 'bg-gray-300'
+                              }`}>
+                                {index + 1}
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">{student.name}</p>
+                                <p className="text-sm text-gray-500">{student.class}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium text-gray-900">{student.name}</p>
-                              <p className="text-sm text-gray-500">{student.class}</p>
+                            <div className="text-right">
+                              <p className="font-bold text-gray-900">{student.points} poin</p>
+                              <p className="text-sm text-gray-500">Level {student.level}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-gray-900">{student.points} poin</p>
-                            <p className="text-sm text-gray-500">Level {student.level}</p>
-                          </div>
+                        ))}
+                      {filteredStudents.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                          <p>Belum ada data siswa</p>
                         </div>
-                      ))}
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Top Classes */}
+                  <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-blue-500" />
+                      Top Kelas
+                    </h3>
+                    <div className="space-y-3">
+                      {uniqueClasses.length > 0 ? (
+                        uniqueClasses
+                          .map(classData => {
+                            const classStudents = students.filter(s => s.classId === classData.id);
+                            const totalPoints = classStudents.reduce((sum, s) => sum + s.points, 0);
+                            const averagePoints = classStudents.length > 0 ? Math.round(totalPoints / classStudents.length) : 0;
+                            const topStudent = classStudents.length > 0 
+                              ? classStudents.reduce((top, current) => current.points > top.points ? current : top)
+                              : null;
+                            
+                            return {
+                              ...classData,
+                              totalPoints,
+                              averagePoints,
+                              studentCount: classStudents.length,
+                              topStudent
+                            };
+                          })
+                          .sort((a, b) => b.averagePoints - a.averagePoints)
+                          .map((classData, index) => (
+                            <div 
+                              key={classData.id} 
+                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                              onClick={() => openClassLeaderboardModal(classData)}
+                              title="Klik untuk melihat leaderboard kelas"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                                  index === 0 ? 'bg-yellow-500' : 
+                                  index === 1 ? 'bg-gray-400' : 
+                                  index === 2 ? 'bg-amber-600' : 'bg-blue-500'
+                                }`}>
+                                  {index + 1}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{classData.name}</p>
+                                  <p className="text-sm text-gray-500">
+                                    {classData.studentCount} siswa • Top: {classData.topStudent?.name || 'N/A'}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-gray-900">{classData.averagePoints} poin</p>
+                                <p className="text-sm text-gray-500">rata-rata</p>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                          <p>Belum ada data kelas</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1321,7 +1422,13 @@ const GamifikasiPage = () => {
                     <p className="text-sm text-gray-600 mb-3">{badge.description}</p>
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-medium text-purple-600">{badge.pointValue} poin</span>
-                      <span className="text-gray-500">{badge.awardedCount || 0} diberikan</span>
+                      <button
+                        onClick={() => openBadgeRecipientsModal(badge)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
+                        title="Klik untuk melihat siswa yang mendapat badge ini"
+                      >
+                        {getBadgeRecipientCount(badge.name)} siswa
+                      </button>
                     </div>
                   </motion.div>
                 ))}
@@ -2300,6 +2407,372 @@ const GamifikasiPage = () => {
               {saving ? 'Memberikan...' : `Berikan ${bulkPointsForm.points} Poin ke ${selectedStudentsForBulkPoints.length} Siswa`}
             </Button>
           </div>
+        </div>
+      </Modal>
+
+      {/* Class Leaderboard Modal */}
+      <Modal
+        isOpen={showClassLeaderboardModal}
+        onClose={() => {
+          setShowClassLeaderboardModal(false);
+          setSelectedClassForLeaderboard(null);
+        }}
+        title={selectedClassForLeaderboard ? `Leaderboard ${selectedClassForLeaderboard.name}` : 'Leaderboard Kelas'}
+        size="large"
+      >
+        <div className="p-6">
+          {selectedClassForLeaderboard && (
+            <>
+              {/* Class Info Header */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">{selectedClassForLeaderboard.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        {selectedClassForLeaderboard.studentCount} siswa • Rata-rata: {selectedClassForLeaderboard.averagePoints} poin
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="bg-white px-3 py-2 rounded-lg border">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Top Student</p>
+                      <p className="font-bold text-gray-900">{selectedClassForLeaderboard.topStudent?.name || 'N/A'}</p>
+                      <p className="text-sm text-gray-600">{selectedClassForLeaderboard.topStudent?.points || 0} poin</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Class Leaderboard */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-yellow-500" />
+                  Ranking Siswa dalam Kelas
+                </h4>
+                <div className="max-h-96 overflow-y-auto">
+                  {students
+                    .filter(student => student.classId === selectedClassForLeaderboard.id)
+                    .sort((a, b) => b.points - a.points)
+                    .map((student, index) => {
+                      // Get badges earned by this student
+                      const achievements = student.achievements || [];
+                      const studentBadges = achievements
+                        .map(badgeName => {
+                          const badge = badges.find(b => b.name === badgeName);
+                          return badge;
+                        })
+                        .filter(Boolean) as Badge[];
+
+                      return (
+                        <motion.div
+                          key={student.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                              index === 0 ? 'bg-yellow-500' : 
+                              index === 1 ? 'bg-gray-400' : 
+                              index === 2 ? 'bg-amber-600' : 'bg-blue-500'
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-purple-600">
+                                {student.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{student.name}</p>
+                              <p className="text-sm text-gray-500">@{student.username}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-4">
+                            {/* Badges */}
+                            <div className="flex items-center gap-1">
+                              {studentBadges.length > 0 ? (
+                                <>
+                                  {studentBadges.slice(0, 3).map((badge, badgeIndex) => (
+                                    <div
+                                      key={`${badge.id}-${badgeIndex}`}
+                                      className="group relative w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center border border-yellow-200 hover:border-yellow-400 transition-colors cursor-help"
+                                    >
+                                      {badge.icon.match(/\p{Emoji}/u) ? (
+                                        <span className="text-xs">{badge.icon}</span>
+                                      ) : (
+                                        <Medal className="w-3 h-3 text-yellow-600" />
+                                      )}
+                                      
+                                      {/* Tooltip */}
+                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                        <div className="font-medium">{badge.name}</div>
+                                        <div className="text-gray-300">{badge.description}</div>
+                                        <div className="text-yellow-300">+{badge.pointValue} poin</div>
+                                        {/* Arrow */}
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                  {studentBadges.length > 3 && (
+                                    <div 
+                                      className="group relative w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200 text-xs text-gray-600 font-medium hover:border-gray-400 transition-colors cursor-help"
+                                      title={`${studentBadges.length - 3} badge lainnya`}
+                                    >
+                                      +{studentBadges.length - 3}
+                                      
+                                      {/* Tooltip for additional badges */}
+                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                        <div className="font-medium">Badge Lainnya</div>
+                                        <div className="text-gray-300">
+                                          {studentBadges.slice(3).map(b => b.name).join(', ')}
+                                        </div>
+                                        {/* Arrow */}
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <span className="text-xs text-gray-400">No badges</span>
+                              )}
+                            </div>
+                            
+                            {/* Level */}
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getLevelColor(student.level)}`}>
+                              Lvl {student.level}
+                            </div>
+                            
+                            {/* Points */}
+                            <div className="text-right min-w-[80px]">
+                              <p className="font-bold text-gray-900">{student.points.toLocaleString()}</p>
+                              <p className="text-xs text-gray-500">poin</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Class Statistics */}
+              <div className="mt-6 pt-6 border-t">
+                <h4 className="font-semibold text-gray-900 mb-3">Statistik Kelas</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-blue-50 p-3 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-blue-600">{selectedClassForLeaderboard.studentCount}</p>
+                    <p className="text-xs text-blue-600 uppercase tracking-wide">Total Siswa</p>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-green-600">{selectedClassForLeaderboard.averagePoints}</p>
+                    <p className="text-xs text-green-600 uppercase tracking-wide">Rata-rata Poin</p>
+                  </div>
+                  <div className="bg-yellow-50 p-3 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-yellow-600">{selectedClassForLeaderboard.totalPoints.toLocaleString()}</p>
+                    <p className="text-xs text-yellow-600 uppercase tracking-wide">Total Poin</p>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg text-center">
+                    <p className="text-2xl font-bold text-purple-600">
+                      {students
+                        .filter(s => s.classId === selectedClassForLeaderboard.id)
+                        .reduce((sum, s) => sum + (s.achievements?.length || 0), 0)
+                      }
+                    </p>
+                    <p className="text-xs text-purple-600 uppercase tracking-wide">Total Badge</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-6 pt-6 border-t">
+                <Button
+                  onClick={() => {
+                    setShowClassLeaderboardModal(false);
+                    setSelectedClassForLeaderboard(null);
+                  }}
+                  className="px-6"
+                >
+                  Tutup
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Badge Recipients Modal */}
+      <Modal
+        isOpen={showBadgeRecipientsModal}
+        onClose={() => {
+          setShowBadgeRecipientsModal(false);
+          setSelectedBadgeForRecipients(null);
+        }}
+        title={selectedBadgeForRecipients ? `Siswa yang Mendapat Badge: ${selectedBadgeForRecipients.name}` : 'Penerima Badge'}
+        size="large"
+      >
+        <div className="p-6">
+          {selectedBadgeForRecipients && (
+            <>
+              {/* Badge Info Header */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center border-2 border-yellow-300">
+                      {getBadgeIcon(selectedBadgeForRecipients.icon)}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">{selectedBadgeForRecipients.name}</h3>
+                      <p className="text-sm text-gray-600">{selectedBadgeForRecipients.description}</p>
+                      <p className="text-sm text-purple-600 font-medium">+{selectedBadgeForRecipients.pointValue} poin</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="bg-white px-3 py-2 rounded-lg border">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Total Penerima</p>
+                      <p className="text-2xl font-bold text-blue-600">{getBadgeRecipientCount(selectedBadgeForRecipients.name)}</p>
+                      <p className="text-sm text-gray-600">dari {students.length} siswa</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recipients List */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-500" />
+                  Daftar Siswa Penerima
+                </h4>
+                
+                {getStudentsWithBadge(selectedBadgeForRecipients.name).length > 0 ? (
+                  <div className="max-h-96 overflow-y-auto space-y-2">
+                    {getStudentsWithBadge(selectedBadgeForRecipients.name)
+                      .sort((a, b) => b.points - a.points) // Sort by points descending
+                      .map((student, index) => (
+                        <motion.div
+                          key={student.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-purple-600">
+                                {student.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{student.name}</p>
+                              <p className="text-sm text-gray-500">@{student.username} • {student.class}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            {/* Level */}
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getLevelColor(student.level)}`}>
+                              Lvl {student.level}
+                            </div>
+                            
+                            {/* Points */}
+                            <div className="text-right">
+                              <p className="font-bold text-gray-900">{student.points.toLocaleString()}</p>
+                              <p className="text-xs text-gray-500">total poin</p>
+                            </div>
+                            
+                            {/* Badge count */}
+                            <div className="text-right">
+                              <p className="font-bold text-yellow-600">{student.achievements?.length || 0}</p>
+                              <p className="text-xs text-gray-500">badge</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Users className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-lg font-medium text-gray-900">Belum Ada Penerima</p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Badge "{selectedBadgeForRecipients.name}" belum diberikan kepada siswa manapun
+                    </p>
+                    <Button
+                      onClick={() => {
+                        setShowBadgeRecipientsModal(false);
+                        openBadgeAssignModal(selectedBadgeForRecipients);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <Gift className="w-4 h-4" />
+                      Berikan Badge Ini
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Statistics */}
+              {getStudentsWithBadge(selectedBadgeForRecipients.name).length > 0 && (
+                <div className="mt-6 pt-6 border-t">
+                  <h4 className="font-semibold text-gray-900 mb-3">Statistik Badge</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {getBadgeRecipientCount(selectedBadgeForRecipients.name)}
+                      </p>
+                      <p className="text-xs text-blue-600 uppercase tracking-wide">Penerima</p>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-green-600">
+                        {Math.round((getBadgeRecipientCount(selectedBadgeForRecipients.name) / students.length) * 100)}%
+                      </p>
+                      <p className="text-xs text-green-600 uppercase tracking-wide">Persentase</p>
+                    </div>
+                    <div className="bg-yellow-50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {getBadgeRecipientCount(selectedBadgeForRecipients.name) * selectedBadgeForRecipients.pointValue}
+                      </p>
+                      <p className="text-xs text-yellow-600 uppercase tracking-wide">Total Poin</p>
+                    </div>
+                    <div className="bg-purple-50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-purple-600">
+                        {uniqueClasses.filter(cls => 
+                          getStudentsWithBadge(selectedBadgeForRecipients.name)
+                            .some(student => student.classId === cls.id)
+                        ).length}
+                      </p>
+                      <p className="text-xs text-purple-600 uppercase tracking-wide">Kelas Terlibat</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-6 pt-6 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => openBadgeAssignModal(selectedBadgeForRecipients)}
+                  className="flex items-center gap-2"
+                >
+                  <Gift className="w-4 h-4" />
+                  Berikan ke Siswa Lain
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowBadgeRecipientsModal(false);
+                    setSelectedBadgeForRecipients(null);
+                  }}
+                  className="px-6"
+                >
+                  Tutup
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
     </div>
