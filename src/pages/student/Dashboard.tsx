@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Award, Users, Star, Crown, Sword, Sparkles, Map, Compass, Castle } from 'lucide-react';
+import { Trophy, TrendingUp, Award, Users, Star, Crown, Sword, Sparkles, Map, Compass, Castle, Shield, Zap, Home, BarChart3, Medal, CheckCircle2, Clock, XCircle, FileText, AlertTriangle, GraduationCap, BookOpen, Sparkles as SparklesIcon, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, hasSessionCredentials, refreshSessionCredentials } from '@/lib/api';
 import { 
@@ -389,12 +389,12 @@ const StudentDashboard = () => {
   };
   
   const getCharacterClass = (level: number, averageGrade: number) => {
-    if (level >= 10 && averageGrade >= 90) return { name: 'Archmage', icon: '🧙‍♂️', color: 'from-purple-600 to-indigo-800' };
-    if (level >= 8 && averageGrade >= 85) return { name: 'Wizard', icon: '🔮', color: 'from-blue-600 to-purple-700' };
-    if (level >= 6 && averageGrade >= 80) return { name: 'Scholar', icon: '📚', color: 'from-green-600 to-blue-600' };
-    if (level >= 4 && averageGrade >= 75) return { name: 'Apprentice', icon: '🎓', color: 'from-yellow-600 to-green-600' };
-    if (level >= 2) return { name: 'Student', icon: '📖', color: 'from-orange-600 to-yellow-600' };
-    return { name: 'Novice', icon: '🌱', color: 'from-gray-600 to-orange-600' };
+    if (level >= 10 && averageGrade >= 90) return { name: 'Archmage', Icon: SparklesIcon, color: 'from-purple-600 to-indigo-800' };
+    if (level >= 8 && averageGrade >= 85) return { name: 'Wizard', Icon: Wand2, color: 'from-blue-600 to-purple-700' };
+    if (level >= 6 && averageGrade >= 80) return { name: 'Scholar', Icon: BookOpen, color: 'from-green-600 to-blue-600' };
+    if (level >= 4 && averageGrade >= 75) return { name: 'Apprentice', Icon: GraduationCap, color: 'from-yellow-600 to-green-600' };
+    if (level >= 2) return { name: 'Student', Icon: BookOpen, color: 'from-orange-600 to-yellow-600' };
+    return { name: 'Novice', Icon: SparklesIcon, color: 'from-gray-600 to-orange-600' };
   };
 
   const getRPGStats = (): RPGStats => {
@@ -478,7 +478,9 @@ const StudentDashboard = () => {
         `}</style>
         <div className="min-h-screen bg-[#FF6B6B] flex items-center justify-center p-4" style={{fontFamily: "'Press Start 2P', monospace"}}>
           <div className="text-center max-w-md bg-white pixel-border p-6">
-            <div className="text-4xl mb-4">⚠️</div>
+            <div className="mb-4 flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-black" strokeWidth={2.5} />
+            </div>
             <h2 className="text-xs text-black mb-2">ERROR!</h2>
             <p className="text-xs text-gray-700 mb-6">{error}</p>
             <button 
@@ -498,7 +500,7 @@ const StudentDashboard = () => {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.6; }
+        .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 1.8; }
         .pixel-border { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
         .pixel-button { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); transition: all 0.1s; }
         .pixel-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
@@ -510,13 +512,13 @@ const StudentDashboard = () => {
         .pixel-nav-item.active { background: #FFD700; }
         .pixel-nav-item:active { transform: translate(1px, 1px); }
       `}</style>
-      <div className="min-h-screen bg-[#87CEEB] relative overflow-hidden pb-20" style={{fontFamily: "'Press Start 2P', monospace"}}>
+      <div className="min-h-screen bg-[#87CEEB] relative overflow-hidden pb-24" style={{fontFamily: "'Press Start 2P', monospace"}}>
         {/* Pixel Background Pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 text-4xl">⚔️</div>
-          <div className="absolute top-32 right-20 text-3xl">🛡️</div>
-          <div className="absolute bottom-20 left-32 text-3xl">⚡</div>
-          <div className="absolute bottom-40 right-10 text-2xl">🏆</div>
+          <div className="absolute top-10 left-10"><Sword className="w-8 h-8 text-black" strokeWidth={2} /></div>
+          <div className="absolute top-32 right-20"><Shield className="w-6 h-6 text-black" strokeWidth={2} /></div>
+          <div className="absolute bottom-20 left-32"><Zap className="w-6 h-6 text-black" strokeWidth={2} /></div>
+          <div className="absolute bottom-40 right-10"><Trophy className="w-5 h-5 text-black" strokeWidth={2} /></div>
       </div>
 
         <div className="relative z-10 space-y-3 p-3">
@@ -526,22 +528,22 @@ const StudentDashboard = () => {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   {/* Character Avatar - Pixel */}
-                  <div className="relative w-16 h-16 pixel-border bg-white flex items-center justify-center text-2xl">
-                  {characterClass.icon}
-                    <div className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[6px] px-1 py-0.5 pixel-border">
+                  <div className="relative w-20 h-20 pixel-border bg-white flex items-center justify-center">
+                    <characterClass.Icon className="w-12 h-12 text-black" strokeWidth={2.5} />
+                    <div className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-xs px-2 py-1 pixel-border">
                       Lv{stats.level}
                   </div>
                 </div>
                 
                   <div className="flex-1">
-                    <h1 className="text-[10px] text-black mb-1">
+                    <h1 className="text-base text-black mb-2 font-bold">
                       {userInfo?.fullName || 'HERO'}
                   </h1>
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="bg-[#4ECDC4] text-black text-[6px] px-2 py-1 pixel-border">
+                      <span className="bg-[#4ECDC4] text-black text-xs px-3 py-1.5 pixel-border">
                         {characterClass.name.toUpperCase()}
                     </span>
-                      <span className="text-[6px] text-gray-700">
+                      <span className="text-xs text-gray-700">
                         RANK #{getCurrentDisplayRank() > 0 ? getCurrentDisplayRank() : '?'}
                     </span>
                   </div>
@@ -549,14 +551,14 @@ const StudentDashboard = () => {
               </div>
               
                 {/* Quick Stats - Pixel */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="pixel-card bg-white p-2 text-center">
-                    <div className="text-[8px] text-black font-bold">{stats.points.toLocaleString()}</div>
-                    <div className="text-[6px] text-gray-600">XP</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="pixel-card bg-white p-3 text-center">
+                    <div className="text-lg text-black font-bold">{stats.points.toLocaleString()}</div>
+                    <div className="text-sm text-gray-600">XP</div>
                 </div>
-                  <div className="pixel-card bg-white p-2 text-center">
-                    <div className="text-[8px] text-black font-bold">{stats.badges.length}</div>
-                    <div className="text-[6px] text-gray-600">BADGES</div>
+                  <div className="pixel-card bg-white p-3 text-center">
+                    <div className="text-lg text-black font-bold">{stats.badges.length}</div>
+                    <div className="text-sm text-gray-600">BADGES</div>
                 </div>
               </div>
             </div>
@@ -565,65 +567,65 @@ const StudentDashboard = () => {
 
           {/* Progress Akademik - Pixel Style */}
           {activeTab === 'home' && (
-            <div className="space-y-3">
-              <div className="pixel-card bg-white p-3">
-                <h2 className="text-[8px] text-black mb-3">PROGRESS AKADEMIK</h2>
+            <div className="space-y-4">
+              <div className="pixel-card bg-white p-4">
+                <h2 className="text-lg text-black mb-4 font-bold">PROGRESS AKADEMIK</h2>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Attendance - Pixel */}
             <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[6px] text-black font-bold">KEHADIRAN</span>
-                      <span className="text-[6px] text-black font-bold">{stats.attendance}%</span>
+                      <span className="text-sm text-black font-bold">KEHADIRAN</span>
+                      <span className="text-sm text-black font-bold">{stats.attendance}%</span>
               </div>
-                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                 <div 
                         className="h-full bg-[#4ECDC4] transition-all duration-500"
                   style={{ width: `${stats.attendance}%` }}
                 ></div>
               </div>
-                    <p className="text-[5px] text-gray-600 mt-1">
-                      {stats.attendance >= 80 ? 'RAJIN BANGET! 👏' : 
-                       stats.attendance > 0 ? 'YUK LEBIH RAJIN! 📚' : 
-                       'DATA SYNC...⏳'}
+                    <p className="text-xs text-gray-600 mt-1">
+                      {stats.attendance >= 80 ? 'RAJIN BANGET!' : 
+                       stats.attendance > 0 ? 'YUK LEBIH RAJIN!' : 
+                       'DATA SYNC...'}
               </p>
             </div>
             
                   {/* Grade Average - Pixel */}
             <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[6px] text-black font-bold">RATA-RATA NILAI</span>
-                      <span className="text-[6px] text-black font-bold">{stats.averageGrade}</span>
+                      <span className="text-sm text-black font-bold">RATA-RATA NILAI</span>
+                      <span className="text-sm text-black font-bold">{stats.averageGrade}</span>
               </div>
-                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                 <div 
                         className="h-full bg-[#FFD700] transition-all duration-500"
                   style={{ width: `${Math.min(stats.averageGrade, 100)}%` }}
                 ></div>
               </div>
-                    <p className="text-[5px] text-gray-600 mt-1">
-                      {stats.averageGrade >= 80 ? 'PRESTASI KEREN! 🌟' : 
-                       stats.averageGrade > 0 ? 'SEMANGAT BELAJAR! 📖' : 
-                       'DATA SYNC...⏳'}
+                    <p className="text-xs text-gray-600 mt-1">
+                      {stats.averageGrade >= 80 ? 'PRESTASI KEREN!' : 
+                       stats.averageGrade > 0 ? 'SEMANGAT BELAJAR!' : 
+                       'DATA SYNC...'}
               </p>
             </div>
             
                   {/* Assignments Completed - Pixel */}
             <div>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[6px] text-black font-bold">TUGAS SELESAI</span>
-                      <span className="text-[6px] text-black font-bold">{stats.completedAssignments}</span>
+                      <span className="text-sm text-black font-bold">TUGAS SELESAI</span>
+                      <span className="text-sm text-black font-bold">{stats.completedAssignments}</span>
               </div>
-                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                 <div 
                         className="h-full bg-[#FF6B6B] transition-all duration-500"
                   style={{ width: `${Math.min((stats.completedAssignments / Math.max(stats.completedAssignments, 10)) * 100, 100)}%` }}
                 ></div>
               </div>
-                    <p className="text-[5px] text-gray-600 mt-1">
-                      {stats.completedAssignments >= 10 ? 'PRODUKTIF BANGET! 🔥' : 
-                       stats.completedAssignments > 0 ? 'ADA QUEST LAIN! 💪' : 
-                       'DATA SYNC...⏳'}
+                    <p className="text-xs text-gray-600 mt-1">
+                      {stats.completedAssignments >= 10 ? 'PRODUKTIF BANGET!' : 
+                       stats.completedAssignments > 0 ? 'ADA QUEST LAIN!' : 
+                       'DATA SYNC...'}
               </p>
             </div>
           </div>
@@ -632,9 +634,9 @@ const StudentDashboard = () => {
               {/* Assignment Grades Detail - Pixel Style */}
         {assignmentGrades.length > 0 && (
                 <div className="pixel-card bg-white p-3">
-                  <h2 className="text-[8px] text-black mb-3 flex items-center justify-between">
+                  <h2 className="text-base text-black mb-3 flex items-center justify-between">
                     <span>NILAI TUGAS</span>
-                    <span className="text-[6px] bg-[#4ECDC4] text-black px-2 py-1 pixel-border">
+                    <span className="text-sm bg-[#4ECDC4] text-black px-2 py-1 pixel-border">
                       {assignmentGrades.length} TUGAS
               </span>
             </h2>
@@ -652,10 +654,10 @@ const StudentDashboard = () => {
                 
                 const getStatusIcon = (status: string) => {
                   switch (status) {
-                    case 'completed': return '✅';
-                    case 'late': return '⏰';
-                    case 'missing': return '❌';
-                    default: return '📝';
+                    case 'completed': return CheckCircle2;
+                    case 'late': return Clock;
+                    case 'missing': return XCircle;
+                    default: return FileText;
                   }
                 };
                 
@@ -674,12 +676,15 @@ const StudentDashboard = () => {
                           className="pixel-card bg-white p-2"
                   >
                           <div className="flex items-start gap-2">
-                            <div className="text-lg">{getStatusIcon(assignment.status)}</div>
+                            {(() => {
+                              const StatusIcon = getStatusIcon(assignment.status);
+                              return <StatusIcon className="w-4 h-4 text-black" strokeWidth={2.5} />;
+                            })()}
                       <div className="flex-1 min-w-0">
-                              <h3 className="text-[6px] text-black font-bold truncate mb-1">
+                              <h3 className="text-sm text-black font-bold truncate mb-1">
                               {assignment.assignmentTitle}
                             </h3>
-                              <div className="flex items-center gap-2 text-[5px] text-gray-600 mb-1">
+                              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
                               <span>{getStatusText(assignment.status)}</span>
                               {assignment.dueDate && (
                                   <span>DUE: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
@@ -688,28 +693,28 @@ const StudentDashboard = () => {
                         
                         {assignment.feedback && (
                                 <div className="pixel-border bg-gray-100 p-1 mb-1">
-                                  <p className="text-[5px] text-gray-600 mb-0.5">FEEDBACK:</p>
-                                  <p className="text-[5px] text-black">{assignment.feedback}</p>
+                                  <p className="text-xs text-gray-600 mb-0.5">FEEDBACK:</p>
+                                  <p className="text-xs text-black">{assignment.feedback}</p>
                           </div>
                         )}
                       </div>
                       
                             <div className="text-right">
-                              <div className="text-[8px] text-black font-bold mb-0.5">
+                              <div className="text-base text-black font-bold mb-0.5">
                             {assignment.score}
                           </div>
-                              <div className="text-[5px] text-gray-600 mb-1">
+                              <div className="text-xs text-gray-600 mb-1">
                                 /{assignment.maxPoints}
                           </div>
-                              <div className={`${getGradeColor(percentage)} text-white text-[5px] px-1 py-0.5 pixel-border font-bold`}>
+                              <div className={`${getGradeColor(percentage)} text-white text-xs px-1 py-0.5 pixel-border font-bold`}>
                           {percentage >= 90 ? 'A' : 
                            percentage >= 80 ? 'B' : 
                            percentage >= 70 ? 'C' : 
                            percentage >= 60 ? 'D' : 'E'}
                         </div>
-                              <div className="text-[5px] text-gray-600 mt-0.5">
+                              <div className="text-xs text-gray-600 mt-0.5">
                                 {percentage}%
-                              </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -721,28 +726,28 @@ const StudentDashboard = () => {
                   <div className="mt-3 pt-3 pixel-border-t border-black">
                     <div className="grid grid-cols-2 gap-2 text-center">
                       <div className="pixel-card bg-[#4ECDC4] p-2">
-                        <div className="text-[8px] text-black font-bold">
+                        <div className="text-base text-black font-bold">
                     {assignmentGrades.filter(a => a.status === 'completed').length}
                   </div>
-                        <div className="text-[5px] text-gray-700">SELESAI</div>
+                        <div className="text-xs text-gray-700">SELESAI</div>
                 </div>
                       <div className="pixel-card bg-[#FFD700] p-2">
-                        <div className="text-[8px] text-black font-bold">
+                        <div className="text-base text-black font-bold">
                     {assignmentGrades.filter(a => a.status === 'late').length}
                   </div>
-                        <div className="text-[5px] text-gray-700">TERLAMBAT</div>
+                        <div className="text-xs text-gray-700">TERLAMBAT</div>
                 </div>
                       <div className="pixel-card bg-[#87CEEB] p-2">
-                        <div className="text-[8px] text-black font-bold">
+                        <div className="text-base text-black font-bold">
                     {Math.round(assignmentGrades.reduce((sum, a) => sum + (a.score / a.maxPoints * 100), 0) / assignmentGrades.length)}%
                   </div>
-                        <div className="text-[5px] text-gray-700">RATA-RATA</div>
+                        <div className="text-xs text-gray-700">RATA-RATA</div>
                 </div>
                       <div className="pixel-card bg-[#FF6B6B] p-2">
-                        <div className="text-[8px] text-black font-bold">
+                        <div className="text-base text-black font-bold">
                     {assignmentGrades.reduce((sum, a) => sum + a.score, 0)}
                   </div>
-                        <div className="text-[5px] text-gray-700">TOTAL POIN</div>
+                        <div className="text-xs text-gray-700">TOTAL POIN</div>
                 </div>
               </div>
             </div>
@@ -753,28 +758,28 @@ const StudentDashboard = () => {
 
           {/* Progress Tab - Pixel Style */}
           {activeTab === 'progress' && (
-            <div className="space-y-3">
-              <div className="pixel-card bg-white p-3">
-                <h2 className="text-[8px] text-black mb-3">PROGRESS & ACHIEVEMENT</h2>
+            <div className="space-y-4">
+              <div className="pixel-card bg-white p-4">
+                <h2 className="text-lg text-black mb-4 font-bold">PROGRESS & ACHIEVEMENT</h2>
                 
-                <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   {/* XP Points - Pixel */}
-                  <div className="pixel-card bg-[#FFD700] p-2">
+                  <div className="pixel-card bg-[#FFD700] p-3">
             <div className="text-center">
-                      <div className="text-[10px] text-black font-bold mb-1">
+                      <div className="text-lg text-black font-bold mb-2">
                         {stats.points.toLocaleString()}
             </div>
-                      <div className="text-[6px] text-gray-700">TOTAL XP</div>
+                      <div className="text-sm text-gray-700">TOTAL XP</div>
             </div>
             </div>
 
                   {/* Current Level - Pixel */}
-                  <div className="pixel-card bg-[#4ECDC4] p-2">
+                  <div className="pixel-card bg-[#4ECDC4] p-3">
             <div className="text-center">
-                      <div className="text-[10px] text-black font-bold mb-1">
+                      <div className="text-lg text-black font-bold mb-2">
                         LV {stats.level}
             </div>
-                      <div className="text-[6px] text-gray-700">{characterClass.name.toUpperCase()}</div>
+                      <div className="text-sm text-gray-700">{characterClass.name.toUpperCase()}</div>
         </div>
                   </div>
                 </div>
@@ -782,8 +787,8 @@ const StudentDashboard = () => {
                 {/* EXP Progress Bar - Pixel */}
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[6px] text-black">NEXT LEVEL</span>
-                    <span className="text-[6px] text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
+                    <span className="text-sm text-black">NEXT LEVEL</span>
+                    <span className="text-sm text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
                     </div>
                   <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                     <div 
@@ -791,7 +796,7 @@ const StudentDashboard = () => {
                         style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
                       ></div>
                     </div>
-                  <div className="text-[6px] text-gray-600 mt-1 text-center">
+                  <div className="text-sm text-gray-600 mt-1 text-center">
                     {Math.round((rpgStats.exp / rpgStats.expToNext) * 100)}% COMPLETE
                   </div>
                 </div>
@@ -804,14 +809,14 @@ const StudentDashboard = () => {
               <div className="space-y-3">
               <div className="pixel-card bg-white p-3">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-[8px] text-black">HALL OF FAME</h2>
+                  <h2 className="text-base text-black">HALL OF FAME</h2>
                   
                   {/* Toggle between Global and Class leaderboard - Pixel */}
                   {classLeaderboard.length > 0 && (
                     <div className="flex gap-1">
                 <button
                         onClick={() => setShowClassLeaderboard(false)}
-                        className={`px-2 py-1 text-[6px] pixel-button ${
+                        className={`px-2 py-1 text-sm pixel-button ${
                           !showClassLeaderboard
                             ? 'bg-[#FFD700] text-black'
                             : 'bg-white text-black'
@@ -821,7 +826,7 @@ const StudentDashboard = () => {
                       </button>
                       <button
                         onClick={() => setShowClassLeaderboard(true)}
-                        className={`px-2 py-1 text-[6px] pixel-button ${
+                        className={`px-2 py-1 text-sm pixel-button ${
                           showClassLeaderboard
                             ? 'bg-[#FFD700] text-black'
                             : 'bg-white text-black'
@@ -845,27 +850,28 @@ const StudentDashboard = () => {
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <div className="text-[8px] min-w-[1.5rem] text-center">
-                            {index === 0 && '👑'}
-                            {index === 1 && '🥈'}
-                            {index === 2 && '🥉'}
-                            {index > 2 && <span className="text-[6px]">#{index + 1}</span>}
+                          <div className="min-w-[1.5rem] flex items-center justify-center">
+                            {index === 0 && <Crown className="w-3 h-3 text-[#FFD700]" strokeWidth={2.5} fill="#FFD700" />}
+                            {index === 1 && <Medal className="w-3 h-3 text-gray-400" strokeWidth={2.5} fill="#gray-400" />}
+                            {index === 2 && <Medal className="w-3 h-3 text-[#CD7F32]" strokeWidth={2.5} fill="#CD7F32" />}
+                            {index > 2 && <span className="text-sm text-black">#{index + 1}</span>}
                         </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[6px] truncate ${
+                            <p className={`text-sm truncate ${
                               student.username === userInfo?.username ? 'text-black font-bold' : 'text-black'
                             }`}>
                               {student.fullName}
                               {student.username === userInfo?.username && (
-                                <span className="ml-1 text-[5px] bg-[#FF6B6B] text-white px-1">YOU</span>
+                                <span className="ml-1 text-xs bg-[#FF6B6B] text-white px-1">YOU</span>
                               )}
                             </p>
-                            <p className="text-[5px] text-gray-600">
+                            <p className="text-xs text-gray-600">
                               {student.points.toLocaleString()} XP • LV{student.level}
                             </p>
                           </div>
-                          <div className="text-[6px] text-black font-bold">
-                            🏆{student.badges}
+                          <div className="text-sm text-black font-bold flex items-center gap-1">
+                            <Trophy className="w-3 h-3" strokeWidth={2} />
+                            {student.badges}
                         </div>
                       </div>
                     </div>
@@ -873,7 +879,7 @@ const StudentDashboard = () => {
                 </div>
               ) : (
                   <div className="text-center py-6">
-                    <p className="text-[6px] text-gray-600">NO DATA</p>
+                    <p className="text-sm text-gray-600">NO DATA</p>
                 </div>
               )}
             </div>
@@ -884,7 +890,7 @@ const StudentDashboard = () => {
             {activeTab === 'badges' && (
               <div className="space-y-3">
                 <div className="pixel-card bg-white p-3">
-                  <h2 className="text-[8px] text-black mb-3">BADGE COLLECTION</h2>
+                  <h2 className="text-base text-black mb-3">BADGE COLLECTION</h2>
                   {stats.badges.length > 0 ? (
                     <div className="grid grid-cols-3 gap-2">
                       {stats.badges.map((badgeName, index) => {
@@ -894,12 +900,18 @@ const StudentDashboard = () => {
                       key={index}
                             className="pixel-card bg-[#FFD700] p-2 text-center"
                           >
-                            <div className="text-2xl mb-1">{badge?.icon || '🏆'}</div>
-                            <div className="text-[5px] text-black font-bold leading-tight">
+                            <div className="mb-1 flex items-center justify-center">
+                              {badge?.icon ? (
+                                <span className="text-2xl">{badge.icon}</span>
+                              ) : (
+                                <Trophy className="w-6 h-6 text-black" strokeWidth={2} />
+                              )}
+                        </div>
+                            <div className="text-xs text-black font-bold leading-tight">
                               {badgeName}
-                      </div>
+                          </div>
                             {badge?.pointValue && (
-                              <div className="text-[5px] text-gray-700 mt-1">
+                              <div className="text-xs text-gray-700 mt-1">
                           +{badge.pointValue} XP
                         </div>
                       )}
@@ -909,7 +921,7 @@ const StudentDashboard = () => {
               </div>
                   ) : (
                     <div className="text-center py-6">
-                      <p className="text-[6px] text-gray-600">NO BADGES YET</p>
+                      <p className="text-sm text-gray-600">NO BADGES YET</p>
                 </div>
               )}
             </div>
@@ -919,42 +931,42 @@ const StudentDashboard = () => {
 
         {/* Bottom Navigation Bar - Pixel Style */}
         <div className="fixed bottom-0 left-0 right-0 bg-white pixel-nav z-50">
-          <div className="grid grid-cols-4 gap-1 p-2">
+          <div className="grid grid-cols-4 gap-2 p-3">
             <button
               onClick={() => setActiveTab('home')}
-              className={`pixel-nav-item p-2 text-center ${
+              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
                 activeTab === 'home' ? 'active' : 'bg-white'
               }`}
             >
-              <div className="text-lg mb-1">🏠</div>
-              <div className="text-[6px] text-black">HOME</div>
+              <Home className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
+              <div className="text-xs text-black font-bold">HOME</div>
             </button>
             <button
               onClick={() => setActiveTab('progress')}
-              className={`pixel-nav-item p-2 text-center ${
+              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
                 activeTab === 'progress' ? 'active' : 'bg-white'
               }`}
             >
-              <div className="text-lg mb-1">📊</div>
-              <div className="text-[6px] text-black">PROGRESS</div>
+              <BarChart3 className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
+              <div className="text-xs text-black font-bold">PROGRESS</div>
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
-              className={`pixel-nav-item p-2 text-center ${
+              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
                 activeTab === 'leaderboard' ? 'active' : 'bg-white'
               }`}
             >
-              <div className="text-lg mb-1">🏆</div>
-              <div className="text-[6px] text-black">RANK</div>
+              <Trophy className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
+              <div className="text-xs text-black font-bold">RANK</div>
             </button>
             <button
               onClick={() => setActiveTab('badges')}
-              className={`pixel-nav-item p-2 text-center ${
+              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
                 activeTab === 'badges' ? 'active' : 'bg-white'
               }`}
             >
-              <div className="text-lg mb-1">🎖️</div>
-              <div className="text-[6px] text-black">BADGES</div>
+              <Medal className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
+              <div className="text-xs text-black font-bold">BADGES</div>
             </button>
     </div>
         </div>
