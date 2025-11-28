@@ -135,6 +135,7 @@ const StudentDashboard = () => {
   const [showClassmates, setShowClassmates] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const [classmates, setClassmates] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'home' | 'progress' | 'leaderboard' | 'badges'>('home');
   
   useEffect(() => {
     // Add delay to ensure session is properly initialized
@@ -442,365 +443,211 @@ const StudentDashboard = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 flex items-center justify-center px-4">
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+          .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 8px; }
+          .pixel-border { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
+          .pixel-button { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); }
+          .pixel-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
+        `}</style>
+        <div className="min-h-screen bg-[#87CEEB] flex items-center justify-center px-4" style={{fontFamily: "'Press Start 2P', monospace"}}>
         <div className="text-center">
           <div className="relative mb-6">
-            <div className="animate-spin w-16 h-16 border-3 border-purple-500/20 border-t-purple-500 rounded-full mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-purple-400" />
+              <div className="w-16 h-16 border-4 border-black bg-white pixel-border mx-auto flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-purple-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">Loading dashboard ✨</h2>
-          <p className="text-purple-300 text-sm">Tunggu sebentar ya...</p>
+            <h2 className="text-xs text-black mb-2" style={{fontFamily: "'Press Start 2P', monospace"}}>LOADING...</h2>
+            <p className="text-xs text-gray-700" style={{fontFamily: "'Press Start 2P', monospace"}}>PLEASE WAIT</p>
         </div>
       </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 via-slate-900 to-red-900 flex items-center justify-center p-4">
-        <div className="text-center max-w-md bg-slate-800/50 backdrop-blur-sm border border-red-500/30 rounded-2xl p-8">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-white mb-2">🛡️ Waduh, ada error!</h2>
-          <p className="text-red-300 mb-6">{error}</p>
-          <Button 
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+          .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 8px; }
+          .pixel-border { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
+          .pixel-button { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); }
+          .pixel-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
+        `}</style>
+        <div className="min-h-screen bg-[#FF6B6B] flex items-center justify-center p-4" style={{fontFamily: "'Press Start 2P', monospace"}}>
+          <div className="text-center max-w-md bg-white pixel-border p-6">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h2 className="text-xs text-black mb-2">ERROR!</h2>
+            <p className="text-xs text-gray-700 mb-6">{error}</p>
+            <button 
             onClick={handleRefresh}
-            className="bg-red-600 hover:bg-red-700 border border-red-500"
+              className="bg-[#4ECDC4] text-black px-4 py-2 pixel-button text-xs"
+              style={{fontFamily: "'Press Start 2P', monospace"}}
           >
-            <Sword className="w-4 h-4 mr-2" />
-            Coba Lagi 🔄
-          </Button>
+              TRY AGAIN
+            </button>
         </div>
       </div>
+      </>
     );
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 relative overflow-hidden">
-      {/* Fantasy Background Elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 text-6xl animate-pulse">⭐</div>
-        <div className="absolute top-32 right-20 text-4xl animate-bounce">🔮</div>
-        <div className="absolute bottom-20 left-32 text-5xl animate-pulse">⚡</div>
-        <div className="absolute bottom-40 right-10 text-3xl animate-bounce">🌟</div>
-        <div className="absolute top-1/2 left-1/4 text-7xl animate-pulse">✨</div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.6; }
+        .pixel-border { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
+        .pixel-button { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); transition: all 0.1s; }
+        .pixel-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
+        .pixel-card { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); background: white; }
+        .pixel-progress { border: 2px solid #000; }
+        .pixel-border-t { border-top: 2px solid #000; }
+        .pixel-nav { border-top: 3px solid #000; box-shadow: 0px -2px 0px 0px rgba(0,0,0,0.8); }
+        .pixel-nav-item { border: 2px solid #000; }
+        .pixel-nav-item.active { background: #FFD700; }
+        .pixel-nav-item:active { transform: translate(1px, 1px); }
+      `}</style>
+      <div className="min-h-screen bg-[#87CEEB] relative overflow-hidden pb-20" style={{fontFamily: "'Press Start 2P', monospace"}}>
+        {/* Pixel Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 text-4xl">⚔️</div>
+          <div className="absolute top-32 right-20 text-3xl">🛡️</div>
+          <div className="absolute bottom-20 left-32 text-3xl">⚡</div>
+          <div className="absolute bottom-40 right-10 text-2xl">🏆</div>
       </div>
 
-      <div className="relative z-10 space-y-6 p-4 sm:p-6 lg:p-8">
-        {/* Character Profile Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-6 text-white border border-purple-500/20">
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="flex items-center gap-6">
-                {/* Character Avatar */}
-                <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br ${characterClass.color} flex items-center justify-center text-3xl border-2 border-white/20`}>
+        <div className="relative z-10 space-y-3 p-3">
+          {/* Character Profile Header - Pixel Style */}
+          {activeTab === 'home' && (
+            <div className="pixel-card bg-[#FFD700] p-3">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  {/* Character Avatar - Pixel */}
+                  <div className="relative w-16 h-16 pixel-border bg-white flex items-center justify-center text-2xl">
                   {characterClass.icon}
-                  <div className="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-medium px-1.5 py-0.5 rounded-full">
-                    {stats.level}
+                    <div className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[6px] px-1 py-0.5 pixel-border">
+                      Lv{stats.level}
                   </div>
                 </div>
                 
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">
-                    {userInfo?.fullName || 'Hero'} ⚔️
+                  <div className="flex-1">
+                    <h1 className="text-[10px] text-black mb-1">
+                      {userInfo?.fullName || 'HERO'}
                   </h1>
-                  <div className="flex items-center gap-4 mb-2">
-                    <span className={`px-3 py-1 rounded-full bg-gradient-to-r ${characterClass.color} text-sm font-bold border border-white/30`}>
-                      {characterClass.name}
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="bg-[#4ECDC4] text-black text-[6px] px-2 py-1 pixel-border">
+                        {characterClass.name.toUpperCase()}
                     </span>
-                    <span className="text-purple-300">
-                      Ranking #{getCurrentDisplayRank() > 0 ? getCurrentDisplayRank() : '?'} {getCurrentLeaderboardContext()}
+                      <span className="text-[6px] text-gray-700">
+                        RANK #{getCurrentDisplayRank() > 0 ? getCurrentDisplayRank() : '?'}
                     </span>
                   </div>
-                  <p className="text-purple-200">
-                    {stats.points > 500 ? "Legend banget! Quest master sejati 🏆" : 
-                     stats.points > 200 ? "Keren nih, adventurer yang promising! ⚡" :
-                     "Pemula yang semangat, gas terus! 🌟"}
-                  </p>
                 </div>
               </div>
               
-              {/* Quick Stats */}
-              <div className="flex gap-4">
-                <div className="text-center bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <Crown className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
-                  <div className="text-xl font-bold">{stats.points.toLocaleString()}</div>
-                  <div className="text-xs text-purple-300">Total XP</div>
+                {/* Quick Stats - Pixel */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="pixel-card bg-white p-2 text-center">
+                    <div className="text-[8px] text-black font-bold">{stats.points.toLocaleString()}</div>
+                    <div className="text-[6px] text-gray-600">XP</div>
                 </div>
-                <div className="text-center bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <Award className="w-5 h-5 mx-auto mb-1 text-orange-400" />
-                  <div className="text-xl font-bold">{stats.badges.length}</div>
-                  <div className="text-xs text-purple-300">Trofi</div>
+                  <div className="pixel-card bg-white p-2 text-center">
+                    <div className="text-[8px] text-black font-bold">{stats.badges.length}</div>
+                    <div className="text-[6px] text-gray-600">BADGES</div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* RPG Stats Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* XP and Level Progress */}
-          <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Star className="w-6 h-6 text-yellow-400" />
-              Progress & Achievement
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* XP Points */}
-              <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Crown className="w-8 h-8 text-yellow-400" />
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Total Experience</h3>
-                    <p className="text-yellow-300 text-sm">XP yang udah dikumpulin</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-400 mb-2">
-                    {stats.points.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-yellow-300">Poin XP</div>
-                </div>
-              </div>
-
-              {/* Current Level */}
-              <div className={`bg-gradient-to-br ${characterClass.color}/20 border border-purple-500/30 rounded-xl p-6`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="text-3xl">{characterClass.icon}</div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Level Sekarang</h3>
-                    <p className="text-purple-300 text-sm">{characterClass.name}</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-white mb-2">
-                    {stats.level}
-                  </div>
-                  <div className="text-sm text-purple-300">Level</div>
-                </div>
-              </div>
-            </div>
-
-            {/* EXP Progress Bar */}
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white font-medium">Progress ke Level Selanjutnya</span>
-                <span className="text-yellow-400 font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
-              </div>
-              <div className="bg-slate-700 rounded-full h-4 overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
-                  style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-slate-400 mt-1 text-center">
-                {Math.round((rpgStats.exp / rpgStats.expToNext) * 100)}% selesai
-              </div>
-            </div>
-          </div>
-
-          {/* Guild Rankings (Leaderboard) */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-yellow-400" />
-                Hall of Fame 🏰
-              </h2>
-              
-              {/* Toggle between Global and Class leaderboard */}
-              {classLeaderboard.length > 0 && (
-                <div className="flex bg-slate-700/50 rounded-lg p-1 border border-purple-500/30">
-                  <button
-                    onClick={() => setShowClassLeaderboard(false)}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                      !showClassLeaderboard
-                        ? 'bg-purple-600 text-white shadow-sm'
-                        : 'text-purple-300 hover:text-white hover:bg-purple-700/50'
-                    }`}
-                  >
-                    🌍 Global
-                  </button>
-                  <button
-                    onClick={() => setShowClassLeaderboard(true)}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                      showClassLeaderboard
-                        ? 'bg-purple-600 text-white shadow-sm'
-                        : 'text-purple-300 hover:text-white hover:bg-purple-700/50'
-                    }`}
-                  >
-                    🏫 Kelas
-                  </button>
                 </div>
               )}
-            </div>
-            
-            {(showClassLeaderboard ? classLeaderboard : leaderboard).length > 0 ? (
-              <div>
-                {/* Leaderboard scope indicator */}
-                <div className="mb-4 text-center">
-                  <span className="text-xs text-purple-300 bg-purple-900/30 px-2 py-1 rounded-full border border-purple-500/30">
-                    {showClassLeaderboard 
-                      ? `🏫 Ranking Kelas (${classLeaderboard.length} siswa)`
-                      : `🌍 Ranking Global (${leaderboard.length} siswa)`}
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  {(showClassLeaderboard ? classLeaderboard : leaderboard).slice(0, 8).map((student, index) => (
-                  <div 
-                    key={student.username}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                      student.username === userInfo?.username 
-                        ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-400/30' 
-                        : 'bg-slate-700/20 hover:bg-slate-700/30'
-                    }`}
-                  >
-                    <div className="text-lg min-w-[2rem] text-center">
-                      {index === 0 && '👑'}
-                      {index === 1 && '🥈'}
-                      {index === 2 && '🥉'}
-                      {index > 2 && <span className="font-medium text-slate-400">#${index + 1}</span>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium truncate ${
-                        student.username === userInfo?.username ? 'text-white' : 'text-slate-300'
-                      }`}>
-                        {student.fullName}
-                        {student.username === userInfo?.username && (
-                          <span className="ml-2 text-xs bg-purple-500/80 px-2 py-0.5 rounded-full">
-                            Kamu
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {student.points.toLocaleString()} XP • Lv.{student.level}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 text-yellow-400">
-                      <Award className="w-4 h-4" />
-                      <span className="text-sm font-medium">{student.badges}</span>
-                    </div>
-                  </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Castle className="w-12 h-12 mx-auto mb-4 text-slate-400" />
-                <p className="text-slate-400">
-                  {showClassLeaderboard 
-                    ? 'Hall of Fame kelas lagi kosong nih...' 
-                    : 'Hall of Fame lagi kosong nih...'}
-                </p>
-              </div>
-            )}
-            
-            <Button 
-              variant="outline" 
-              className="w-full mt-4 border-purple-500/50 text-purple-300 hover:bg-purple-600/20 hover:text-white"
-              onClick={handleRefresh}
-              disabled={refreshing}
-            >
-              <Compass className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Refreshing...' : 'Refresh Data 🔄'}
-            </Button>
-          </div>
-        </div>
 
-        {/* Real Progress Overview */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-blue-400" />
-            Progress Akademik 📊
-            {refreshing && (
-              <span className="ml-auto text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full animate-pulse">
-                Syncing...
-              </span>
-            )}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Real Attendance */}
+          {/* Progress Akademik - Pixel Style */}
+          {activeTab === 'home' && (
+            <div className="space-y-3">
+              <div className="pixel-card bg-white p-3">
+                <h2 className="text-[8px] text-black mb-3">PROGRESS AKADEMIK</h2>
+                
+                <div className="space-y-3">
+                  {/* Attendance - Pixel */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-300">Tingkat Kehadiran</span>
-                <span className="text-sm font-bold text-green-400">{stats.attendance}%</span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[6px] text-black font-bold">KEHADIRAN</span>
+                      <span className="text-[6px] text-black font-bold">{stats.attendance}%</span>
               </div>
-              <div className="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-500"
+                        className="h-full bg-[#4ECDC4] transition-all duration-500"
                   style={{ width: `${stats.attendance}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                {stats.attendance >= 80 ? 'Rajin banget! Mantap 👏' : 
-                 stats.attendance > 0 ? 'Yuk lebih rajin hadir! 📚' : 
-                 'Data kehadiran lagi di-sync...⏳'}
+                    <p className="text-[5px] text-gray-600 mt-1">
+                      {stats.attendance >= 80 ? 'RAJIN BANGET! 👏' : 
+                       stats.attendance > 0 ? 'YUK LEBIH RAJIN! 📚' : 
+                       'DATA SYNC...⏳'}
               </p>
             </div>
             
-            {/* Real Grade Average */}
+                  {/* Grade Average - Pixel */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-300">Rata-rata Nilai</span>
-                <span className="text-sm font-bold text-blue-400">{stats.averageGrade}</span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[6px] text-black font-bold">RATA-RATA NILAI</span>
+                      <span className="text-[6px] text-black font-bold">{stats.averageGrade}</span>
               </div>
-              <div className="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                        className="h-full bg-[#FFD700] transition-all duration-500"
                   style={{ width: `${Math.min(stats.averageGrade, 100)}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                {stats.averageGrade >= 80 ? 'Prestasi keren! 🌟' : 
-                 stats.averageGrade > 0 ? 'Semangat belajar terus! 📖' : 
-                 'Data nilai lagi di-sync...⏳'}
+                    <p className="text-[5px] text-gray-600 mt-1">
+                      {stats.averageGrade >= 80 ? 'PRESTASI KEREN! 🌟' : 
+                       stats.averageGrade > 0 ? 'SEMANGAT BELAJAR! 📖' : 
+                       'DATA SYNC...⏳'}
               </p>
             </div>
             
-            {/* Real Assignments Completed */}
+                  {/* Assignments Completed - Pixel */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-300">Tugas Selesai</span>
-                <span className="text-sm font-bold text-purple-400">{stats.completedAssignments}</span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[6px] text-black font-bold">TUGAS SELESAI</span>
+                      <span className="text-[6px] text-black font-bold">{stats.completedAssignments}</span>
               </div>
-              <div className="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="pixel-progress bg-gray-300 h-3 overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                        className="h-full bg-[#FF6B6B] transition-all duration-500"
                   style={{ width: `${Math.min((stats.completedAssignments / Math.max(stats.completedAssignments, 10)) * 100, 100)}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-slate-400 mt-1">
-                {stats.completedAssignments >= 10 ? 'Produktif banget! 🔥' : 
-                 stats.completedAssignments > 0 ? 'Ada quest lain menunggu! 💪' : 
-                 'Data tugas lagi di-sync...⏳'}
+                    <p className="text-[5px] text-gray-600 mt-1">
+                      {stats.completedAssignments >= 10 ? 'PRODUKTIF BANGET! 🔥' : 
+                       stats.completedAssignments > 0 ? 'ADA QUEST LAIN! 💪' : 
+                       'DATA SYNC...⏳'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Assignment Grades Detail */}
+              {/* Assignment Grades Detail - Pixel Style */}
         {assignmentGrades.length > 0 && (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Award className="w-6 h-6 text-blue-400" />
-              Nilai Tugas 📝
-              <span className="ml-auto text-sm bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full border border-blue-500/30">
-                {assignmentGrades.length} Tugas
+                <div className="pixel-card bg-white p-3">
+                  <h2 className="text-[8px] text-black mb-3 flex items-center justify-between">
+                    <span>NILAI TUGAS</span>
+                    <span className="text-[6px] bg-[#4ECDC4] text-black px-2 py-1 pixel-border">
+                      {assignmentGrades.length} TUGAS
               </span>
             </h2>
             
-            <div className="grid gap-4">
+                  <div className="space-y-2">
               {assignmentGrades.map((assignment, index) => {
                 const percentage = Math.round((assignment.score / assignment.maxPoints) * 100);
                 const getGradeColor = (percentage: number) => {
-                  if (percentage >= 90) return 'from-green-500 to-emerald-500';
-                  if (percentage >= 80) return 'from-blue-500 to-cyan-500';
-                  if (percentage >= 70) return 'from-yellow-500 to-orange-500';
-                  if (percentage >= 60) return 'from-orange-500 to-red-500';
-                  return 'from-red-500 to-pink-500';
+                        if (percentage >= 90) return 'bg-[#4ECDC4]';
+                        if (percentage >= 80) return 'bg-[#87CEEB]';
+                        if (percentage >= 70) return 'bg-[#FFD700]';
+                        if (percentage >= 60) return 'bg-[#FFA500]';
+                        return 'bg-[#FF6B6B]';
                 };
                 
                 const getStatusIcon = (status: string) => {
@@ -814,101 +661,55 @@ const StudentDashboard = () => {
                 
                 const getStatusText = (status: string) => {
                   switch (status) {
-                    case 'completed': return 'Selesai';
-                    case 'late': return 'Terlambat';
-                    case 'missing': return 'Belum Dikerjakan';
-                    default: return 'Unknown';
+                          case 'completed': return 'SELESAI';
+                          case 'late': return 'TERLAMBAT';
+                          case 'missing': return 'BELUM';
+                          default: return 'UNKNOWN';
                   }
                 };
 
                 return (
                   <div 
                     key={assignment.assignmentId || index}
-                    className="bg-slate-700/30 rounded-xl p-5 border border-slate-600/50 hover:bg-slate-700/50 transition-all duration-300 hover:border-purple-500/50"
+                          className="pixel-card bg-white p-2"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                      {/* Assignment Info */}
+                          <div className="flex items-start gap-2">
+                            <div className="text-lg">{getStatusIcon(assignment.status)}</div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="text-2xl">{getStatusIcon(assignment.status)}</div>
-                          <div>
-                            <h3 className="text-lg font-bold text-white truncate">
+                              <h3 className="text-[6px] text-black font-bold truncate mb-1">
                               {assignment.assignmentTitle}
                             </h3>
-                            <div className="flex items-center gap-4 text-sm text-slate-400">
+                              <div className="flex items-center gap-2 text-[5px] text-gray-600 mb-1">
                               <span>{getStatusText(assignment.status)}</span>
                               {assignment.dueDate && (
-                                <span>Due: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
+                                  <span>DUE: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
                               )}
-                              {assignment.submittedAt && (
-                                <span>Dikerjakan: {new Date(assignment.submittedAt).toLocaleDateString('id-ID')}</span>
-                              )}
-                            </div>
-                          </div>
                         </div>
                         
-                        {assignment.assignmentDescription && (
-                          <p className="text-sm text-slate-300 mb-3 line-clamp-2">
-                            {assignment.assignmentDescription}
-                          </p>
-                        )}
-                        
                         {assignment.feedback && (
-                          <div className="bg-slate-800/50 rounded-lg p-3 mb-3">
-                            <p className="text-xs text-slate-400 mb-1">💬 Feedback:</p>
-                            <p className="text-sm text-slate-300">{assignment.feedback}</p>
+                                <div className="pixel-border bg-gray-100 p-1 mb-1">
+                                  <p className="text-[5px] text-gray-600 mb-0.5">FEEDBACK:</p>
+                                  <p className="text-[5px] text-black">{assignment.feedback}</p>
                           </div>
                         )}
                       </div>
                       
-                      {/* Score Display */}
-                      <div className="flex flex-col items-center lg:items-end gap-3">
-                        <div className="text-center lg:text-right">
-                          <div className="text-3xl font-bold text-white mb-1">
+                            <div className="text-right">
+                              <div className="text-[8px] text-black font-bold mb-0.5">
                             {assignment.score}
                           </div>
-                          <div className="text-sm text-slate-400">
-                            dari {assignment.maxPoints}
+                              <div className="text-[5px] text-gray-600 mb-1">
+                                /{assignment.maxPoints}
                           </div>
-                        </div>
-                        
-                        {/* Percentage Circle */}
-                        <div className="relative w-16 h-16">
-                          <svg className="w-16 h-16 transform -rotate-90">
-                            <circle
-                              cx="32"
-                              cy="32"
-                              r="28"
-                              stroke="rgb(51 65 85)"
-                              strokeWidth="4"
-                              fill="transparent"
-                            />
-                            <circle
-                              cx="32"
-                              cy="32"
-                              r="28"
-                              stroke={percentage >= 90 ? '#10b981' : percentage >= 80 ? '#3b82f6' : percentage >= 70 ? '#f59e0b' : percentage >= 60 ? '#f97316' : '#ef4444'}
-                              strokeWidth="4"
-                              fill="transparent"
-                              strokeDasharray={`${2 * Math.PI * 28}`}
-                              strokeDashoffset={`${2 * Math.PI * 28 * (1 - percentage / 100)}`}
-                              style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
-                            />
-                          </svg>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">
-                              {percentage}%
-                            </span>
-                          </div>
-                        </div>
-                        
-                        {/* Grade Badge */}
-                        <div className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${getGradeColor(percentage)} text-white`}>
+                              <div className={`${getGradeColor(percentage)} text-white text-[5px] px-1 py-0.5 pixel-border font-bold`}>
                           {percentage >= 90 ? 'A' : 
                            percentage >= 80 ? 'B' : 
                            percentage >= 70 ? 'C' : 
                            percentage >= 60 ? 'D' : 'E'}
                         </div>
+                              <div className="text-[5px] text-gray-600 mt-0.5">
+                                {percentage}%
+                              </div>
                       </div>
                     </div>
                   </div>
@@ -916,503 +717,249 @@ const StudentDashboard = () => {
               })}
             </div>
             
-            {/* Assignment Summary */}
-            <div className="mt-6 pt-6 border-t border-slate-600/50">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-green-400">
+                  {/* Assignment Summary - Pixel */}
+                  <div className="mt-3 pt-3 pixel-border-t border-black">
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div className="pixel-card bg-[#4ECDC4] p-2">
+                        <div className="text-[8px] text-black font-bold">
                     {assignmentGrades.filter(a => a.status === 'completed').length}
                   </div>
-                  <div className="text-xs text-slate-400">Selesai Tepat Waktu</div>
+                        <div className="text-[5px] text-gray-700">SELESAI</div>
                 </div>
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-yellow-400">
+                      <div className="pixel-card bg-[#FFD700] p-2">
+                        <div className="text-[8px] text-black font-bold">
                     {assignmentGrades.filter(a => a.status === 'late').length}
                   </div>
-                  <div className="text-xs text-slate-400">Terlambat</div>
+                        <div className="text-[5px] text-gray-700">TERLAMBAT</div>
                 </div>
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-blue-400">
+                      <div className="pixel-card bg-[#87CEEB] p-2">
+                        <div className="text-[8px] text-black font-bold">
                     {Math.round(assignmentGrades.reduce((sum, a) => sum + (a.score / a.maxPoints * 100), 0) / assignmentGrades.length)}%
                   </div>
-                  <div className="text-xs text-slate-400">Rata-rata</div>
+                        <div className="text-[5px] text-gray-700">RATA-RATA</div>
                 </div>
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-purple-400">
+                      <div className="pixel-card bg-[#FF6B6B] p-2">
+                        <div className="text-[8px] text-black font-bold">
                     {assignmentGrades.reduce((sum, a) => sum + a.score, 0)}
                   </div>
-                  <div className="text-xs text-slate-400">Total Poin</div>
+                        <div className="text-[5px] text-gray-700">TOTAL POIN</div>
                 </div>
               </div>
             </div>
           </div>
         )}
-        
-        {/* Trophy Collection */}
-        {stats.badges.length > 0 ? (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Award className="w-6 h-6 text-yellow-400" />
-              Koleksi Trofi 🏆
-              <span className="ml-auto text-sm bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full border border-yellow-500/30">
-                {stats.badges.length} Badge{stats.badges.length !== 1 ? 's' : ''}
-              </span>
-            </h2>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {stats.badges.map((badgeName, index) => {
-                const badge = availableBadges.find(b => b.name === badgeName);
-                return (
-                  <div 
-                    key={index}
-                    className="relative group bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300 hover:shadow-2xl cursor-pointer"
-                    title={badgeName}
-                  >
-                    <div className="text-4xl mb-3">
-                      {badge?.icon || '🏆'}
-                    </div>
-                    <h3 className="text-sm font-bold text-white mb-1 leading-tight min-h-[2.5rem] flex items-center justify-center">
-                      {badgeName}
-                    </h3>
-                    {badge?.pointValue && (
-                      <div className="text-xs text-yellow-300 font-medium">
-                        +{badge.pointValue} XP
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/0 to-yellow-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div className="mt-6 pt-6 border-t border-slate-600/50">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-yellow-400">{stats.badges.length}</div>
-                  <div className="text-xs text-slate-400">Badge Diperoleh</div>
-                </div>
-                <div className="bg-slate-700/30 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-orange-400">
-                    {availableBadges.reduce((total, badge) => {
-                      const isEarned = stats.badges.includes(badge.name);
-                      return total + (isEarned ? (badge.pointValue || 0) : 0);
-                    }, 0)}
-                  </div>
-                  <div className="text-xs text-slate-400">XP dari Badge</div>
-                </div>
-                <div className="bg-slate-700/30 rounded-xl p-4 col-span-2 md:col-span-1">
-                  <div className="text-2xl font-bold text-purple-400">
-                    {Math.round((stats.badges.length / Math.max(availableBadges.length, 1)) * 100)}%
-                  </div>
-                  <div className="text-xs text-slate-400">Koleksi Lengkap</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Award className="w-6 h-6 text-yellow-400" />
-              Koleksi Trofi 🏆
-              <span className="ml-auto text-sm bg-slate-600/50 text-slate-400 px-3 py-1 rounded-full border border-slate-500/30">
-                0 Badge
-              </span>
-            </h2>
-            
-            <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto mb-6 bg-slate-700/50 rounded-full flex items-center justify-center">
-                <Award className="w-12 h-12 text-slate-400" />
-              </div>
-              <p className="text-slate-400 text-lg font-medium mb-2">Belum ada badge nih</p>
-              <p className="text-slate-500 text-sm mb-6">Yuk selesaikan achievement untuk dapetin trofi pertama! ⭐</p>
-              
-              {availableBadges.length > 0 && (
-                <div>
-                  <p className="text-slate-400 text-sm mb-4">Badge yang bisa didapetin:</p>
-                  <div className="flex justify-center gap-2 flex-wrap max-w-md mx-auto">
-                    {availableBadges.slice(0, 6).map((badge, index) => (
-                      <div key={index} className="text-2xl opacity-50 hover:opacity-100 transition-opacity" title={badge.name}>
-                        {badge.icon || '🏆'}
-                      </div>
-                    ))}
-                    {availableBadges.length > 6 && (
-                      <div className="text-slate-500 text-sm">+{availableBadges.length - 6} lagi</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button 
-            className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-colors duration-200"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
+          {/* Progress Tab - Pixel Style */}
+          {activeTab === 'progress' && (
+            <div className="space-y-3">
+              <div className="pixel-card bg-white p-3">
+                <h2 className="text-[8px] text-black mb-3">PROGRESS & ACHIEVEMENT</h2>
+                
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {/* XP Points - Pixel */}
+                  <div className="pixel-card bg-[#FFD700] p-2">
             <div className="text-center">
-              <Compass className={`w-6 h-6 mx-auto mb-1 ${refreshing ? 'animate-spin' : ''}`} />
-              <span className="text-sm">{refreshing ? 'Refreshing...' : 'Refresh Stats'}</span>
+                      <div className="text-[10px] text-black font-bold mb-1">
+                        {stats.points.toLocaleString()}
             </div>
-          </Button>
-          
-          <Button 
-            className="h-16 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium transition-colors duration-200"
-            onClick={handleProgressMap}
-          >
+                      <div className="text-[6px] text-gray-700">TOTAL XP</div>
+            </div>
+            </div>
+
+                  {/* Current Level - Pixel */}
+                  <div className="pixel-card bg-[#4ECDC4] p-2">
             <div className="text-center">
-              <Map className="w-6 h-6 mx-auto mb-1" />
-              <span className="text-sm">Peta Progress</span>
+                      <div className="text-[10px] text-black font-bold mb-1">
+                        LV {stats.level}
             </div>
-          </Button>
-          
-          <Button 
-            className="h-16 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium transition-colors duration-200"
-            onClick={handleClassmates}
-          >
-            <div className="text-center">
-              <Users className="w-6 h-6 mx-auto mb-1" />
-              <span className="text-sm">Teman Kelas</span>
-            </div>
-          </Button>
-          
-          <Button 
-            className="h-16 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-medium transition-colors duration-200"
-            onClick={handleAchievements}
-          >
-            <div className="text-center">
-              <Star className="w-6 h-6 mx-auto mb-1" />
-              <span className="text-sm">Achievement</span>
-            </div>
-          </Button>
+                      <div className="text-[6px] text-gray-700">{characterClass.name.toUpperCase()}</div>
         </div>
-
-        {/* Progress Map Modal */}
-        {showProgressMap && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Map className="w-6 h-6 text-green-400" />
-                  🗺️ Peta Progress Belajar
-                </h2>
-                <button
-                  onClick={() => setShowProgressMap(false)}
-                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Attendance Progress */}
-                <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl">
-                      📚
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Kehadiran</h3>
-                      <p className="text-green-300 text-sm">Rajin hadir kelas</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">{stats.attendance}%</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
-                        style={{ width: `${stats.attendance}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {stats.attendance >= 90 ? "🌟 Perfect Attendance!" : 
-                       stats.attendance >= 80 ? "👍 Great Job!" : 
-                       "💪 Keep Going!"}
-                    </p>
                   </div>
                 </div>
 
-                {/* Grade Progress */}
-                <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-2xl">
-                      📊
+                {/* EXP Progress Bar - Pixel */}
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[6px] text-black">NEXT LEVEL</span>
+                    <span className="text-[6px] text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Nilai</h3>
-                      <p className="text-blue-300 text-sm">Prestasi akademik</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">{stats.averageGrade}</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                        style={{ width: `${Math.min(stats.averageGrade, 100)}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {stats.averageGrade >= 90 ? "🏆 Outstanding!" : 
-                       stats.averageGrade >= 80 ? "⭐ Excellent!" : 
-                       "📈 Improving!"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Assignment Progress */}
-                <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-2xl">
-                      📝
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Tugas</h3>
-                      <p className="text-purple-300 text-sm">Tugas selesai</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-400 mb-2">{stats.completedAssignments}</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-                        style={{ width: `${Math.min((stats.completedAssignments / Math.max(stats.completedAssignments, 10)) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {stats.completedAssignments >= 15 ? "🔥 Super Productive!" : 
-                       stats.completedAssignments >= 5 ? "💪 Good Progress!" : 
-                       "🚀 Let's Go!"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Level Progress */}
-                <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">
-                      {characterClass.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Level</h3>
-                      <p className="text-yellow-300 text-sm">{characterClass.name}</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">Level {stats.level}</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"
+                  <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
+                    <div 
+                      className="h-full bg-[#FFD700] transition-all duration-500"
                         style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
                       ></div>
                     </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {rpgStats.exp}/{rpgStats.expToNext} XP to next level
-                    </p>
+                  <div className="text-[6px] text-gray-600 mt-1 text-center">
+                    {Math.round((rpgStats.exp / rpgStats.expToNext) * 100)}% COMPLETE
                   </div>
                 </div>
-
-                {/* Badge Collection */}
-                <div className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border border-orange-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-2xl">
-                      🏆
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Badges</h3>
-                      <p className="text-orange-300 text-sm">Koleksi trofi</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-orange-400 mb-2">{stats.badges.length}</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
-                        style={{ width: `${Math.min((stats.badges.length / Math.max(availableBadges.length, 1)) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {stats.badges.length}/{availableBadges.length} badges earned
-                    </p>
-                  </div>
-                </div>
-
-                {/* Rank Progress */}
-                <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-2xl">
-                      👑
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">Ranking</h3>
-                      <p className="text-indigo-300 text-sm">Posisi di kelas</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-indigo-400 mb-2">#{getCurrentDisplayRank()}</div>
-                    <div className="w-full bg-slate-700 rounded-full h-3">
-                      <div 
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                        style={{ width: `${Math.max(100 - (getCurrentDisplayRank() / Math.max(stats.totalStudents, 1)) * 100, 10)}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-2">
-                      {getCurrentLeaderboardContext()}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
 
-        {/* Classmates Modal */}
-        {showClassmates && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Users className="w-6 h-6 text-purple-400" />
-                  👥 Teman Sekelas
-                </h2>
+          {/* Leaderboard Tab - Pixel Style */}
+            {activeTab === 'leaderboard' && (
+              <div className="space-y-3">
+              <div className="pixel-card bg-white p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-[8px] text-black">HALL OF FAME</h2>
+                  
+                  {/* Toggle between Global and Class leaderboard - Pixel */}
+                  {classLeaderboard.length > 0 && (
+                    <div className="flex gap-1">
                 <button
-                  onClick={() => setShowClassmates(false)}
-                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
-                >
-                  ✕
+                        onClick={() => setShowClassLeaderboard(false)}
+                        className={`px-2 py-1 text-[6px] pixel-button ${
+                          !showClassLeaderboard
+                            ? 'bg-[#FFD700] text-black'
+                            : 'bg-white text-black'
+                        }`}
+                      >
+                        GLOBAL
+                      </button>
+                      <button
+                        onClick={() => setShowClassLeaderboard(true)}
+                        className={`px-2 py-1 text-[6px] pixel-button ${
+                          showClassLeaderboard
+                            ? 'bg-[#FFD700] text-black'
+                            : 'bg-white text-black'
+                        }`}
+                      >
+                        CLASS
                 </button>
+                    </div>
+                  )}
               </div>
               
-              {classmates.length > 0 ? (
-                <div className="grid gap-4">
-                  {classmates.map((classmate, index) => (
-                    <div 
-                      key={classmate.username}
-                      className="bg-slate-700/30 rounded-xl p-4 border border-slate-600/50 hover:bg-slate-700/50 transition-all"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-2xl">
-                          {classmate.fullName?.charAt(0) || classmate.name?.charAt(0) || '👤'}
+                {(showClassLeaderboard ? classLeaderboard : leaderboard).length > 0 ? (
+                  <div className="space-y-2">
+                    {(showClassLeaderboard ? classLeaderboard : leaderboard).slice(0, 8).map((student, index) => (
+                      <div 
+                        key={student.username}
+                        className={`pixel-card p-2 ${
+                          student.username === userInfo?.username 
+                            ? 'bg-[#FFD700]' 
+                            : 'bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-[8px] min-w-[1.5rem] text-center">
+                            {index === 0 && '👑'}
+                            {index === 1 && '🥈'}
+                            {index === 2 && '🥉'}
+                            {index > 2 && <span className="text-[6px]">#{index + 1}</span>}
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-white">
-                            {classmate.fullName || classmate.name}
-                          </h3>
-                          <p className="text-slate-400 text-sm">@{classmate.username}</p>
-                          <div className="flex items-center gap-4 mt-2">
-                            <span className="text-sm text-yellow-400 flex items-center gap-1">
-                              <Crown className="w-4 h-4" />
-                              {classmate.points} XP
-                            </span>
-                            <span className="text-sm text-purple-400">
-                              Level {classmate.level}
-                            </span>
-                            <span className="text-sm text-orange-400 flex items-center gap-1">
-                              <Award className="w-4 h-4" />
-                              {classmate.badges.length} badges
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[6px] truncate ${
+                              student.username === userInfo?.username ? 'text-black font-bold' : 'text-black'
+                            }`}>
+                              {student.fullName}
+                              {student.username === userInfo?.username && (
+                                <span className="ml-1 text-[5px] bg-[#FF6B6B] text-white px-1">YOU</span>
+                              )}
+                            </p>
+                            <p className="text-[5px] text-gray-600">
+                              {student.points.toLocaleString()} XP • LV{student.level}
+                            </p>
                           </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-slate-300">#{index + 1}</div>
-                          <div className="text-xs text-slate-400">Rank di kelas</div>
+                          <div className="text-[6px] text-black font-bold">
+                            🏆{student.badges}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <Users className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-                  <p className="text-slate-400 text-lg">Belum ada teman sekelas</p>
-                  <p className="text-slate-500 text-sm">Data teman sekelas akan muncul di sini</p>
+                  <div className="text-center py-6">
+                    <p className="text-[6px] text-gray-600">NO DATA</p>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Achievements Modal */}
-        {showAchievements && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-2xl border border-purple-500/30 p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Star className="w-6 h-6 text-orange-400" />
-                  🏆 Achievement Center
-                </h2>
-                <button
-                  onClick={() => setShowAchievements(false)}
-                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-slate-700"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {availableBadges.map((badge, index) => {
-                  const isEarned = stats.badges.includes(badge.name);
+          {/* Badges Tab - Pixel Style */}
+            {activeTab === 'badges' && (
+              <div className="space-y-3">
+                <div className="pixel-card bg-white p-3">
+                  <h2 className="text-[8px] text-black mb-3">BADGE COLLECTION</h2>
+                  {stats.badges.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      {stats.badges.map((badgeName, index) => {
+                        const badge = availableBadges.find(b => b.name === badgeName);
                   return (
                     <div 
                       key={index}
-                      className={`relative rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 border ${
-                        isEarned 
-                          ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30 hover:shadow-2xl' 
-                          : 'bg-slate-700/30 border-slate-600/50 hover:bg-slate-700/50'
-                      }`}
-                    >
-                      <div className={`text-6xl mb-4 ${isEarned ? '' : 'opacity-30 grayscale'}`}>
-                        {badge.icon || '🏆'}
+                            className="pixel-card bg-[#FFD700] p-2 text-center"
+                          >
+                            <div className="text-2xl mb-1">{badge?.icon || '🏆'}</div>
+                            <div className="text-[5px] text-black font-bold leading-tight">
+                              {badgeName}
                       </div>
-                      <h3 className={`text-lg font-bold mb-2 ${isEarned ? 'text-white' : 'text-slate-400'}`}>
-                        {badge.name}
-                      </h3>
-                      {badge.description && (
-                        <p className={`text-sm mb-3 ${isEarned ? 'text-slate-300' : 'text-slate-500'}`}>
-                          {badge.description}
-                        </p>
-                      )}
-                      {badge.pointValue && (
-                        <div className={`text-sm font-medium ${isEarned ? 'text-yellow-300' : 'text-slate-500'}`}>
+                            {badge?.pointValue && (
+                              <div className="text-[5px] text-gray-700 mt-1">
                           +{badge.pointValue} XP
-                        </div>
-                      )}
-                      {isEarned && (
-                        <div className="absolute top-2 right-2">
-                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            ✓
-                          </div>
-                        </div>
-                      )}
-                      {!isEarned && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent rounded-2xl flex items-center justify-center">
-                          <div className="text-slate-400 text-sm font-medium bg-slate-800/80 px-3 py-1 rounded-full">
-                            🔒 Locked
-                          </div>
                         </div>
                       )}
                     </div>
                   );
                 })}
               </div>
-              
-              {availableBadges.length === 0 && (
-                <div className="text-center py-12">
-                  <Star className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-                  <p className="text-slate-400 text-lg">Belum ada achievement tersedia</p>
-                  <p className="text-slate-500 text-sm">Achievement akan muncul seiring waktu</p>
+                  ) : (
+                    <div className="text-center py-6">
+                      <p className="text-[6px] text-gray-600">NO BADGES YET</p>
                 </div>
               )}
             </div>
           </div>
         )}
       </div>
+
+        {/* Bottom Navigation Bar - Pixel Style */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white pixel-nav z-50">
+          <div className="grid grid-cols-4 gap-1 p-2">
+            <button
+              onClick={() => setActiveTab('home')}
+              className={`pixel-nav-item p-2 text-center ${
+                activeTab === 'home' ? 'active' : 'bg-white'
+              }`}
+            >
+              <div className="text-lg mb-1">🏠</div>
+              <div className="text-[6px] text-black">HOME</div>
+            </button>
+            <button
+              onClick={() => setActiveTab('progress')}
+              className={`pixel-nav-item p-2 text-center ${
+                activeTab === 'progress' ? 'active' : 'bg-white'
+              }`}
+            >
+              <div className="text-lg mb-1">📊</div>
+              <div className="text-[6px] text-black">PROGRESS</div>
+            </button>
+            <button
+              onClick={() => setActiveTab('leaderboard')}
+              className={`pixel-nav-item p-2 text-center ${
+                activeTab === 'leaderboard' ? 'active' : 'bg-white'
+              }`}
+            >
+              <div className="text-lg mb-1">🏆</div>
+              <div className="text-[6px] text-black">RANK</div>
+            </button>
+            <button
+              onClick={() => setActiveTab('badges')}
+              className={`pixel-nav-item p-2 text-center ${
+                activeTab === 'badges' ? 'active' : 'bg-white'
+              }`}
+            >
+              <div className="text-lg mb-1">🎖️</div>
+              <div className="text-[6px] text-black">BADGES</div>
+            </button>
     </div>
+        </div>
+      </div>
+    </>
   );
 };
 
