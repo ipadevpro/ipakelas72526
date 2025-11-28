@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Award, Users, Star, Crown, Sword, Sparkles, Map, Compass, Castle, Shield, Zap, Home, BarChart3, Medal, CheckCircle2, Clock, XCircle, FileText, AlertTriangle, GraduationCap, BookOpen, Sparkles as SparklesIcon, Wand2 } from 'lucide-react';
+import { Trophy, TrendingUp, Award, Users, Star, Crown, Sword, Sparkles, Map, Compass, Castle, Shield, Zap, Home, BarChart3, Medal, CheckCircle2, Clock, XCircle, FileText, AlertTriangle, GraduationCap, BookOpen, Sparkles as SparklesIcon, Wand2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, hasSessionCredentials, refreshSessionCredentials } from '@/lib/api';
 import { 
@@ -768,34 +768,34 @@ const StudentDashboard = () => {
             <div className="text-center">
                       <div className="text-base text-black font-bold mb-1.5">
                         {stats.points.toLocaleString()}
-            </div>
+                    </div>
                       <div className="text-xs text-gray-700 font-medium">TOTAL XP</div>
+                  </div>
             </div>
-            </div>
-
+            
                   {/* Current Level - Pixel */}
                   <div className="pixel-card bg-[#4ECDC4] p-3">
             <div className="text-center">
                       <div className="text-base text-black font-bold mb-1.5">
                         LV {stats.level}
-            </div>
+                </div>
                       <div className="text-xs text-gray-700 font-medium">{characterClass.name.toUpperCase()}</div>
-        </div>
                   </div>
                 </div>
+                  </div>
 
                 {/* EXP Progress Bar - Pixel */}
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs text-black font-medium">NEXT LEVEL</span>
                     <span className="text-xs text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
-                    </div>
+              </div>
                   <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                     <div 
                       className="h-full bg-[#FFD700] transition-all duration-500"
                         style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
                       ></div>
-                    </div>
+                      </div>
                   <div className="text-xs text-gray-600 mt-1.5 text-center font-medium">
                     {Math.round((rpgStats.exp / rpgStats.expToNext) * 100)}% COMPLETE
                   </div>
@@ -824,7 +824,7 @@ const StudentDashboard = () => {
                       >
                         GLOBAL
                       </button>
-                      <button
+                <button
                         onClick={() => setShowClassLeaderboard(true)}
                         className={`px-2 py-1 text-sm pixel-button ${
                           showClassLeaderboard
@@ -834,10 +834,10 @@ const StudentDashboard = () => {
                       >
                         CLASS
                 </button>
-                    </div>
-                  )}
               </div>
-              
+                  )}
+                </div>
+
                 {(showClassLeaderboard ? classLeaderboard : leaderboard).length > 0 ? (
                   <div className="space-y-2">
                     {(showClassLeaderboard ? classLeaderboard : leaderboard).slice(0, 8).map((student, index) => (
@@ -855,7 +855,7 @@ const StudentDashboard = () => {
                             {index === 1 && <Medal className="w-3 h-3 text-gray-400" strokeWidth={2.5} fill="#gray-400" />}
                             {index === 2 && <Medal className="w-3 h-3 text-[#CD7F32]" strokeWidth={2.5} fill="#CD7F32" />}
                             {index > 2 && <span className="text-sm text-black">#{index + 1}</span>}
-                        </div>
+                    </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm break-words ${
                               student.username === userInfo?.username ? 'text-black font-bold' : 'text-black'
@@ -867,20 +867,20 @@ const StudentDashboard = () => {
                             </p>
                             <p className="text-xs text-gray-600">
                               {student.points.toLocaleString()} XP • LV{student.level}
-                            </p>
-                          </div>
+                    </p>
+                  </div>
                           <div className="text-sm text-black font-bold flex items-center gap-1">
                             <Trophy className="w-3 h-3" strokeWidth={2} />
                             {student.badges}
-                        </div>
-                      </div>
+                </div>
+                    </div>
                     </div>
                   ))}
-                </div>
+                  </div>
               ) : (
                   <div className="text-center py-6">
                     <p className="text-sm text-gray-600">NO DATA</p>
-                </div>
+                    </div>
               )}
             </div>
           </div>
@@ -888,46 +888,114 @@ const StudentDashboard = () => {
 
           {/* Badges Tab - Pixel Style */}
             {activeTab === 'badges' && (
-              <div className="space-y-3">
-                <div className="pixel-card bg-white p-3">
-                  <h2 className="text-base text-black mb-3">BADGE COLLECTION</h2>
-                  {stats.badges.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-2">
-                      {stats.badges.map((badgeName, index) => {
-                        const badge = availableBadges.find(b => b.name === badgeName);
-                  return (
-                    <div 
-                      key={index}
-                            className="pixel-card bg-[#FFD700] p-2 text-center"
-                          >
-                            <div className="mb-1 flex items-center justify-center">
-                              {badge?.icon ? (
-                                <span className="text-2xl">{badge.icon}</span>
-                              ) : (
-                                <Trophy className="w-6 h-6 text-black" strokeWidth={2} />
-                              )}
+              <div className="space-y-4">
+                {availableBadges.length > 0 ? (
+                  <>
+                    {/* Earned Badges Section */}
+                    {stats.badges.length > 0 && (
+                      <div className="pixel-card bg-white p-4">
+                        <h2 className="text-base text-black mb-3 font-bold flex items-center gap-2">
+                          <Trophy className="w-4 h-4 text-[#FFD700]" strokeWidth={2.5} />
+                          EARNED BADGES ({stats.badges.length})
+                </h2>
+                        <div className="grid grid-cols-2 gap-3">
+                          {availableBadges
+                            .filter(badge => stats.badges.includes(badge.name))
+                            .map((badge, index) => (
+                              <div 
+                                key={index}
+                                className="pixel-card bg-[#FFD700] p-3 text-center"
+                              >
+                                <div className="mb-2 flex items-center justify-center">
+                                  {badge.icon ? (
+                                    <span className="text-2xl">{badge.icon}</span>
+                                  ) : (
+                                    <Trophy className="w-6 h-6 text-black" strokeWidth={2} />
+                                  )}
                         </div>
-                            <div className="text-xs text-black font-bold leading-tight break-words px-1">
-                              {badgeName}
+                                <div className="text-xs font-bold leading-tight break-words px-1 mb-1 text-black">
+                                  {badge.name}
                           </div>
-                            {badge?.pointValue && (
-                              <div className="text-xs text-gray-700 mt-1">
-                          +{badge.pointValue} XP
+                                {badge.description && (
+                                  <div className="text-[10px] leading-tight break-words px-1 mb-1 text-gray-700">
+                                    {badge.description}
                         </div>
-                      )}
+                                )}
+                                {badge.pointValue && (
+                                  <div className="text-xs mt-1 font-semibold text-gray-700">
+                                    +{badge.pointValue} XP
+                        </div>
+                                )}
                     </div>
-                  );
-                })}
-              </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <p className="text-sm text-gray-600">NO BADGES YET</p>
-                </div>
-              )}
+                  ))}
             </div>
           </div>
         )}
-      </div>
+
+                    {/* Locked Badges Section */}
+                    {availableBadges.filter(badge => !stats.badges.includes(badge.name)).length > 0 && (
+                      <div className="pixel-card bg-white p-4">
+                        <h2 className="text-base text-black mb-3 font-bold flex items-center gap-2">
+                          <Lock className="w-4 h-4 text-gray-400" strokeWidth={2.5} />
+                          LOCKED BADGES ({availableBadges.filter(badge => !stats.badges.includes(badge.name)).length})
+                </h2>
+                        <div className="grid grid-cols-2 gap-3">
+                          {availableBadges
+                            .filter(badge => !stats.badges.includes(badge.name))
+                            .map((badge, index) => (
+                    <div 
+                      key={index}
+                                className="pixel-card bg-gray-100 opacity-60 p-3 text-center"
+                              >
+                                <div className="mb-2 flex items-center justify-center">
+                                  {badge.icon ? (
+                                    <span className="text-2xl opacity-50 grayscale">{badge.icon}</span>
+                                  ) : (
+                                    <Trophy className="w-6 h-6 text-gray-400" strokeWidth={2} />
+                                  )}
+                      </div>
+                                <div className="text-xs font-bold leading-tight break-words px-1 mb-1 text-gray-500">
+                        {badge.name}
+                                </div>
+                      {badge.description && (
+                                  <div className="text-[10px] leading-tight break-words px-1 mb-1 text-gray-400">
+                          {badge.description}
+                                  </div>
+                      )}
+                      {badge.pointValue && (
+                                  <div className="text-xs mt-1 font-semibold text-gray-400">
+                          +{badge.pointValue} XP
+                        </div>
+                      )}
+                                <div className="mt-1 flex items-center justify-center gap-1">
+                                  <Lock className="w-3 h-3 text-gray-400" strokeWidth={2.5} />
+                                  <span className="text-[9px] text-gray-400 font-medium">LOCKED</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Empty State */}
+                    {stats.badges.length === 0 && availableBadges.filter(badge => !stats.badges.includes(badge.name)).length === 0 && (
+                      <div className="pixel-card bg-white p-4">
+                        <div className="text-center py-6">
+                          <p className="text-sm text-gray-600">NO BADGES AVAILABLE</p>
+                          </div>
+                        </div>
+                      )}
+                  </>
+                ) : (
+                  <div className="pixel-card bg-white p-4">
+                    <div className="text-center py-6">
+                      <p className="text-sm text-gray-600">NO BADGES AVAILABLE</p>
+                    </div>
+              </div>
+                )}
+                </div>
+              )}
+            </div>
 
         {/* Bottom Navigation Bar - Pixel Style */}
         <div className="fixed bottom-0 left-0 right-0 bg-white pixel-nav z-50">
@@ -968,9 +1036,9 @@ const StudentDashboard = () => {
               <Medal className="w-4 h-4 mb-1 text-black" strokeWidth={2.5} />
               <div className="text-[10px] text-black font-semibold">BADGES</div>
             </button>
-    </div>
-        </div>
+          </div>
       </div>
+    </div>
     </>
   );
 };
