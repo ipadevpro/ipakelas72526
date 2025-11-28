@@ -499,8 +499,8 @@ const StudentDashboard = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        .pixel-font { font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 1.8; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        .neo-font { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 600; }
         .pixel-border { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
         .pixel-button { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); transition: all 0.1s; }
         .pixel-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
@@ -512,7 +512,7 @@ const StudentDashboard = () => {
         .pixel-nav-item.active { background: #FFD700; }
         .pixel-nav-item:active { transform: translate(1px, 1px); }
       `}</style>
-      <div className="min-h-screen bg-[#87CEEB] relative overflow-hidden pb-24" style={{fontFamily: "'Press Start 2P', monospace"}}>
+      <div className="min-h-screen bg-[#87CEEB] relative overflow-hidden pb-24" style={{fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}}>
         {/* Pixel Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-10 left-10"><Sword className="w-8 h-8 text-black" strokeWidth={2} /></div>
@@ -535,15 +535,15 @@ const StudentDashboard = () => {
                   </div>
                 </div>
                 
-                  <div className="flex-1">
-                    <h1 className="text-base text-black mb-2 font-bold">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-sm text-black mb-2 font-bold break-words">
                       {userInfo?.fullName || 'HERO'}
                   </h1>
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="bg-[#4ECDC4] text-black text-xs px-3 py-1.5 pixel-border">
+                      <span className="bg-[#4ECDC4] text-black text-xs px-2.5 py-1 pixel-border font-semibold">
                         {characterClass.name.toUpperCase()}
                     </span>
-                      <span className="text-xs text-gray-700">
+                      <span className="text-xs text-gray-700 font-medium">
                         RANK #{getCurrentDisplayRank() > 0 ? getCurrentDisplayRank() : '?'}
                     </span>
                   </div>
@@ -553,12 +553,12 @@ const StudentDashboard = () => {
                 {/* Quick Stats - Pixel */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="pixel-card bg-white p-3 text-center">
-                    <div className="text-lg text-black font-bold">{stats.points.toLocaleString()}</div>
-                    <div className="text-sm text-gray-600">XP</div>
+                    <div className="text-base text-black font-bold">{stats.points.toLocaleString()}</div>
+                    <div className="text-xs text-gray-600 font-medium">XP</div>
                 </div>
                   <div className="pixel-card bg-white p-3 text-center">
-                    <div className="text-lg text-black font-bold">{stats.badges.length}</div>
-                    <div className="text-sm text-gray-600">BADGES</div>
+                    <div className="text-base text-black font-bold">{stats.badges.length}</div>
+                    <div className="text-xs text-gray-600 font-medium">BADGES</div>
                 </div>
               </div>
             </div>
@@ -569,14 +569,14 @@ const StudentDashboard = () => {
           {activeTab === 'home' && (
             <div className="space-y-4">
               <div className="pixel-card bg-white p-4">
-                <h2 className="text-lg text-black mb-4 font-bold">PROGRESS AKADEMIK</h2>
+                <h2 className="text-base text-black mb-3 font-bold">PROGRESS AKADEMIK</h2>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Attendance - Pixel */}
             <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-black font-bold">KEHADIRAN</span>
-                      <span className="text-sm text-black font-bold">{stats.attendance}%</span>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-xs text-black font-semibold">KEHADIRAN</span>
+                      <span className="text-xs text-black font-bold">{stats.attendance}%</span>
               </div>
                     <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                 <div 
@@ -584,7 +584,7 @@ const StudentDashboard = () => {
                   style={{ width: `${stats.attendance}%` }}
                 ></div>
               </div>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600 mt-1.5 font-medium">
                       {stats.attendance >= 80 ? 'RAJIN BANGET!' : 
                        stats.attendance > 0 ? 'YUK LEBIH RAJIN!' : 
                        'DATA SYNC...'}
@@ -681,20 +681,20 @@ const StudentDashboard = () => {
                               return <StatusIcon className="w-4 h-4 text-black" strokeWidth={2.5} />;
                             })()}
                       <div className="flex-1 min-w-0">
-                              <h3 className="text-sm text-black font-bold truncate mb-1">
+                              <h3 className="text-sm text-black font-bold break-words mb-1">
                               {assignment.assignmentTitle}
                             </h3>
-                              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-                              <span>{getStatusText(assignment.status)}</span>
+                              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1 flex-wrap">
+                              <span className="break-words">{getStatusText(assignment.status)}</span>
                               {assignment.dueDate && (
-                                  <span>DUE: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
+                                  <span className="break-words">DUE: {new Date(assignment.dueDate).toLocaleDateString('id-ID')}</span>
                               )}
                         </div>
                         
                         {assignment.feedback && (
                                 <div className="pixel-border bg-gray-100 p-1 mb-1">
                                   <p className="text-xs text-gray-600 mb-0.5">FEEDBACK:</p>
-                                  <p className="text-xs text-black">{assignment.feedback}</p>
+                                  <p className="text-xs text-black break-words">{assignment.feedback}</p>
                           </div>
                         )}
                       </div>
@@ -760,35 +760,35 @@ const StudentDashboard = () => {
           {activeTab === 'progress' && (
             <div className="space-y-4">
               <div className="pixel-card bg-white p-4">
-                <h2 className="text-lg text-black mb-4 font-bold">PROGRESS & ACHIEVEMENT</h2>
+                <h2 className="text-base text-black mb-3 font-bold">PROGRESS & ACHIEVEMENT</h2>
                 
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-2 gap-3 mb-3">
                   {/* XP Points - Pixel */}
                   <div className="pixel-card bg-[#FFD700] p-3">
             <div className="text-center">
-                      <div className="text-lg text-black font-bold mb-2">
+                      <div className="text-base text-black font-bold mb-1.5">
                         {stats.points.toLocaleString()}
             </div>
-                      <div className="text-sm text-gray-700">TOTAL XP</div>
+                      <div className="text-xs text-gray-700 font-medium">TOTAL XP</div>
             </div>
             </div>
 
                   {/* Current Level - Pixel */}
                   <div className="pixel-card bg-[#4ECDC4] p-3">
             <div className="text-center">
-                      <div className="text-lg text-black font-bold mb-2">
+                      <div className="text-base text-black font-bold mb-1.5">
                         LV {stats.level}
             </div>
-                      <div className="text-sm text-gray-700">{characterClass.name.toUpperCase()}</div>
+                      <div className="text-xs text-gray-700 font-medium">{characterClass.name.toUpperCase()}</div>
         </div>
                   </div>
                 </div>
 
                 {/* EXP Progress Bar - Pixel */}
                 <div className="mt-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-black">NEXT LEVEL</span>
-                    <span className="text-sm text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-black font-medium">NEXT LEVEL</span>
+                    <span className="text-xs text-black font-bold">{rpgStats.exp}/{rpgStats.expToNext} XP</span>
                     </div>
                   <div className="pixel-progress bg-gray-300 h-4 overflow-hidden">
                     <div 
@@ -796,7 +796,7 @@ const StudentDashboard = () => {
                         style={{ width: `${(rpgStats.exp / rpgStats.expToNext) * 100}%` }}
                       ></div>
                     </div>
-                  <div className="text-sm text-gray-600 mt-1 text-center">
+                  <div className="text-xs text-gray-600 mt-1.5 text-center font-medium">
                     {Math.round((rpgStats.exp / rpgStats.expToNext) * 100)}% COMPLETE
                   </div>
                 </div>
@@ -857,7 +857,7 @@ const StudentDashboard = () => {
                             {index > 2 && <span className="text-sm text-black">#{index + 1}</span>}
                         </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm truncate ${
+                            <p className={`text-sm break-words ${
                               student.username === userInfo?.username ? 'text-black font-bold' : 'text-black'
                             }`}>
                               {student.fullName}
@@ -907,7 +907,7 @@ const StudentDashboard = () => {
                                 <Trophy className="w-6 h-6 text-black" strokeWidth={2} />
                               )}
                         </div>
-                            <div className="text-xs text-black font-bold leading-tight">
+                            <div className="text-xs text-black font-bold leading-tight break-words px-1">
                               {badgeName}
                           </div>
                             {badge?.pointValue && (
@@ -931,42 +931,42 @@ const StudentDashboard = () => {
 
         {/* Bottom Navigation Bar - Pixel Style */}
         <div className="fixed bottom-0 left-0 right-0 bg-white pixel-nav z-50">
-          <div className="grid grid-cols-4 gap-2 p-3">
+          <div className="grid grid-cols-4 gap-1.5 p-2.5">
             <button
               onClick={() => setActiveTab('home')}
-              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
+              className={`pixel-nav-item p-2.5 text-center flex flex-col items-center ${
                 activeTab === 'home' ? 'active' : 'bg-white'
               }`}
             >
-              <Home className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
-              <div className="text-xs text-black font-bold">HOME</div>
+              <Home className="w-4 h-4 mb-1 text-black" strokeWidth={2.5} />
+              <div className="text-[10px] text-black font-semibold">HOME</div>
             </button>
             <button
               onClick={() => setActiveTab('progress')}
-              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
+              className={`pixel-nav-item p-2.5 text-center flex flex-col items-center ${
                 activeTab === 'progress' ? 'active' : 'bg-white'
               }`}
             >
-              <BarChart3 className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
-              <div className="text-xs text-black font-bold">PROGRESS</div>
+              <BarChart3 className="w-4 h-4 mb-1 text-black" strokeWidth={2.5} />
+              <div className="text-[10px] text-black font-semibold">PROGRESS</div>
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
-              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
+              className={`pixel-nav-item p-2.5 text-center flex flex-col items-center ${
                 activeTab === 'leaderboard' ? 'active' : 'bg-white'
               }`}
             >
-              <Trophy className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
-              <div className="text-xs text-black font-bold">RANK</div>
+              <Trophy className="w-4 h-4 mb-1 text-black" strokeWidth={2.5} />
+              <div className="text-[10px] text-black font-semibold">RANK</div>
             </button>
             <button
               onClick={() => setActiveTab('badges')}
-              className={`pixel-nav-item p-3 text-center flex flex-col items-center ${
+              className={`pixel-nav-item p-2.5 text-center flex flex-col items-center ${
                 activeTab === 'badges' ? 'active' : 'bg-white'
               }`}
             >
-              <Medal className="w-5 h-5 mb-1.5 text-black" strokeWidth={2.5} />
-              <div className="text-xs text-black font-bold">BADGES</div>
+              <Medal className="w-4 h-4 mb-1 text-black" strokeWidth={2.5} />
+              <div className="text-[10px] text-black font-semibold">BADGES</div>
             </button>
     </div>
         </div>

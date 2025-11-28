@@ -55,38 +55,38 @@ const StudentLayout = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         .pixel-header-dash { border-bottom: 4px solid #000; box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.8); }
         .pixel-border-dash { border: 3px solid #000; box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8); }
         .pixel-button-dash { border: 3px solid #000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.8); transition: all 0.1s; }
         .pixel-button-dash:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.8); }
       `}</style>
-      <div className={`min-h-screen ${isDashboard ? 'bg-[#87CEEB]' : 'bg-[#1a1c2e]'} ${isDashboard ? 'text-black' : 'text-white'}`} style={isDashboard ? {fontFamily: "'Press Start 2P', monospace"} : {}}>
+      <div className={`min-h-screen ${isDashboard ? 'bg-[#87CEEB]' : 'bg-[#1a1c2e]'} ${isDashboard ? 'text-black' : 'text-white'}`} style={isDashboard ? {fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"} : {}}>
         {/* Header */}
         {isDashboard ? (
-          <header className="h-auto pixel-header-dash bg-white relative z-50" style={{fontFamily: "'Press Start 2P', monospace"}}>
+          <header className="h-auto pixel-header-dash bg-white relative z-50" style={{fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}}>
             <div className="flex items-center justify-between p-3 px-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 pixel-border-dash bg-[#FFD700] flex items-center justify-center">
                   <Sword className="w-5 h-5 text-black" strokeWidth={3} />
                 </div>
-                <h1 className="text-sm text-black font-bold leading-tight">
+                <h1 className="text-xs text-black font-bold leading-tight">
                   STUDENT DASHBOARD
                 </h1>
               </div>
               
               <div className="flex items-center gap-3">
                 {/* User info - Pixel */}
-                <div className="hidden sm:flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-xs text-black font-bold leading-tight">
+                <div className="hidden sm:flex items-center gap-2 max-w-[200px]">
+                  <div className="text-right min-w-0 flex-1">
+                    <div className="text-xs text-black font-semibold leading-tight break-words">
                       {currentUser?.fullName || 'STUDENT'}
                     </div>
-                    <div className="text-xs text-gray-600 leading-tight">
+                    <div className="text-xs text-gray-600 leading-tight font-medium break-words">
                       {currentUser?.className || currentUser?.class || 'CLASS'}
                     </div>
                   </div>
-                  <div className="w-10 h-10 pixel-border-dash bg-[#4ECDC4] flex items-center justify-center text-sm text-black font-bold">
+                  <div className="w-9 h-9 pixel-border-dash bg-[#4ECDC4] flex items-center justify-center text-xs text-black font-bold">
                     {currentUser?.fullName?.[0] || 'S'}
                   </div>
                 </div>
@@ -94,7 +94,7 @@ const StudentLayout = () => {
                 {/* Mobile menu button - Pixel */}
                 <button
                   onClick={toggleMobileMenu}
-                  className="sm:hidden pixel-button-dash bg-[#87CEEB] text-black px-3 py-2 flex items-center justify-center"
+                  className="sm:hidden pixel-button-dash bg-[#87CEEB] text-black px-2.5 py-1.5 flex items-center justify-center"
                   title="MENU"
                 >
                   {isMobileMenuOpen ? (
@@ -107,7 +107,7 @@ const StudentLayout = () => {
                 {/* Logout button - Pixel */}
                 <button
                   onClick={handleLogout}
-                  className="pixel-button-dash bg-[#FF6B6B] text-white text-xs px-3 py-2 font-bold"
+                  className="pixel-button-dash bg-[#FF6B6B] text-white text-xs px-2.5 py-1.5 font-semibold"
                   title="LOGOUT"
                 >
                   LOGOUT
