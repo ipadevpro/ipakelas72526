@@ -8,32 +8,33 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { AnimatedContainer, fadeInUp, slideInFromLeft } from '@/components/ui/motion';
 import { 
   GraduationCap,
-  TrendingUp,
-  TrendingDown,
-  ChevronDown,
-  Search,
+  TrendUp,
+  TrendDown,
+  CaretDown,
+  CaretLeft,
+  CaretRight,
+  MagnifyingGlass,
   Download,
   FileText,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  AlertTriangle,
-  Edit,
-  Trash2,
+  WarningCircle,
+  Warning,
+  Pencil,
+  Trash,
   Plus,
   Eye,
   Star,
   Clock,
-  Loader2,
+  Spinner,
   X,
-  RefreshCw,
-  Save,
-  Pencil,
-  BarChart,
+  ArrowClockwise,
+  FloppyDisk,
+  ChartBar,
   ThumbsUp,
   Activity,
   Target
-} from 'lucide-react';
+} from 'phosphor-react';
 import { gradeApi, assignmentApi, classApi, studentApi } from '@/lib/api';
 import * as XLSX from 'xlsx';
 
@@ -90,6 +91,12 @@ const NilaiPage = () => {
   const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [currentPendingPage, setCurrentPendingPage] = useState(1);
+  const [itemsPerPendingPage, setItemsPerPendingPage] = useState(20);
   
   // Notification State
   const [notification, setNotification] = useState<{
@@ -701,6 +708,18 @@ const NilaiPage = () => {
     return 0;
   });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredGrades.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedGrades = filteredGrades.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setCurrentPendingPage(1);
+  }, [searchQuery, selectedClassId, selectedAssignmentId, sortBy, sortOrder]);
+
   const filteredAssignments = assignments.filter(assignment => {
     if (selectedClassId === 'all') return true;
     return assignment.classId === selectedClassId;
@@ -812,7 +831,7 @@ const NilaiPage = () => {
       case 'fair':
         return <Activity className="w-4 h-4" />;
       case 'poor':
-        return <AlertTriangle className="w-4 h-4" />;
+        return <Warning className="w-4 h-4" />;
       default:
         return <FileText className="w-4 h-4" />;
     }
@@ -820,10 +839,23 @@ const NilaiPage = () => {
 
   // Bulk operations
   const handleSelectAll = () => {
-    if (selectedGrades.length === filteredGrades.length) {
-      setSelectedGrades([]);
+    const currentPageGradeIds = paginatedGrades.map(g => g.id);
+    const allCurrentPageSelected = currentPageGradeIds.every(id => selectedGrades.includes(id));
+    
+    if (allCurrentPageSelected) {
+      // Deselect all on current page
+      setSelectedGrades(prev => prev.filter(id => !currentPageGradeIds.includes(id)));
     } else {
-      setSelectedGrades(filteredGrades.map(g => g.id));
+      // Select all on current page
+      setSelectedGrades(prev => {
+        const newSelection = [...prev];
+        currentPageGradeIds.forEach(id => {
+          if (!newSelection.includes(id)) {
+            newSelection.push(id);
+          }
+        });
+        return newSelection;
+      });
     }
   };
 
@@ -911,6 +943,13 @@ const NilaiPage = () => {
     
     return pendingList;
   };
+
+  // Get pending grades and pagination calculations
+  const pendingGrades = getPendingGrades();
+  const totalPendingPages = Math.ceil(pendingGrades.length / itemsPerPendingPage);
+  const startPendingIndex = (currentPendingPage - 1) * itemsPerPendingPage;
+  const endPendingIndex = startPendingIndex + itemsPerPendingPage;
+  const paginatedPendingGrades = pendingGrades.slice(startPendingIndex, endPendingIndex);
 
   const handleQuickGrade = (pendingGrade: any) => {
     // Pre-fill form with pending grade data
@@ -1041,39 +1080,78 @@ const NilaiPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-screen p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+          {/* Header Skeleton */}
+          <div className="space-y-3">
+            <div className="h-8 bg-industrial-light border-2 border-industrial-black w-64"></div>
+            <div className="h-4 bg-industrial-light border-2 border-industrial-black w-96"></div>
+          </div>
+          
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} variant="industrial">
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-industrial-light w-1/2"></div>
+                    <div className="h-6 bg-industrial-light w-3/4"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Table Skeleton */}
+          <Card variant="industrial">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 border-2 border-industrial-black bg-industrial-white">
+                    <div className="w-10 h-10 bg-industrial-light border-2 border-industrial-black"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-industrial-light w-1/4"></div>
+                      <div className="h-3 bg-industrial-light w-1/3"></div>
+                    </div>
+                    <div className="h-6 bg-industrial-light border-2 border-industrial-black w-20"></div>
+                    <div className="h-6 bg-industrial-light border-2 border-industrial-black w-24"></div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         
-        {/* Notification */}
+        {/* Notification - Industrial Minimalism */}
         <AnimatePresence>
           {notification && (
             <motion.div
               initial={{ opacity: 0, y: -50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border-l-4 ${
+              className={`fixed top-4 right-4 z-50 p-4 border-2 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${
                 notification.type === 'success' 
-                  ? 'bg-green-50 border-green-400 text-green-800' 
-                  : 'bg-red-50 border-red-400 text-red-800'
+                  ? 'bg-industrial-white border-industrial-black text-industrial-black' 
+                  : 'bg-industrial-white border-industrial-red text-industrial-red'
               }`}
             >
               <div className="flex items-center gap-3">
                 {notification.type === 'success' ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-industrial-black" />
                 ) : (
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <Warning className="w-5 h-5 text-industrial-red" />
                 )}
-                <span className="font-medium">{notification.message}</span>
+                <span className="font-semibold">{notification.message}</span>
                 <button
                   onClick={() => setNotification(null)}
-                  className="ml-2 text-gray-400 hover:text-gray-600"
+                  className="ml-2 text-industrial-text-secondary hover:text-industrial-black"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1082,69 +1160,70 @@ const NilaiPage = () => {
           )}
         </AnimatePresence>
 
-        {/* Header */}
+        {/* Header - Industrial Minimalism */}
         <AnimatedContainer variant={fadeInUp}>
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1">
                 Manajemen Nilai
               </h1>
-              <p className="text-gray-600 mt-2">Kelola penilaian dan lihat progres siswa dengan analitik mendalam</p>
+              <p className="text-industrial-text-secondary mt-2 text-sm sm:text-base industrial-body">Kelola penilaian dan lihat progres siswa dengan analitik mendalam</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {selectedGrades.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex items-center gap-2"
                 >
-                  <Badge variant="secondary" className="px-3 py-1">
+                  <Badge variant="industrial-secondary" className="px-3 py-1 text-xs sm:text-sm">
                     {selectedGrades.length} dipilih
                   </Badge>
                   <Button
-                    variant="destructive"
+                    variant="industrial-danger"
                     size="sm"
                     onClick={() => setShowBulkActions(true)}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-1 text-xs sm:text-sm"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                     Hapus Terpilih
                   </Button>
                 </motion.div>
               )}
               <Button 
-                variant="outline" 
+                variant="industrial-secondary" 
                 size="sm"
                 onClick={handleRefreshData}
                 disabled={isRefreshing}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-xs sm:text-sm"
               >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <ArrowClockwise className={`w-3 h-3 sm:w-4 sm:h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 {isRefreshing ? 'Memperbarui...' : 'Refresh'}
               </Button>
               <Button 
-                variant="outline" 
+                variant="industrial-secondary" 
                 size="sm"
-                className="flex gap-1 items-center"
+                className="flex gap-1 items-center text-xs sm:text-sm"
                 onClick={handleExportGrades}
                 disabled={isExporting || filteredGrades.length === 0}
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>{isExporting ? 'Mengekspor...' : 'Ekspor Excel'}</span>
               </Button>
               <Button 
-                variant="outline"
+                variant="industrial-secondary"
                 onClick={handleOpenBulkModal} 
-                className="flex gap-1 items-center border-green-200 text-green-700 hover:bg-green-50"
+                className="flex gap-1 items-center text-xs sm:text-sm"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Bulk Nilai</span>
               </Button>
               <Button 
                 onClick={handleOpenAddModal} 
-                className="flex gap-1 items-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                variant="industrial-primary"
+                className="flex gap-1 items-center text-xs sm:text-sm"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Input Nilai Baru</span>
               </Button>
             </div>
@@ -1155,97 +1234,97 @@ const NilaiPage = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+            className="bg-industrial-white border-2 border-industrial-red px-4 py-3"
           >
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5" />
-              <span>{error}</span>
+              <Warning className="w-5 h-5 text-industrial-red" />
+              <span className="text-industrial-black font-semibold">{error}</span>
             </div>
           </motion.div>
         )}
 
-        {/* Enhanced Statistics Cards */}
+        {/* Enhanced Statistics Cards - Industrial Minimalism */}
         <AnimatedContainer variant={slideInFromLeft} delay={0.2}>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Nilai</p>
-                    <p className="text-2xl font-bold text-blue-600">{getEnhancedStats().total}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Total Nilai</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().total}</p>
                   </div>
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Rata-rata</p>
-                    <p className="text-2xl font-bold text-green-600">{getEnhancedStats().averageScore}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Rata-rata</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().averageScore}</p>
                   </div>
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                    <Target className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Nilai Tertinggi</p>
-                    <p className="text-2xl font-bold text-purple-600">{getEnhancedStats().highestScore}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Nilai Tertinggi</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().highestScore}</p>
                   </div>
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-purple-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                    <TrendUp className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Sangat Baik</p>
-                    <p className="text-2xl font-bold text-green-600">{getEnhancedStats().excellentCount}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Sangat Baik</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().excellentCount}</p>
                   </div>
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Star className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Tingkat Lulus</p>
-                    <p className="text-2xl font-bold text-indigo-600">{getEnhancedStats().passRate}%</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Tingkat Lulus</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().passRate}%</p>
                   </div>
-                  <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                    <GraduationCap className="w-5 h-5 text-indigo-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-4">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Perlu Perbaikan</p>
-                    <p className="text-2xl font-bold text-red-600">{getEnhancedStats().poorCount}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Perlu Perbaikan</p>
+                    <p className="text-xl sm:text-2xl font-bold text-industrial-red industrial-mono">{getEnhancedStats().poorCount}</p>
                   </div>
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-red border-2 border-industrial-red flex items-center justify-center">
+                    <Warning className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                   </div>
                 </div>
               </CardContent>
@@ -1253,19 +1332,19 @@ const NilaiPage = () => {
           </div>
         </AnimatedContainer>
 
-        {/* Enhanced Controls and Filters */}
+        {/* Enhanced Controls and Filters - Industrial Minimalism */}
         <AnimatedContainer variant={fadeInUp} delay={0.3}>
-          <Card className="border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <Card variant="industrial">
+            <CardContent className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 sm:gap-4">
                 {/* Class filter */}
                 <div>
-                  <label htmlFor="class-filter" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label htmlFor="class-filter" className="text-xs sm:text-sm font-semibold text-industrial-black mb-2 block">
                     Filter Kelas
                   </label>
                   <select 
                     id="class-filter"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                     value={selectedClassId}
                     onChange={(e) => handleClassChange(e.target.value)}
                   >
@@ -1278,12 +1357,12 @@ const NilaiPage = () => {
 
                 {/* Assignment filter */}
                 <div>
-                  <label htmlFor="assignment-filter" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label htmlFor="assignment-filter" className="text-xs sm:text-sm font-semibold text-industrial-black mb-2 block">
                     Filter Tugas
                   </label>
                   <select 
                     id="assignment-filter"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                     value={selectedAssignmentId}
                     onChange={(e) => handleAssignmentChange(e.target.value)}
                   >
@@ -1296,15 +1375,16 @@ const NilaiPage = () => {
 
                 {/* Search */}
                 <div>
-                  <label htmlFor="search" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label htmlFor="search" className="text-xs sm:text-sm font-semibold text-industrial-black mb-2 block">
                     Cari Nilai
                   </label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-3 h-3 sm:w-4 sm:h-4" />
                     <Input
+                      variant="industrial"
                       id="search"
                       placeholder="Cari siswa atau tugas..."
-                      className="pl-9"
+                      className="pl-8 sm:pl-9 h-9 sm:h-10 text-xs sm:text-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -1313,12 +1393,12 @@ const NilaiPage = () => {
 
                 {/* Sort by */}
                 <div>
-                  <label htmlFor="sort-by" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label htmlFor="sort-by" className="text-xs sm:text-sm font-semibold text-industrial-black mb-2 block">
                     Urutkan Berdasarkan
                   </label>
                   <select 
                     id="sort-by"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'student' | 'assignment' | 'points' | 'date')}
                   >
@@ -1331,12 +1411,12 @@ const NilaiPage = () => {
 
                 {/* Sort order */}
                 <div>
-                  <label htmlFor="sort-order" className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label htmlFor="sort-order" className="text-xs sm:text-sm font-semibold text-industrial-black mb-2 block">
                     Urutan
                   </label>
                   <select 
                     id="sort-order"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
                   >
@@ -1347,21 +1427,21 @@ const NilaiPage = () => {
               </div>
 
               {/* Select All and Results Count */}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between mt-4 pt-4 border-t-2 border-industrial-border">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="select-all"
-                      checked={filteredGrades.length > 0 && selectedGrades.length === filteredGrades.length}
+                      checked={paginatedGrades.length > 0 && paginatedGrades.every(g => selectedGrades.includes(g.id))}
                       onChange={handleSelectAll}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 border-2 border-industrial-black text-industrial-steel focus:ring-industrial-steel"
                     />
-                    <label htmlFor="select-all" className="text-sm font-medium text-gray-700">
-                      Pilih Semua
+                    <label htmlFor="select-all" className="text-xs sm:text-sm font-semibold text-industrial-black">
+                      Pilih Semua (Halaman Ini)
                     </label>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-industrial-text-secondary">
                     Menampilkan {filteredGrades.length} dari {grades.length} nilai
                   </div>
                 </div>
@@ -1370,44 +1450,44 @@ const NilaiPage = () => {
           </Card>
         </AnimatedContainer>
 
-        {/* Tabs */}
-        <div className="flex border-b bg-white rounded-t-lg px-6">
+        {/* Tabs - Industrial Minimalism */}
+        <div className="flex border-b-2 border-industrial-black bg-industrial-white">
           <button
-            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+            className={`px-4 py-3 font-semibold text-xs sm:text-sm border-b-2 transition-colors ${
               activeTab === 'grades'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-industrial-black text-industrial-black bg-industrial-light'
+                : 'border-transparent text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
             }`}
             onClick={() => setActiveTab('grades')}
           >
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
               Daftar Nilai ({filteredGrades.length})
             </div>
           </button>
           <button
-            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+            className={`px-4 py-3 font-semibold text-xs sm:text-sm border-b-2 transition-colors ${
               activeTab === 'pending'
-                ? 'border-orange-500 text-orange-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-industrial-black text-industrial-black bg-industrial-light'
+                : 'border-transparent text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
             }`}
             onClick={() => setActiveTab('pending')}
           >
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Belum Dinilai ({getPendingGrades().length})
+              <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+              Belum Dinilai ({pendingGrades.length})
             </div>
           </button>
           <button
-            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+            className={`px-4 py-3 font-semibold text-xs sm:text-sm border-b-2 transition-colors ${
               activeTab === 'analytics'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-industrial-black text-industrial-black bg-industrial-light'
+                : 'border-transparent text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
             }`}
             onClick={() => setActiveTab('analytics')}
           >
             <div className="flex items-center gap-2">
-              <BarChart className="w-4 h-4" />
+              <ChartBar className="w-3 h-3 sm:w-4 sm:h-4" />
               Analitik Mendalam
             </div>
           </button>
@@ -1415,80 +1495,81 @@ const NilaiPage = () => {
 
         {activeTab === 'grades' && (
           <AnimatedContainer variant={fadeInUp} delay={0.4}>
-            <Card className="border-0 shadow-lg overflow-hidden">
+            <Card variant="industrial" className="overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <table className="industrial-table w-full">
+                  <thead>
                     <tr>
-                      <th className="px-6 py-4 text-left">
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left">
                         <input
                           type="checkbox"
-                          checked={filteredGrades.length > 0 && selectedGrades.length === filteredGrades.length}
+                          checked={paginatedGrades.length > 0 && paginatedGrades.every(g => selectedGrades.includes(g.id))}
                           onChange={handleSelectAll}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 border-2 border-industrial-black text-industrial-steel focus:ring-industrial-steel"
                         />
                       </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Siswa</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Tugas</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Nilai</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Status</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Feedback</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Tanggal</th>
-                      <th className="px-6 py-4 text-right font-semibold text-gray-700">Aksi</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Siswa</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Tugas</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Nilai</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Status</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Feedback</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Tanggal</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-right font-semibold text-industrial-white text-xs sm:text-sm">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+                  <tbody>
                     <AnimatePresence>
-                      {filteredGrades.length > 0 ? (
-                        filteredGrades.map((grade, index) => (
+                      {paginatedGrades.length > 0 ? (
+                        paginatedGrades.map((grade, index) => (
                           <motion.tr 
                             key={grade.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ delay: index * 0.05 }}
-                            className={`hover:bg-gray-50 transition-colors ${
-                              selectedGrades.includes(grade.id) ? 'bg-blue-50' : ''
+                            className={`transition-colors ${
+                              selectedGrades.includes(grade.id) ? 'bg-industrial-light' : ''
                             }`}
                           >
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <input
                                 type="checkbox"
                                 checked={selectedGrades.includes(grade.id)}
                                 onChange={() => handleSelectGrade(grade.id)}
-                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                className="w-4 h-4 border-2 border-industrial-black text-industrial-steel focus:ring-industrial-steel"
                               />
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div>
-                                <div className="font-medium text-gray-900">{grade.studentName}</div>
-                                <div className="text-sm text-gray-500">
+                                <div className="font-semibold text-industrial-black text-xs sm:text-sm">{grade.studentName}</div>
+                                <div className="text-xs sm:text-sm text-industrial-text-secondary">
                                   {grade.studentUsername} • {getStudentClassName(grade.studentUsername, grade.assignmentId)}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div className="max-w-xs">
-                                <div className="font-medium text-gray-900 truncate">
+                                <div className="font-semibold text-industrial-black text-xs sm:text-sm truncate">
                                   {getAssignmentName(grade.assignmentId)}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-xs sm:text-sm text-industrial-text-secondary">
                                   Max: {grade.maxPoints || 100} poin
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div className="flex items-center gap-2">
-                                <span className="text-2xl font-bold text-gray-900">{grade.points}</span>
-                                <div className="text-sm text-gray-500">
+                                <span className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{grade.points}</span>
+                                <div className="text-xs sm:text-sm text-industrial-text-secondary">
                                   <div>{grade.percentage}%</div>
                                   <div>/{grade.maxPoints || 100}</div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <Badge 
-                                className={`${getGradeStatusColor(grade.status || 'fair')} border`}
+                                variant={grade.status === 'excellent' ? 'industrial-success' : grade.status === 'good' ? 'industrial-primary' : grade.status === 'poor' ? 'industrial-danger' : 'industrial-warning'}
+                                className="text-xs"
                               >
                                 <div className="flex items-center gap-1">
                                   {getGradeStatusIcon(grade.status || 'fair')}
@@ -1496,43 +1577,43 @@ const NilaiPage = () => {
                                 </div>
                               </Badge>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div className="max-w-xs">
-                                <p className="text-sm text-gray-600 truncate">
+                                <p className="text-xs sm:text-sm text-industrial-text-secondary break-words">
                                   {grade.feedback || '-'}
                                 </p>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
-                              <div className="text-sm text-gray-500">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div className="text-xs sm:text-sm text-industrial-text-secondary">
                                 {formatDate(grade.gradedAt)}
                               </div>
                             </td>
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
                               <div className="flex justify-end gap-1">
                                 <Button
-                                  variant="ghost"
+                                  variant="industrial-secondary"
                                   size="sm"
                                   onClick={() => handleOpenDetailModal(grade)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  className="w-8 h-8 p-0"
                                 >
-                                  <Eye className="w-4 h-4" />
+                                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </Button>
                                 <Button
-                                  variant="ghost"
+                                  variant="industrial-secondary"
                                   size="sm"
                                   onClick={() => handleOpenEditModal(grade)}
-                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                  className="w-8 h-8 p-0"
                                 >
-                                  <Pencil className="w-4 h-4" />
+                                  <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </Button>
                                 <Button
-                                  variant="ghost"
+                                  variant="industrial-danger"
                                   size="sm"
                                   onClick={() => setDeleteConfirmId(grade.id)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  className="w-8 h-8 p-0"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </Button>
                               </div>
                             </td>
@@ -1540,22 +1621,22 @@ const NilaiPage = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="px-6 py-12 text-center">
+                          <td colSpan={8} className="px-4 sm:px-6 py-8 sm:py-12 text-center">
                             <div className="flex flex-col items-center gap-4">
-                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                                <FileText className="w-8 h-8 text-gray-400" />
+                              <div className="w-16 h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                                <FileText className="w-8 h-8 text-industrial-white" />
                               </div>
                               <div>
-                                <p className="text-gray-500 font-medium">
+                                <p className="text-industrial-black font-semibold text-sm sm:text-base">
                                   {searchQuery ? 'Tidak ada nilai yang sesuai dengan pencarian' : 'Belum ada nilai'}
                                 </p>
-                                <p className="text-gray-400 text-sm mt-1">
+                                <p className="text-industrial-text-secondary text-xs sm:text-sm mt-1">
                                   {searchQuery ? 'Coba ubah kata kunci pencarian' : 'Mulai tambahkan nilai untuk siswa'}
                                 </p>
                               </div>
                               {!searchQuery && (
-                                <Button onClick={handleOpenAddModal} className="mt-2">
-                                  <Plus className="w-4 h-4 mr-2" />
+                                <Button onClick={handleOpenAddModal} variant="industrial-primary" className="mt-2 text-xs sm:text-sm">
+                                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                                   Tambah Nilai Pertama
                                 </Button>
                               )}
@@ -1567,28 +1648,107 @@ const NilaiPage = () => {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination Controls */}
+              {filteredGrades.length > itemsPerPage && (
+                <div className="border-t-2 border-industrial-black p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm text-industrial-text-secondary">Items per page:</span>
+                      <select
+                        value={itemsPerPage}
+                        onChange={(e) => {
+                          setItemsPerPage(Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                        className="border-2 border-industrial-black bg-industrial-white px-2 py-1 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm text-industrial-text-secondary">
+                        Menampilkan {startIndex + 1}-{Math.min(endIndex, filteredGrades.length)} dari {filteredGrades.length} nilai
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="h-8 w-8 p-0"
+                      >
+                        <CaretLeft className="w-4 h-4" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "industrial-primary" : "industrial-secondary"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              className="h-8 min-w-8 px-2 text-xs sm:text-sm"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="h-8 w-8 p-0"
+                      >
+                        <CaretRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
           </AnimatedContainer>
         )}
 
         {activeTab === 'pending' && (
           <AnimatedContainer variant={fadeInUp} delay={0.4}>
-            <Card className="border-0 shadow-lg overflow-hidden">
+            <Card variant="industrial" className="overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <table className="industrial-table w-full">
+                  <thead>
                     <tr>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Siswa</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Tugas</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Kelas</th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-700">Status</th>
-                      <th className="px-6 py-4 text-right font-semibold text-gray-700">Aksi</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Siswa</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Tugas</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Kelas</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-left font-semibold text-industrial-white text-xs sm:text-sm">Status</th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-right font-semibold text-industrial-white text-xs sm:text-sm">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+                  <tbody>
                     <AnimatePresence>
-                      {getPendingGrades().length > 0 ? (
-                        getPendingGrades().map((student, index) => (
+                      {paginatedPendingGrades.length > 0 ? (
+                        paginatedPendingGrades.map((student, index) => (
                           <motion.tr 
                             key={`${student.studentUsername}-${student.assignmentId}`}
                             initial={{ opacity: 0, y: 20 }}
@@ -1596,44 +1756,44 @@ const NilaiPage = () => {
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ delay: index * 0.05 }}
                           >
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div>
-                                <div className="font-medium text-gray-900">{student.studentName}</div>
-                                <div className="text-sm text-gray-500">
+                                <div className="font-semibold text-industrial-black text-xs sm:text-sm">{student.studentName}</div>
+                                <div className="text-xs sm:text-sm text-industrial-text-secondary">
                                   {student.studentUsername}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div className="max-w-xs">
-                                <div className="font-medium text-gray-900 truncate">
+                                <div className="font-semibold text-industrial-black text-xs sm:text-sm truncate">
                                   {student.assignmentTitle}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
                               <div className="max-w-xs">
-                                <div className="font-medium text-gray-900 truncate">
+                                <div className="font-semibold text-industrial-black text-xs sm:text-sm truncate">
                                   {student.assignmentClassName}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
-                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <Badge variant="industrial-warning" className="text-xs">
                                 <div className="flex items-center gap-1">
                                   <Clock className="w-3 h-3" />
                                   <span>Belum Dinilai</span>
                                 </div>
                               </Badge>
                             </td>
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
                               <Button
-                                variant="default"
+                                variant="industrial-primary"
                                 size="sm"
                                 onClick={() => handleQuickGrade(student)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="text-xs sm:text-sm"
                               >
-                                <Plus className="w-4 h-4 mr-1" />
+                                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                                 Nilai Sekarang
                               </Button>
                             </td>
@@ -1641,16 +1801,16 @@ const NilaiPage = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="px-6 py-12 text-center">
+                          <td colSpan={5} className="px-4 sm:px-6 py-8 sm:py-12 text-center">
                             <div className="flex flex-col items-center gap-4">
-                              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-8 h-8 text-green-600" />
+                              <div className="w-16 h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                                <CheckCircle className="w-8 h-8 text-industrial-white" />
                               </div>
                               <div>
-                                <p className="text-gray-500 font-medium">
-                                  Semua Siswa Sudah Dinilai! 🎉
+                                <p className="text-industrial-black font-semibold text-sm sm:text-base">
+                                  Semua Siswa Sudah Dinilai!
                                 </p>
-                                <p className="text-gray-400 text-sm mt-1">
+                                <p className="text-industrial-text-secondary text-xs sm:text-sm mt-1">
                                   {selectedAssignmentId !== 'all' 
                                     ? `Semua siswa sudah mendapat nilai untuk tugas "${getAssignmentName(selectedAssignmentId)}"` 
                                     : selectedClassId !== 'all'
@@ -1667,6 +1827,85 @@ const NilaiPage = () => {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination Controls for Pending */}
+              {pendingGrades.length > itemsPerPendingPage && (
+                <div className="border-t-2 border-industrial-black p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm text-industrial-text-secondary">Items per page:</span>
+                      <select
+                        value={itemsPerPendingPage}
+                        onChange={(e) => {
+                          setItemsPerPendingPage(Number(e.target.value));
+                          setCurrentPendingPage(1);
+                        }}
+                        className="border-2 border-industrial-black bg-industrial-white px-2 py-1 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm text-industrial-text-secondary">
+                        Menampilkan {startPendingIndex + 1}-{Math.min(endPendingIndex, pendingGrades.length)} dari {pendingGrades.length} belum dinilai
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
+                        onClick={() => setCurrentPendingPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPendingPage === 1}
+                        className="h-8 w-8 p-0"
+                      >
+                        <CaretLeft className="w-4 h-4" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPendingPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPendingPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPendingPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPendingPage >= totalPendingPages - 2) {
+                            pageNum = totalPendingPages - 4 + i;
+                          } else {
+                            pageNum = currentPendingPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPendingPage === pageNum ? "industrial-primary" : "industrial-secondary"}
+                              size="sm"
+                              onClick={() => setCurrentPendingPage(pageNum)}
+                              className="h-8 min-w-8 px-2 text-xs sm:text-sm"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
+                        onClick={() => setCurrentPendingPage(prev => Math.min(totalPendingPages, prev + 1))}
+                        disabled={currentPendingPage === totalPendingPages}
+                        className="h-8 w-8 p-0"
+                      >
+                        <CaretRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
           </AnimatedContainer>
         )}
@@ -1674,49 +1913,49 @@ const NilaiPage = () => {
         {activeTab === 'analytics' && (
           <AnimatedContainer variant={fadeInUp} delay={0.4}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-              <Card className="lg:col-span-2 border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <Card variant="industrial" className="lg:col-span-2">
+                <CardHeader className="pb-4 border-b-2 border-industrial-black">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                    <ChartBar className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                     Distribusi Nilai
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Analisis performa akademik siswa berdasarkan kategori nilai
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="pt-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                    <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="text-xl sm:text-2xl font-bold text-green-600">{getEnhancedStats().excellentCount}</div>
-                      <div className="text-xs sm:text-sm text-green-700 font-medium">Sangat Baik</div>
-                      <div className="text-xs text-green-600">85% - 100%</div>
+                    <div className="text-center p-3 sm:p-4 bg-industrial-white border-2 border-industrial-black">
+                      <div className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().excellentCount}</div>
+                      <div className="text-xs sm:text-sm text-industrial-black font-semibold mt-1">Sangat Baik</div>
+                      <div className="text-xs text-industrial-text-secondary">85% - 100%</div>
                     </div>
-                    <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-xl sm:text-2xl font-bold text-blue-600">{getEnhancedStats().goodCount}</div>
-                      <div className="text-xs sm:text-sm text-blue-700 font-medium">Baik</div>
-                      <div className="text-xs text-blue-600">70% - 84%</div>
+                    <div className="text-center p-3 sm:p-4 bg-industrial-white border-2 border-industrial-steel">
+                      <div className="text-xl sm:text-2xl font-bold text-industrial-steel industrial-mono">{getEnhancedStats().goodCount}</div>
+                      <div className="text-xs sm:text-sm text-industrial-black font-semibold mt-1">Baik</div>
+                      <div className="text-xs text-industrial-text-secondary">70% - 84%</div>
                     </div>
-                    <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                      <div className="text-xl sm:text-2xl font-bold text-yellow-600">{getEnhancedStats().fairCount}</div>
-                      <div className="text-xs sm:text-sm text-yellow-700 font-medium">Cukup</div>
-                      <div className="text-xs text-yellow-600">60% - 69%</div>
+                    <div className="text-center p-3 sm:p-4 bg-industrial-white border-2 border-industrial-black">
+                      <div className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{getEnhancedStats().fairCount}</div>
+                      <div className="text-xs sm:text-sm text-industrial-black font-semibold mt-1">Cukup</div>
+                      <div className="text-xs text-industrial-text-secondary">60% - 69%</div>
                     </div>
-                    <div className="text-center p-3 sm:p-4 bg-red-50 rounded-lg border border-red-200">
-                      <div className="text-xl sm:text-2xl font-bold text-red-600">{getEnhancedStats().poorCount}</div>
-                      <div className="text-xs sm:text-sm text-red-700 font-medium">Perlu Perbaikan</div>
-                      <div className="text-xs text-red-600">{'< 60%'}</div>
+                    <div className="text-center p-3 sm:p-4 bg-industrial-white border-2 border-industrial-red">
+                      <div className="text-xl sm:text-2xl font-bold text-industrial-red industrial-mono">{getEnhancedStats().poorCount}</div>
+                      <div className="text-xs sm:text-sm text-industrial-black font-semibold mt-1">Perlu Perbaikan</div>
+                      <div className="text-xs text-industrial-text-secondary">{'< 60%'}</div>
                     </div>
                   </div>
                   
                   <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
                     <div>
                       <div className="flex justify-between text-xs sm:text-sm mb-2">
-                        <span>Tingkat Kelulusan</span>
-                        <span className="font-medium">{getEnhancedStats().passRate}%</span>
+                        <span className="text-industrial-black font-semibold">Tingkat Kelulusan</span>
+                        <span className="font-semibold text-industrial-black industrial-mono">{getEnhancedStats().passRate}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+                      <div className="w-full bg-industrial-light border-2 border-industrial-black h-3">
                         <div 
-                          className="bg-gradient-to-r from-green-500 to-blue-500 h-2 sm:h-3 rounded-full transition-all duration-1000" 
+                          className="bg-industrial-black h-3 transition-all duration-1000" 
                           style={{ width: `${getEnhancedStats().passRate}%` }}
                         ></div>
                       </div>
@@ -1724,12 +1963,12 @@ const NilaiPage = () => {
                     
                     <div>
                       <div className="flex justify-between text-xs sm:text-sm mb-2">
-                        <span>Rata-rata Persentase</span>
-                        <span className="font-medium">{getEnhancedStats().averagePercentage}%</span>
+                        <span className="text-industrial-black font-semibold">Rata-rata Persentase</span>
+                        <span className="font-semibold text-industrial-black industrial-mono">{getEnhancedStats().averagePercentage}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+                      <div className="w-full bg-industrial-light border-2 border-industrial-black h-3">
                         <div 
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 sm:h-3 rounded-full transition-all duration-1000" 
+                          className="bg-industrial-steel h-3 transition-all duration-1000" 
                           style={{ width: `${getEnhancedStats().averagePercentage}%` }}
                         ></div>
                       </div>
@@ -1739,65 +1978,65 @@ const NilaiPage = () => {
               </Card>
 
               <div className="space-y-4 sm:space-y-6">
-                <Card className="border-0 shadow-lg">
-                  <CardHeader className="pb-3 sm:pb-4">
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                <Card variant="industrial">
+                  <CardHeader className="pb-3 sm:pb-4 border-b-2 border-industrial-black">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                      <TrendUp className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                       Statistik Kunci
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3 sm:space-y-4 pt-0">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-xs sm:text-sm">Total Nilai</span>
-                      <span className="font-bold text-base sm:text-lg">{getEnhancedStats().total}</span>
+                  <CardContent className="space-y-3 sm:space-y-4 pt-4">
+                    <div className="flex justify-between items-center border-b-2 border-industrial-border pb-2">
+                      <span className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Total Nilai</span>
+                      <span className="font-bold text-base sm:text-lg text-industrial-black industrial-mono">{getEnhancedStats().total}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b-2 border-industrial-border pb-2">
+                      <span className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Rata-rata</span>
+                      <span className="font-bold text-base sm:text-lg text-industrial-steel industrial-mono">{getEnhancedStats().averageScore}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b-2 border-industrial-border pb-2">
+                      <span className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Tertinggi</span>
+                      <span className="font-bold text-base sm:text-lg text-industrial-black industrial-mono">{getEnhancedStats().highestScore}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-xs sm:text-sm">Rata-rata</span>
-                      <span className="font-bold text-base sm:text-lg text-blue-600">{getEnhancedStats().averageScore}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-xs sm:text-sm">Tertinggi</span>
-                      <span className="font-bold text-base sm:text-lg text-green-600">{getEnhancedStats().highestScore}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-xs sm:text-sm">Terendah</span>
-                      <span className="font-bold text-base sm:text-lg text-red-600">{getEnhancedStats().lowestScore}</span>
+                      <span className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Terendah</span>
+                      <span className="font-bold text-base sm:text-lg text-industrial-red industrial-mono">{getEnhancedStats().lowestScore}</span>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="border-0 shadow-lg">
-                  <CardHeader className="pb-3 sm:pb-4">
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                <Card variant="industrial">
+                  <CardHeader className="pb-3 sm:pb-4 border-b-2 border-industrial-black">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                      <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                       Tren Performa
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-4">
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between border-b-2 border-industrial-border pb-2">
                         <div className="flex items-center gap-2">
-                          <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                          <span className="text-xs sm:text-sm text-gray-600">Performa Baik</span>
+                          <TrendUp className="w-3 h-3 sm:w-4 sm:h-4 text-industrial-black" />
+                          <span className="text-xs sm:text-sm text-industrial-text-secondary font-semibold">Performa Baik</span>
                         </div>
-                        <span className="font-medium text-green-600 text-sm sm:text-base">{getEnhancedStats().trend.up}</span>
+                        <span className="font-semibold text-industrial-black text-sm sm:text-base industrial-mono">{getEnhancedStats().trend.up}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
-                          <span className="text-xs sm:text-sm text-gray-600">Perlu Perhatian</span>
+                          <TrendDown className="w-3 h-3 sm:w-4 sm:h-4 text-industrial-red" />
+                          <span className="text-xs sm:text-sm text-industrial-text-secondary font-semibold">Perlu Perhatian</span>
                         </div>
-                        <span className="font-medium text-red-600 text-sm sm:text-base">{getEnhancedStats().trend.down}</span>
+                        <span className="font-semibold text-industrial-red text-sm sm:text-base industrial-mono">{getEnhancedStats().trend.down}</span>
                       </div>
                     </div>
                     
                     {getEnhancedStats().trend.down > 0 && (
-                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="mt-4 p-3 bg-industrial-white border-2 border-industrial-red">
                         <div className="flex items-start gap-2">
-                          <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                          <Warning className="w-3 h-3 sm:w-4 sm:h-4 text-industrial-red mt-0.5 flex-shrink-0" />
                           <div className="text-xs sm:text-sm">
-                            <p className="font-medium text-yellow-800">Rekomendasi</p>
-                            <p className="text-yellow-700">Ada {getEnhancedStats().trend.down} siswa yang perlu perhatian khusus</p>
+                            <p className="font-semibold text-industrial-red">Rekomendasi</p>
+                            <p className="text-industrial-black">Ada {getEnhancedStats().trend.down} siswa yang perlu perhatian khusus</p>
                           </div>
                         </div>
                       </div>
@@ -1809,21 +2048,23 @@ const NilaiPage = () => {
           </AnimatedContainer>
         )}
 
-        {/* Add Modal */}
+        {/* Add Modal - Industrial Minimalism */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-4 sm:p-6 mx-4">
-              <h2 className="text-lg sm:text-xl font-bold mb-4">Tambah Nilai Baru</h2>
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
+            <Card variant="industrial" className="max-w-md w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)] mx-4">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Tambah Nilai Baru</CardTitle>
+              </CardHeader>
               
               <form onSubmit={handleAddGrade}>
-                <div className="space-y-3 sm:space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
                   <div className="space-y-2">
-                    <label htmlFor="assignmentId" className="text-xs sm:text-sm font-medium">
+                    <label htmlFor="assignmentId" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Tugas *
                     </label>
                     <select
                       id="assignmentId"
-                      className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                       value={formData.assignmentId}
                       onChange={(e) => handleSelectChange('assignmentId', e.target.value)}
                       required
@@ -1838,12 +2079,12 @@ const NilaiPage = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="studentUsername" className="text-xs sm:text-sm font-medium">
+                    <label htmlFor="studentUsername" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Siswa *
                     </label>
                     <select
                       id="studentUsername"
-                      className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                       value={formData.studentUsername}
                       onChange={(e) => handleSelectChange('studentUsername', e.target.value)}
                       required
@@ -1858,10 +2099,11 @@ const NilaiPage = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="points" className="text-xs sm:text-sm font-medium">
+                    <label htmlFor="points" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Nilai *
                     </label>
                     <Input
+                      variant="industrial"
                       id="points"
                       name="points"
                       type="number"
@@ -1876,38 +2118,39 @@ const NilaiPage = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="feedback" className="text-xs sm:text-sm font-medium">
+                    <label htmlFor="feedback" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Feedback
                     </label>
                     <textarea
                       id="feedback"
                       name="feedback"
                       rows={3}
-                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      className="flex w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm placeholder:text-industrial-text-muted focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       value={formData.feedback}
                       onChange={handleInputChange}
                       placeholder="Masukkan feedback untuk siswa"
                     />
                   </div>
                   
-                  <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t-2 border-industrial-black">
                     <Button 
                       type="button" 
-                      variant="outline" 
+                      variant="industrial-secondary" 
                       onClick={() => setShowAddModal(false)}
-                      className="order-2 sm:order-1 h-9 text-sm"
+                      className="order-2 sm:order-1 h-9 text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
                       Batal
                     </Button>
                     <Button 
                       type="submit" 
-                      className="order-1 sm:order-2 h-9 text-sm"
+                      variant="industrial-primary"
+                      className="order-1 sm:order-2 h-9 text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                           <span>Menyimpan...</span>
                         </div>
                       ) : (
@@ -1915,31 +2158,31 @@ const NilaiPage = () => {
                       )}
                     </Button>
                   </div>
-                </div>
+                </CardContent>
               </form>
-            </div>
+            </Card>
           </div>
         )}
 
-        {/* Bulk Grading Modal */}
+        {/* Bulk Grading Modal - Industrial Minimalism */}
         {showBulkModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              <div className="p-4 sm:p-6 border-b">
-                <h2 className="text-lg sm:text-xl font-bold">Bulk Input Nilai</h2>
-                <p className="text-sm text-gray-600 mt-1">Input nilai untuk beberapa siswa sekaligus</p>
-              </div>
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
+            <Card variant="industrial" className="max-w-4xl w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)] max-h-[90vh] overflow-hidden flex flex-col">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Bulk Input Nilai</CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary mt-1">Input nilai untuk beberapa siswa sekaligus</CardDescription>
+              </CardHeader>
               
-              <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
+              <form onSubmit={handleBulkSubmit} className="flex flex-col h-full overflow-hidden">
                 <div className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
                   {/* Assignment Selection */}
                   <div className="space-y-2">
-                    <label htmlFor="bulk-assignment" className="text-sm font-medium">
+                    <label htmlFor="bulk-assignment" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Pilih Tugas *
                     </label>
                     <select
                       id="bulk-assignment"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                       value={bulkAssignmentId}
                       onChange={(e) => handleBulkAssignmentChange(e.target.value)}
                       required
@@ -1956,47 +2199,48 @@ const NilaiPage = () => {
                   {/* Students Table */}
                   {bulkGrades.length > 0 && (
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">
                         Daftar Siswa ({bulkGrades.length} siswa belum dinilai)
                       </label>
-                      <div className="border rounded-lg overflow-hidden">
+                      <div className="border-2 border-industrial-black overflow-hidden">
                         <div className="max-h-96 overflow-y-auto">
-                          <table className="w-full">
-                            <thead className="bg-gray-50 sticky top-0">
+                          <table className="industrial-table w-full">
+                            <thead>
                               <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   No
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   Nama Siswa
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   Username
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   Nilai (0-100) *
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   Feedback
                                 </th>
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody>
                               {bulkGrades.map((grade, index) => (
-                                <tr key={grade.studentUsername} className="hover:bg-gray-50">
-                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                <tr key={grade.studentUsername}>
+                                  <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-industrial-black industrial-mono">
                                     {index + 1}
                                   </td>
-                                  <td className="px-4 py-3">
-                                    <div className="text-sm font-medium text-gray-900">
+                                  <td className="px-3 sm:px-4 py-2 sm:py-3">
+                                    <div className="text-xs sm:text-sm font-semibold text-industrial-black">
                                       {grade.studentName}
                                     </div>
                                   </td>
-                                  <td className="px-4 py-3 text-sm text-gray-500">
+                                  <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-industrial-text-secondary">
                                     {grade.studentUsername}
                                   </td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                                     <Input
+                                      variant="industrial"
                                       type="number"
                                       min="0"
                                       max="100"
@@ -2004,16 +2248,17 @@ const NilaiPage = () => {
                                       value={grade.points}
                                       onChange={(e) => handleBulkGradeChange(index, 'points', e.target.value)}
                                       placeholder="0-100"
-                                      className="w-20 h-8 text-sm"
+                                      className="w-20 sm:w-24 h-8 text-xs sm:text-sm"
                                     />
                                   </td>
-                                  <td className="px-4 py-3">
+                                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                                     <Input
+                                      variant="industrial"
                                       type="text"
                                       value={grade.feedback}
                                       onChange={(e) => handleBulkGradeChange(index, 'feedback', e.target.value)}
                                       placeholder="Feedback (opsional)"
-                                      className="w-full h-8 text-sm"
+                                      className="w-full h-8 text-xs sm:text-sm"
                                     />
                                   </td>
                                 </tr>
@@ -2027,7 +2272,7 @@ const NilaiPage = () => {
                       <div className="flex flex-wrap gap-2 mt-3">
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="industrial-secondary"
                           size="sm"
                           onClick={() => {
                             const points = prompt('Masukkan nilai yang sama untuk semua siswa (0-100):');
@@ -2035,13 +2280,13 @@ const NilaiPage = () => {
                               setBulkGrades(prev => prev.map(grade => ({ ...grade, points })));
                             }
                           }}
-                          className="text-xs"
+                          className="text-xs sm:text-sm"
                         >
                           Set Nilai Sama
                         </Button>
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="industrial-secondary"
                           size="sm"
                           onClick={() => {
                             const feedback = prompt('Masukkan feedback yang sama untuk semua siswa:');
@@ -2049,38 +2294,40 @@ const NilaiPage = () => {
                               setBulkGrades(prev => prev.map(grade => ({ ...grade, feedback })));
                             }
                           }}
-                          className="text-xs"
+                          className="text-xs sm:text-sm"
                         >
                           Set Feedback Sama
                         </Button>
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="industrial-danger"
                           size="sm"
                           onClick={() => {
                             setBulkGrades(prev => prev.map(grade => ({ ...grade, points: '', feedback: '' })));
                           }}
-                          className="text-xs text-red-600 hover:text-red-700"
+                          className="text-xs sm:text-sm"
                         >
                           Reset Semua
                         </Button>
-                      </div>
-                    </div>
-                  )}
+            </div>
+          </div>
+        )}
 
                   {bulkAssignmentId && bulkGrades.length === 0 && (
                     <div className="text-center py-8">
-                      <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
-                      <p className="text-gray-600 font-medium">Semua siswa sudah dinilai!</p>
-                      <p className="text-sm text-gray-500">Pilih tugas lain untuk menilai siswa yang belum dinilai.</p>
+                      <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-3">
+                        <CheckCircle className="w-6 h-6 text-industrial-white" />
+                      </div>
+                      <p className="text-industrial-black font-semibold text-sm sm:text-base">Semua siswa sudah dinilai!</p>
+                      <p className="text-xs sm:text-sm text-industrial-text-secondary">Pilih tugas lain untuk menilai siswa yang belum dinilai.</p>
                     </div>
                   )}
                 </div>
                 
                 {/* Modal Footer */}
-                <div className="border-t p-4 sm:p-6">
+                <div className="border-t-2 border-industrial-black p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-industrial-text-secondary">
                       {bulkGrades.length > 0 && (
                         <span>
                           {bulkGrades.filter(g => g.points.trim() !== '').length} dari {bulkGrades.length} siswa akan dinilai
@@ -2090,26 +2337,27 @@ const NilaiPage = () => {
                     <div className="flex gap-2 w-full sm:w-auto">
                       <Button 
                         type="button" 
-                        variant="outline" 
+                        variant="industrial-secondary" 
                         onClick={() => setShowBulkModal(false)}
-                        className="flex-1 sm:flex-none h-9 text-sm"
+                        className="flex-1 sm:flex-none h-9 text-xs sm:text-sm"
                         disabled={isBulkSubmitting}
                       >
                         Batal
                       </Button>
                       <Button 
-                        type="submit" 
-                        className="flex-1 sm:flex-none h-9 text-sm bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                        type="submit"
+                        variant="industrial-primary"
+                        className="flex-1 sm:flex-none h-9 text-xs sm:text-sm"
                         disabled={isBulkSubmitting || bulkGrades.filter(g => g.points.trim() !== '').length === 0}
                       >
                         {isBulkSubmitting ? (
                           <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                             <span>Menyimpan...</span>
                           </div>
                         ) : (
                           <>
-                            <Save className="w-4 h-4 mr-2" />
+                            <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                             Simpan Semua Nilai
                           </>
                         )}
@@ -2118,38 +2366,41 @@ const NilaiPage = () => {
                   </div>
                 </div>
               </form>
-            </div>
+            </Card>
           </div>
         )}
 
-        {/* Edit Modal */}
+        {/* Edit Modal - Industrial Minimalism */}
         {showEditModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-              <h2 className="text-xl font-bold mb-4">Edit Nilai</h2>
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
+            <Card variant="industrial" className="max-w-md w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Edit Nilai</CardTitle>
+              </CardHeader>
               
               <form onSubmit={handleEditGrade}>
-                <div className="space-y-4">
+                <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Tugas</label>
-                    <div className="p-2 bg-gray-50 rounded text-sm">
+                    <label className="text-xs sm:text-sm font-semibold text-industrial-black">Tugas</label>
+                    <div className="p-2 bg-industrial-light border-2 border-industrial-border text-xs sm:text-sm text-industrial-black">
                       {getAssignmentName(formData.assignmentId)}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Siswa</label>
-                    <div className="p-2 bg-gray-50 rounded text-sm">
+                    <label className="text-xs sm:text-sm font-semibold text-industrial-black">Siswa</label>
+                    <div className="p-2 bg-industrial-light border-2 border-industrial-border text-xs sm:text-sm text-industrial-black">
                       {students.find(s => s.username === formData.studentUsername)?.fullName} 
                       ({getStudentClassName(formData.studentUsername, formData.assignmentId)})
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="points-edit" className="text-sm font-medium">
+                    <label htmlFor="points-edit" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Nilai *
                     </label>
                     <Input
+                      variant="industrial"
                       id="points-edit"
                       name="points"
                       type="number"
@@ -2158,41 +2409,45 @@ const NilaiPage = () => {
                       value={formData.points}
                       onChange={handleInputChange}
                       placeholder="Masukkan nilai (0-100)"
+                      className="h-9 sm:h-10 text-xs sm:text-sm"
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="feedback-edit" className="text-sm font-medium">
+                    <label htmlFor="feedback-edit" className="text-xs sm:text-sm font-semibold text-industrial-black">
                       Feedback
                     </label>
                     <textarea
                       id="feedback-edit"
                       name="feedback"
                       rows={3}
-                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm placeholder:text-industrial-text-muted focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       value={formData.feedback}
                       onChange={handleInputChange}
                       placeholder="Masukkan feedback untuk siswa"
                     />
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4">
+                  <div className="flex justify-end gap-2 pt-4 border-t-2 border-industrial-black">
                     <Button 
                       type="button" 
-                      variant="outline" 
+                      variant="industrial-secondary" 
                       onClick={() => setShowEditModal(false)}
+                      className="h-9 text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
                       Batal
                     </Button>
                     <Button 
                       type="submit"
+                      variant="industrial-primary"
+                      className="h-9 text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                           <span>Menyimpan...</span>
                         </div>
                       ) : (
@@ -2200,82 +2455,89 @@ const NilaiPage = () => {
                       )}
                     </Button>
                   </div>
-                </div>
+                </CardContent>
               </form>
-            </div>
+            </Card>
           </div>
         )}
 
-        {/* Detail Modal */}
+        {/* Detail Modal - Industrial Minimalism */}
         {showDetailModal && selectedGrade && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-              <h2 className="text-xl font-bold mb-4">Detail Nilai</h2>
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
+            <Card variant="industrial" className="max-w-md w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Detail Nilai</CardTitle>
+              </CardHeader>
               
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Siswa</label>
-                  <p className="text-lg font-medium">{selectedGrade.studentName}</p>
-                  <p className="text-sm text-gray-500">{getStudentClassName(selectedGrade.studentUsername, selectedGrade.assignmentId)}</p>
+              <CardContent className="space-y-4 p-4 sm:p-6">
+                <div className="border-b-2 border-industrial-border pb-4">
+                  <label className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Siswa</label>
+                  <p className="text-base sm:text-lg font-semibold text-industrial-black mt-1">{selectedGrade.studentName}</p>
+                  <p className="text-xs sm:text-sm text-industrial-text-secondary">{getStudentClassName(selectedGrade.studentUsername, selectedGrade.assignmentId)}</p>
+                </div>
+                
+                <div className="border-b-2 border-industrial-border pb-4">
+                  <label className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Tugas</label>
+                  <p className="text-base sm:text-lg font-semibold text-industrial-black mt-1">{getAssignmentName(selectedGrade.assignmentId)}</p>
+                </div>
+                
+                <div className="border-b-2 border-industrial-border pb-4">
+                  <label className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Nilai</label>
+                  <p className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-mono mt-1">{selectedGrade.points}</p>
+                </div>
+                
+                <div className="border-b-2 border-industrial-border pb-4">
+                  <label className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Feedback</label>
+                  <p className="text-xs sm:text-sm text-industrial-black mt-1">{selectedGrade.feedback || 'Tidak ada feedback'}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Tugas</label>
-                  <p className="text-lg">{getAssignmentName(selectedGrade.assignmentId)}</p>
+                  <label className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Dinilai Pada</label>
+                  <p className="text-xs sm:text-sm text-industrial-black mt-1">{formatDate(selectedGrade.gradedAt)}</p>
                 </div>
                 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Nilai</label>
-                  <p className="text-2xl font-bold text-blue-600">{selectedGrade.points}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Feedback</label>
-                  <p className="text-sm">{selectedGrade.feedback || 'Tidak ada feedback'}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Dinilai Pada</label>
-                  <p className="text-sm">{formatDate(selectedGrade.gradedAt)}</p>
-                </div>
-                
-                <div className="flex justify-end pt-4">
-                  <Button onClick={() => setShowDetailModal(false)}>
+                <div className="flex justify-end pt-4 border-t-2 border-industrial-black">
+                  <Button onClick={() => setShowDetailModal(false)} variant="industrial-secondary" className="h-9 text-xs sm:text-sm">
                     Tutup
                   </Button>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Delete Confirmation */}
+        {/* Delete Confirmation - Industrial Minimalism */}
         {deleteConfirmId && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
-              <h2 className="text-xl font-bold mb-4">Konfirmasi Hapus</h2>
-              <p className="text-gray-500 mb-6">
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
+            <Card variant="industrial" className="max-w-sm w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-red">
+                <CardTitle className="text-base sm:text-lg text-industrial-red industrial-h2">Konfirmasi Hapus</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <p className="text-industrial-black text-xs sm:text-sm mb-6">
                 Apakah Anda yakin ingin menghapus nilai ini? Tindakan ini tidak dapat dibatalkan.
               </p>
               
-              <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 pt-4 border-t-2 border-industrial-black">
                 <Button 
                   type="button" 
-                  variant="outline" 
+                    variant="industrial-secondary" 
                   onClick={() => setDeleteConfirmId(null)}
+                    className="h-9 text-xs sm:text-sm"
                   disabled={isDeleting}
                 >
                   Batal
                 </Button>
                 <Button 
                   type="button" 
-                  variant="destructive" 
+                    variant="industrial-danger" 
                   onClick={() => handleDeleteGrade(deleteConfirmId)}
+                    className="h-9 text-xs sm:text-sm"
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                       <span>Menghapus...</span>
                     </div>
                   ) : (
@@ -2283,68 +2545,73 @@ const NilaiPage = () => {
                   )}
                 </Button>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Bulk Actions Confirmation Modal */}
+        {/* Bulk Actions Confirmation Modal - Industrial Minimalism */}
         {showBulkActions && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center p-4 z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-red-600" />
+              <Card variant="industrial" className="max-w-md w-full shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-red">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-industrial-red border-2 border-industrial-red flex items-center justify-center">
+                      <Trash className="w-5 h-5 text-industrial-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Konfirmasi Hapus Massal</h3>
-                  <p className="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan</p>
+                      <CardTitle className="text-base sm:text-lg text-industrial-red industrial-h2">Konfirmasi Hapus Massal</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">Tindakan ini tidak dapat dibatalkan</CardDescription>
                 </div>
               </div>
+                </CardHeader>
               
-              <div className="mb-6">
-                <p className="text-gray-700">
+                <CardContent className="p-4 sm:p-6">
+                  <p className="text-industrial-black text-xs sm:text-sm mb-4">
                   Apakah Anda yakin ingin menghapus <span className="font-semibold">{selectedGrades.length} nilai</span> yang dipilih?
                 </p>
-                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="p-3 bg-industrial-white border-2 border-industrial-red">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-red-600" />
-                    <p className="text-sm text-red-700">Data yang dihapus tidak dapat dikembalikan</p>
-                  </div>
+                      <Warning className="w-4 h-4 text-industrial-red" />
+                      <p className="text-xs sm:text-sm text-industrial-red font-semibold">Data yang dihapus tidak dapat dikembalikan</p>
                 </div>
               </div>
               
-              <div className="flex justify-end gap-3">
+                  <div className="flex justify-end gap-3 pt-4 border-t-2 border-industrial-black">
                 <Button 
-                  variant="outline" 
+                      variant="industrial-secondary" 
                   onClick={() => setShowBulkActions(false)}
+                      className="h-9 text-xs sm:text-sm"
                   disabled={isBulkDeleting}
                 >
                   Batal
                 </Button>
                 <Button 
-                  variant="destructive" 
+                      variant="industrial-danger" 
                   onClick={handleBulkDelete}
-                  className="bg-red-600 hover:bg-red-700"
+                      className="h-9 text-xs sm:text-sm"
                   disabled={isBulkDeleting}
                 >
                   {isBulkDeleting ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                       <span>Menghapus...</span>
                     </div>
                   ) : (
                     <>
-                      <Trash2 className="w-4 h-4 mr-2" />
+                          <Trash className="w-4 h-4 mr-2" />
                       Hapus {selectedGrades.length} Nilai
                     </>
                   )}
                 </Button>
               </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         )}

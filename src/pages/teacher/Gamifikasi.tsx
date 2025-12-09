@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Medal, Trophy, Star, Zap, Target, Users, BarChart, Pencil, Trash2, X, Save, Gift, CheckCircle, AlertCircle, RefreshCw, Smile } from 'lucide-react';
+import { Plus, MagnifyingGlass, Medal, Trophy, Star, Lightning, Target, Users, ChartBar, Pencil, Trash, X, FloppyDisk, Gift, CheckCircle, WarningCircle, ArrowClockwise, Smiley } from 'phosphor-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { gamificationApi, badgeApi, levelApi, challengeApi, apiRequest } from '@/lib/api';
 import { processGamificationData, calculateLevelFromPoints } from '@/lib/gamification';
 import React from 'react';
@@ -69,18 +71,18 @@ const NotificationToast = ({ notification, onClose }: {
   const getIcon = () => {
     switch (notification.type) {
       case 'success': return <CheckCircle className="w-5 h-5" />;
-      case 'error': return <AlertCircle className="w-5 h-5" />;
-      case 'warning': return <AlertCircle className="w-5 h-5" />;
+      case 'error': return <WarningCircle className="w-5 h-5" />;
+      case 'warning': return <WarningCircle className="w-5 h-5" />;
       default: return <Trophy className="w-5 h-5" />;
     }
   };
 
   const getColors = () => {
     switch (notification.type) {
-      case 'success': return 'bg-green-50 border-green-200 text-green-800';
-      case 'error': return 'bg-red-50 border-red-200 text-red-800';
-      case 'warning': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
-      default: return 'bg-blue-50 border-blue-200 text-blue-800';
+      case 'success': return 'bg-industrial-white border-2 border-industrial-black text-industrial-black';
+      case 'error': return 'bg-industrial-white border-2 border-industrial-red text-industrial-red';
+      case 'warning': return 'bg-industrial-white border-2 border-industrial-black text-industrial-black';
+      default: return 'bg-industrial-white border-2 border-industrial-steel text-industrial-black';
     }
   };
 
@@ -91,15 +93,15 @@ const NotificationToast = ({ notification, onClose }: {
           initial={{ opacity: 0, y: -50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -50, scale: 0.95 }}
-          className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 border rounded-lg shadow-lg ${getColors()}`}
+          className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${getColors()}`}
         >
           {getIcon()}
-          <span className="text-sm font-medium">{notification.message}</span>
+          <span className="text-sm font-semibold">{notification.message}</span>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-6 w-6 p-0 hover:bg-black/10"
+            className="h-6 w-6 p-0 hover:bg-industrial-light text-industrial-text-secondary hover:text-industrial-black"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -109,15 +111,19 @@ const NotificationToast = ({ notification, onClose }: {
   );
 };
 
-// Enhanced Loading Skeleton
+// Enhanced Loading Skeleton - Industrial Minimalism
 const LoadingSkeleton = () => (
   <div className="animate-pulse space-y-4">
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-gray-200 h-24 rounded-lg"></div>
+        <Card key={i} variant="industrial">
+          <CardContent className="h-24 bg-industrial-light"></CardContent>
+        </Card>
       ))}
     </div>
-    <div className="bg-gray-200 h-64 rounded-lg"></div>
+    <Card variant="industrial">
+      <CardContent className="h-64 bg-industrial-light"></CardContent>
+    </Card>
   </div>
 );
 
@@ -143,22 +149,22 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }: {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-industrial-black/80"
             onClick={onClose}
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`relative bg-white rounded-xl shadow-2xl border border-gray-200 w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden`}
+            className={`relative bg-industrial-white border-2 border-industrial-black shadow-[0_8px_16px_rgba(0,0,0,0.3)] w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden flex flex-col`}
           >
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <div className="flex items-center justify-between p-6 border-b-2 border-industrial-black">
+              <h3 className="text-lg font-semibold text-industrial-black industrial-h2">{title}</h3>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="h-8 w-8 p-0 hover:bg-gray-100"
+                className="h-8 w-8 p-0 hover:bg-industrial-light text-industrial-text-secondary hover:text-industrial-black"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -203,7 +209,7 @@ const EmojiPicker = ({ selectedEmoji, onEmojiSelect, isOpen, onToggle }: {
           <span className="text-lg">{selectedEmoji}</span>
           <span className="text-sm text-gray-600">Choose icon</span>
         </div>
-        <Smile className="w-4 h-4 text-gray-400" />
+        <Smiley className="w-4 h-4 text-gray-400" />
       </Button>
 
       <AnimatePresence>
@@ -262,6 +268,10 @@ const GamifikasiPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [classFilter, setClassFilter] = useState('all');
   const [levelFilter, setLevelFilter] = useState('all');
+  
+  // Pagination state for Students Tab
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   
   // Modal states
   const [showCreateBadgeModal, setShowCreateBadgeModal] = useState(false);
@@ -919,12 +929,12 @@ const GamifikasiPage = () => {
       
       return matchesClass && matchesLevel;
     });
-    
+
     return filtered;
   };
 
   // Filtered data with error handling
-  const filteredStudents = React.useMemo(() => {
+  const filteredStudents = useMemo(() => {
     try {
       if (!Array.isArray(students)) {
         return [];
@@ -952,6 +962,17 @@ const GamifikasiPage = () => {
       return [];
     }
   }, [students, searchQuery]);
+
+  // Pagination for Students Tab
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedStudents = filteredStudents.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Statistics
   const stats = {
@@ -1059,8 +1080,8 @@ const GamifikasiPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Notification Toast */}
         {notification.visible && (
           <NotificationToast
@@ -1069,35 +1090,34 @@ const GamifikasiPage = () => {
           />
         )}
 
-        {/* Header */}
-        <div className="mb-8">
+        {/* Header - Industrial Minimalism */}
+        <div className="mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold text-industrial-black industrial-h1">
                 Gamifikasi
               </h1>
-              <p className="text-gray-600">Kelola sistem penghargaan dan motivasi siswa</p>
+              <p className="text-industrial-text-secondary">Kelola sistem penghargaan dan motivasi siswa</p>
             </div>
             <div className="flex items-center gap-3">
               <Button 
                 onClick={refreshData}
-                variant="outline" 
+                variant="industrial-secondary" 
                 size="sm"
                 className="flex items-center gap-2"
               >
-                <RefreshCw className="w-4 h-4" />
+                <ArrowClockwise className="w-4 h-4" />
                 Refresh
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              {[
-                { key: 'dashboard', label: 'Dashboard', icon: BarChart },
+        {/* Tab Navigation - Industrial Minimalism */}
+        <Card variant="industrial" className="mb-4 sm:mb-6">
+          <nav className="flex space-x-8 border-b-2 border-industrial-black overflow-x-auto">
+            {[
+              { key: 'dashboard', label: 'Dashboard', icon: ChartBar },
                 { key: 'badges', label: 'Badge', icon: Medal },
                 { key: 'levels', label: 'Level', icon: Trophy },
                 { key: 'challenges', label: 'Challenge', icon: Target },
@@ -1108,10 +1128,10 @@ const GamifikasiPage = () => {
                   <motion.button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`flex items-center gap-2 py-2 px-1 border-b-2 font-semibold text-sm transition-colors whitespace-nowrap ${
                       activeTab === tab.key
-                        ? 'border-purple-500 text-purple-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-industrial-black text-industrial-white bg-industrial-black'
+                      : 'border-transparent text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
                     }`}
                     whileHover={{ y: -1 }}
                     whileTap={{ y: 0 }}
@@ -1122,16 +1142,18 @@ const GamifikasiPage = () => {
                 );
               })}
             </nav>
-          </div>
-        </div>
+        </Card>
 
-        {/* Search and Filters */}
+        {/* Search and Filters - Industrial Minimalism */}
         {(activeTab === 'badges' || activeTab === 'students' || activeTab === 'challenges' || activeTab === 'levels') && (
-          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <Card variant="industrial" className="mb-4 sm:mb-6">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4" />
                 <Input
+                      variant="industrial"
                   placeholder="Cari data..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -1142,6 +1164,7 @@ const GamifikasiPage = () => {
             <div className="flex gap-2">
               {activeTab === 'badges' && (
                 <Button 
+                      variant="industrial-primary"
                   onClick={() => {
                     setEditingBadge(null);
                     setBadgeForm({ name: '', description: '', icon: '🏆', category: 'achievement', pointValue: 100 });
@@ -1155,6 +1178,7 @@ const GamifikasiPage = () => {
               )}
               {activeTab === 'levels' && (
                 <Button 
+                      variant="industrial-primary"
                   onClick={() => {
                     setEditingLevel(null);
                     setLevelForm({ name: '', pointsRequired: 0, benefits: '', color: '#3B82F6' });
@@ -1168,6 +1192,7 @@ const GamifikasiPage = () => {
               )}
               {activeTab === 'challenges' && (
                 <Button 
+                      variant="industrial-primary"
                   onClick={() => {
                     setEditingChallenge(null);
                     setChallengeForm({ title: '', description: '', reward: 50, deadline: '' });
@@ -1181,6 +1206,8 @@ const GamifikasiPage = () => {
               )}
             </div>
           </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Tab Content */}
@@ -1192,311 +1219,333 @@ const GamifikasiPage = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Dashboard Tab */}
+            {/* Dashboard Tab - Industrial Minimalism */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
-                {/* Stats Cards */}
+                {/* Stats Cards - Industrial Minimalism */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <motion.div 
-                    className="bg-white p-6 rounded-lg border shadow-sm"
-                    whileHover={{ y: -2 }}
-                  >
+                  <Card variant="industrial">
+                    <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Siswa</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
+                          <p className="text-sm font-semibold text-industrial-text-secondary">Total Siswa</p>
+                          <p className="text-2xl font-bold text-industrial-black industrial-mono">{stats.totalStudents}</p>
                       </div>
-                      <div className="bg-blue-100 p-3 rounded-lg">
-                        <Users className="w-6 h-6 text-blue-600" />
+                        <div className="bg-industrial-black border-2 border-industrial-black p-3">
+                          <Users className="w-6 h-6 text-industrial-white" />
                       </div>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
 
-                  <motion.div 
-                    className="bg-white p-6 rounded-lg border shadow-sm"
-                    whileHover={{ y: -2 }}
-                  >
+                  <Card variant="industrial">
+                    <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Badge</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalBadges}</p>
+                          <p className="text-sm font-semibold text-industrial-text-secondary">Total Badge</p>
+                          <p className="text-2xl font-bold text-industrial-black industrial-mono">{stats.totalBadges}</p>
                       </div>
-                      <div className="bg-yellow-100 p-3 rounded-lg">
-                        <Medal className="w-6 h-6 text-yellow-600" />
+                        <div className="bg-industrial-black border-2 border-industrial-black p-3">
+                          <Medal className="w-6 h-6 text-industrial-white" />
                       </div>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
 
-                  <motion.div 
-                    className="bg-white p-6 rounded-lg border shadow-sm"
-                    whileHover={{ y: -2 }}
-                  >
+                  <Card variant="industrial">
+                    <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Rata-rata Poin</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.averagePoints}</p>
+                          <p className="text-sm font-semibold text-industrial-text-secondary">Rata-rata Poin</p>
+                          <p className="text-2xl font-bold text-industrial-black industrial-mono">{stats.averagePoints}</p>
                       </div>
-                      <div className="bg-green-100 p-3 rounded-lg">
-                        <Trophy className="w-6 h-6 text-green-600" />
+                        <div className="bg-industrial-black border-2 border-industrial-black p-3">
+                          <Trophy className="w-6 h-6 text-industrial-white" />
                       </div>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
 
-                  <motion.div 
-                    className="bg-white p-6 rounded-lg border shadow-sm"
-                    whileHover={{ y: -2 }}
-                  >
+                  <Card variant="industrial">
+                    <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Siswa Terbaik</p>
-                        <p className="text-lg font-bold text-gray-900 truncate">
+                          <p className="text-sm font-semibold text-industrial-text-secondary">Siswa Terbaik</p>
+                          <p className="text-lg font-bold text-industrial-black truncate">
                           {stats.topStudent ? stats.topStudent.name : 'Belum ada'}
                         </p>
                         {stats.topStudent && (
-                          <p className="text-sm text-gray-500">{stats.topStudent.points} poin</p>
+                            <p className="text-sm text-industrial-text-secondary">{stats.topStudent.points} poin</p>
                         )}
                       </div>
-                      <div className="bg-purple-100 p-3 rounded-lg">
-                        <Star className="w-6 h-6 text-purple-600" />
+                        <div className="bg-industrial-black border-2 border-industrial-black p-3">
+                          <Star className="w-6 h-6 text-industrial-white" />
                       </div>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                {/* Leaderboards */}
+                {/* Leaderboards - Industrial Minimalism */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Global Top Students */}
-                  <div className="bg-white rounded-lg border shadow-sm p-6">
-                    <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-yellow-500" />
-                      Top 10 Global
-                    </h3>
-                    <div className="space-y-3">
-                      {filteredStudents
-                        .sort((a, b) => b.points - a.points)
-                        .slice(0, 10)
-                        .map((student, index) => (
-                          <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                                index === 0 ? 'bg-yellow-500' : 
-                                index === 1 ? 'bg-gray-400' : 
-                                index === 2 ? 'bg-amber-600' : 'bg-gray-300'
-                              }`}>
-                                {index + 1}
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-900">{student.name}</p>
-                                <p className="text-sm text-gray-500">{student.class}</p>
-                              </div>
+                  <Card variant="industrial">
+                    <CardHeader className="p-6 border-b-2 border-industrial-black">
+                      <CardTitle className="text-lg text-industrial-black industrial-h2 flex items-center gap-2">
+                        <Trophy className="w-5 h-5" />
+                        Top 10 Global
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                  <div className="space-y-3">
+                    {filteredStudents
+                      .sort((a, b) => b.points - a.points)
+                      .slice(0, 10)
+                      .map((student, index) => (
+                            <Card key={student.id} variant="industrial">
+                              <CardContent className="p-3">
+                                <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 border-2 border-industrial-black flex items-center justify-center text-sm font-bold ${
+                                      index === 0 ? 'bg-industrial-black text-industrial-white' : 
+                                      index === 1 ? 'bg-industrial-steel text-industrial-white' : 
+                                      index === 2 ? 'bg-industrial-gray text-industrial-white' : 'bg-industrial-light text-industrial-black'
+                            }`}>
+                              {index + 1}
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold text-gray-900">{student.points} poin</p>
-                              <p className="text-sm text-gray-500">Level {student.level}</p>
+                            <div>
+                                      <p className="font-semibold text-industrial-black">{student.name}</p>
+                                      <p className="text-sm text-industrial-text-secondary">{student.class}</p>
                             </div>
                           </div>
-                        ))}
-                      {filteredStudents.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                          <p>Belum ada data siswa</p>
+                          <div className="text-right">
+                                    <p className="font-bold text-industrial-black industrial-mono">{student.points} poin</p>
+                                    <p className="text-sm text-industrial-text-secondary">Level {student.level}</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
+                              </CardContent>
+                            </Card>
+                      ))}
+                        {filteredStudents.length === 0 && (
+                          <div className="text-center py-8 text-industrial-text-secondary">
+                            <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                              <Users className="w-4 h-4 text-industrial-white" />
                   </div>
+                            <p>Belum ada data siswa</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
 
                   {/* Top Classes */}
-                  <div className="bg-white rounded-lg border shadow-sm p-6">
-                    <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-500" />
-                      Top Kelas
-                    </h3>
-                    <div className="space-y-3">
-                      {uniqueClasses.length > 0 ? (
-                        uniqueClasses
-                          .map(classData => {
-                            const classStudents = students.filter(s => s.classId === classData.id);
-                            const totalPoints = classStudents.reduce((sum, s) => sum + s.points, 0);
-                            const averagePoints = classStudents.length > 0 ? Math.round(totalPoints / classStudents.length) : 0;
-                            const topStudent = classStudents.length > 0 
-                              ? classStudents.reduce((top, current) => current.points > top.points ? current : top)
-                              : null;
-                            
-                            return {
-                              ...classData,
-                              totalPoints,
-                              averagePoints,
-                              studentCount: classStudents.length,
-                              topStudent
-                            };
-                          })
-                          .sort((a, b) => b.averagePoints - a.averagePoints)
-                          .map((classData, index) => (
-                            <div 
-                              key={classData.id} 
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                              onClick={() => openClassLeaderboardModal(classData)}
-                              title="Klik untuk melihat leaderboard kelas"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                                  index === 0 ? 'bg-yellow-500' : 
-                                  index === 1 ? 'bg-gray-400' : 
-                                  index === 2 ? 'bg-amber-600' : 'bg-blue-500'
-                                }`}>
-                                  {index + 1}
-                                </div>
-                                <div>
-                                  <p className="font-medium text-gray-900">{classData.name}</p>
-                                  <p className="text-sm text-gray-500">
-                                    {classData.studentCount} siswa • Top: {classData.topStudent?.name || 'N/A'}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-bold text-gray-900">{classData.averagePoints} poin</p>
-                                <p className="text-sm text-gray-500">rata-rata</p>
-                              </div>
+                  <Card variant="industrial">
+                    <CardHeader className="p-6 border-b-2 border-industrial-black">
+                      <CardTitle className="text-lg text-industrial-black industrial-h2 flex items-center gap-2">
+                        <Users className="w-5 h-5" />
+                        Top Kelas
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-3">
+                        {uniqueClasses.length > 0 ? (
+                          uniqueClasses
+                            .map(classData => {
+                              const classStudents = students.filter(s => s.classId === classData.id);
+                              const totalPoints = classStudents.reduce((sum, s) => sum + s.points, 0);
+                              const averagePoints = classStudents.length > 0 ? Math.round(totalPoints / classStudents.length) : 0;
+                              const topStudent = classStudents.length > 0 
+                                ? classStudents.reduce((top, current) => current.points > top.points ? current : top)
+                                : null;
+                              
+                              return {
+                                ...classData,
+                                totalPoints,
+                                averagePoints,
+                                studentCount: classStudents.length,
+                                topStudent
+                              };
+                            })
+                            .sort((a, b) => b.averagePoints - a.averagePoints)
+                            .map((classData, index) => (
+                              <Card 
+                                key={classData.id} 
+                                variant="industrial"
+                                className="cursor-pointer hover:bg-industrial-light transition-colors"
+                                onClick={() => openClassLeaderboardModal(classData)}
+                                title="Klik untuk melihat leaderboard kelas"
+                              >
+                                <CardContent className="p-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-8 h-8 border-2 border-industrial-black flex items-center justify-center text-sm font-bold ${
+                                        index === 0 ? 'bg-industrial-black text-industrial-white' : 
+                                        index === 1 ? 'bg-industrial-steel text-industrial-white' : 
+                                        index === 2 ? 'bg-industrial-gray text-industrial-white' : 'bg-industrial-light text-industrial-black'
+                                      }`}>
+                                        {index + 1}
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-industrial-black">{classData.name}</p>
+                                        <p className="text-sm text-industrial-text-secondary">
+                                          {classData.studentCount} siswa • Top: {classData.topStudent?.name || 'N/A'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="font-bold text-industrial-black industrial-mono">{classData.averagePoints} poin</p>
+                                      <p className="text-sm text-industrial-text-secondary">rata-rata</p>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))
+                        ) : (
+                          <div className="text-center py-8 text-industrial-text-secondary">
+                            <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                              <Users className="w-4 h-4 text-industrial-white" />
                             </div>
-                          ))
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                          <p>Belum ada data kelas</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                            <p>Belum ada data kelas</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             )}
 
-            {/* Badges Tab */}
+            {/* Badges Tab - Industrial Minimalism */}
             {activeTab === 'badges' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {badges.filter(badge =>
                   badge.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   badge.description.toLowerCase().includes(searchQuery.toLowerCase())
                 ).map((badge) => (
-                  <motion.div 
+                  <Card 
                     key={badge.id} 
-                    className="bg-white rounded-lg border shadow-sm p-6 hover:shadow-md transition-shadow"
-                    whileHover={{ y: -2 }}
-                    layout
+                    variant="industrial"
+                    className="overflow-hidden"
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4 border-b-2 border-industrial-black pb-3">
                       <div className="flex items-center gap-3">
                         {getBadgeIcon(badge.icon)}
                         <div>
-                          <h3 className="font-medium text-gray-900">{badge.name}</h3>
-                          <p className="text-sm text-gray-500">{badge.category}</p>
+                            <h3 className="font-semibold text-industrial-black industrial-h3">{badge.name}</h3>
+                            <p className="text-sm text-industrial-text-secondary">{badge.category}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
                         <Button
-                          variant="ghost"
+                            variant="industrial-secondary"
                           size="sm"
                           onClick={() => openEditBadge(badge)}
-                          className="h-8 w-8 p-0 hover:bg-blue-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Pencil className="w-4 h-4 text-blue-600" />
+                            <Pencil className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                            variant="industrial-secondary"
                           size="sm"
                           onClick={() => openBadgeAssignModal(badge)}
-                          className="h-8 w-8 p-0 hover:bg-green-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Gift className="w-4 h-4 text-green-600" />
+                            <Gift className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                            variant="industrial-danger"
                           size="sm"
                           onClick={() => deleteBadge(badge.id)}
-                          className="h-8 w-8 p-0 hover:bg-red-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Trash2 className="w-4 h-4 text-red-600" />
+                            <Trash className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{badge.description}</p>
+                      <p className="text-sm text-industrial-text-secondary mb-3">{badge.description}</p>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium text-purple-600">{badge.pointValue} poin</span>
-                      <button
-                        onClick={() => openBadgeRecipientsModal(badge)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
-                        title="Klik untuk melihat siswa yang mendapat badge ini"
-                      >
-                        {getBadgeRecipientCount(badge.name)} siswa
-                      </button>
+                        <span className="font-semibold text-industrial-black industrial-mono">{badge.pointValue} poin</span>
+                        <button
+                          onClick={() => openBadgeRecipientsModal(badge)}
+                          className="text-industrial-black hover:text-industrial-steel hover:underline transition-colors cursor-pointer font-semibold"
+                          title="Klik untuk melihat siswa yang mendapat badge ini"
+                        >
+                          {getBadgeRecipientCount(badge.name)} siswa
+                        </button>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
                 ))}
                 {badges.length === 0 && (
-                  <div className="col-span-full text-center py-12">
-                    <Medal className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada badge yang dibuat</p>
+                  <Card variant="industrial" className="col-span-full">
+                    <CardContent className="text-center py-12">
+                      <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                        <Medal className="w-6 h-6 text-industrial-white" />
                   </div>
+                      <p className="text-industrial-text-secondary">Belum ada badge yang dibuat</p>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             )}
 
-            {/* Levels Tab */}
+            {/* Levels Tab - Industrial Minimalism */}
             {activeTab === 'levels' && (
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <Card variant="industrial" className="overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full industrial-table">
+                    <thead className="bg-industrial-black">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poin Diperlukan</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manfaat</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Level</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Nama</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Poin Diperlukan</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Manfaat</th>
+                        <th className="px-6 py-3 text-right text-xs font-semibold text-industrial-white uppercase tracking-wider">Aksi</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y-2 divide-industrial-black">
                       {levels.filter(level =>
                         level.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         level.benefits.toLowerCase().includes(searchQuery.toLowerCase())
                       ).map((level) => (
                         <motion.tr 
                           key={level.id} 
-                          className="hover:bg-gray-50"
+                          className="hover:bg-industrial-light"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white ${level.color ? 'bg-blue-500' : 'bg-gray-500'}`}>
+                            <Badge variant="industrial-primary" className="text-sm">
                               {level.id}
-                            </div>
+                            </Badge>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-industrial-black">
                             {level.name}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-industrial-text-secondary industrial-mono">
                             {level.pointsRequired.toLocaleString()} poin
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
+                          <td className="px-6 py-4 text-sm text-industrial-text-secondary">
                             {level.benefits}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end gap-1">
                               <Button
-                                variant="ghost"
+                                variant="industrial-secondary"
                                 size="sm"
                                 onClick={() => openEditLevel(level)}
-                                className="h-8 w-8 p-0 hover:bg-blue-100"
+                                className="h-8 w-8 p-0"
                               >
-                                <Pencil className="w-4 h-4 text-blue-600" />
+                                <Pencil className="w-4 h-4" />
                               </Button>
                               <Button
-                                variant="ghost"
+                                variant="industrial-danger"
                                 size="sm"
                                 onClick={() => deleteLevel(level.id)}
-                                className="h-8 w-8 p-0 hover:bg-red-100"
+                                className="h-8 w-8 p-0"
                               >
-                                <Trash2 className="w-4 h-4 text-red-600" />
+                                <Trash className="w-4 h-4" />
                               </Button>
                             </div>
                           </td>
@@ -1506,123 +1555,133 @@ const GamifikasiPage = () => {
                   </table>
                 </div>
                 {levels.length === 0 && (
-                  <div className="text-center py-12">
-                    <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada level yang dibuat</p>
+                  <Card variant="industrial">
+                    <CardContent className="text-center py-12">
+                      <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                        <Trophy className="w-6 h-6 text-industrial-white" />
                   </div>
+                      <p className="text-industrial-text-secondary">Belum ada level yang dibuat</p>
+                    </CardContent>
+                  </Card>
                 )}
-              </div>
+              </Card>
             )}
 
-            {/* Challenges Tab */}
+            {/* Challenges Tab - Industrial Minimalism */}
             {activeTab === 'challenges' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {challenges.filter(challenge =>
                   challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   challenge.description.toLowerCase().includes(searchQuery.toLowerCase())
                 ).map((challenge) => (
-                  <motion.div 
+                  <Card 
                     key={challenge.id} 
-                    className="bg-white rounded-lg border shadow-sm p-6 hover:shadow-md transition-shadow"
-                    whileHover={{ y: -2 }}
-                    layout
+                    variant="industrial"
+                    className="overflow-hidden"
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4 border-b-2 border-industrial-black pb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${challenge.isActive ? 'bg-green-100' : 'bg-gray-100'}`}>
-                          <Target className={`w-5 h-5 ${challenge.isActive ? 'text-green-600' : 'text-gray-400'}`} />
+                          <div className={`p-2 border-2 border-industrial-black ${challenge.isActive ? 'bg-industrial-black' : 'bg-industrial-light'}`}>
+                            <Target className={`w-5 h-5 ${challenge.isActive ? 'text-industrial-white' : 'text-industrial-text-muted'}`} />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-900">{challenge.title}</h3>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            challenge.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
+                            <h3 className="font-semibold text-industrial-black industrial-h3">{challenge.title}</h3>
+                            <Badge variant={challenge.isActive ? "industrial-success" : "industrial-secondary"} className="text-xs mt-1">
                             {challenge.isActive ? 'Aktif' : 'Nonaktif'}
-                          </span>
+                            </Badge>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
                         <Button
-                          variant="ghost"
+                            variant="industrial-secondary"
                           size="sm"
                           onClick={() => openEditChallenge(challenge)}
-                          className="h-8 w-8 p-0 hover:bg-blue-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Pencil className="w-4 h-4 text-blue-600" />
+                            <Pencil className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                            variant="industrial-secondary"
                           size="sm"
                           onClick={() => toggleChallengeStatus(challenge.id)}
-                          className="h-8 w-8 p-0 hover:bg-yellow-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Zap className="w-4 h-4 text-yellow-600" />
+                            <Lightning className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                            variant="industrial-danger"
                           size="sm"
                           onClick={() => deleteChallenge(challenge.id)}
-                          className="h-8 w-8 p-0 hover:bg-red-100"
+                            className="h-8 w-8 p-0"
                         >
-                          <Trash2 className="w-4 h-4 text-red-600" />
+                            <Trash className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{challenge.description}</p>
+                      <p className="text-sm text-industrial-text-secondary mb-4">{challenge.description}</p>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium text-green-600">{challenge.reward} poin</span>
-                      <span className="text-gray-500">Deadline: {formatDate(challenge.deadline)}</span>
+                        <span className="font-semibold text-industrial-black industrial-mono">{challenge.reward} poin</span>
+                        <span className="text-industrial-text-secondary">Deadline: {formatDate(challenge.deadline)}</span>
                     </div>
-                  </motion.div>
+                    </CardContent>
+                  </Card>
                 ))}
                 {challenges.length === 0 && (
-                  <div className="col-span-full text-center py-12">
-                    <Target className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada challenge yang dibuat</p>
+                  <Card variant="industrial" className="col-span-full">
+                    <CardContent className="text-center py-12">
+                      <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                        <Target className="w-6 h-6 text-industrial-white" />
                   </div>
+                      <p className="text-industrial-text-secondary">Belum ada challenge yang dibuat</p>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             )}
 
-            {/* Students Tab */}
+            {/* Students Tab - Industrial Minimalism */}
             {activeTab === 'students' && (
               <div className="space-y-4">
                 {/* Bulk Actions */}
                 <div className="flex justify-end">
                   <Button 
+                    variant="industrial-primary"
                     onClick={openBulkPointsModal}
                     className="flex items-center gap-2"
                   >
-                    <Zap className="w-4 h-4" />
+                    <Lightning className="w-4 h-4" />
                     Bulk Reward Poin
                   </Button>
                 </div>
 
-                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                <Card variant="industrial" className="overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full industrial-table">
+                      <thead className="bg-industrial-black">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Siswa</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poin</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Badge Diperoleh</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                      </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Siswa</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Kelas</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Level</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Poin</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-industrial-white uppercase tracking-wider">Badge Diperoleh</th>
+                          <th className="px-6 py-3 text-right text-xs font-semibold text-industrial-white uppercase tracking-wider">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y-2 divide-industrial-black">
                       {filteredStudents.length === 0 && searchQuery.trim() !== '' ? (
                         <tr>
                           <td colSpan={6} className="px-6 py-12 text-center">
                             <div className="flex flex-col items-center">
-                              <Search className="w-12 h-12 text-gray-300 mb-4" />
-                              <p className="text-lg font-medium text-gray-900">Tidak ada hasil pencarian</p>
-                              <p className="text-sm text-gray-500">
+                              <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                                <MagnifyingGlass className="w-6 h-6 text-industrial-white" />
+                              </div>
+                              <p className="text-lg font-semibold text-industrial-black industrial-h2 mb-2">Tidak ada hasil pencarian</p>
+                              <p className="text-sm text-industrial-text-secondary mb-4">
                                 Tidak ditemukan siswa dengan kata kunci "{searchQuery}"
                               </p>
                               <Button
-                                variant="outline"
+                                variant="industrial-secondary"
                                 size="sm"
                                 onClick={() => setSearchQuery('')}
                                 className="mt-4"
@@ -1636,14 +1695,16 @@ const GamifikasiPage = () => {
                         <tr>
                           <td colSpan={6} className="px-6 py-12 text-center">
                             <div className="flex flex-col items-center">
-                              <Users className="w-12 h-12 text-gray-300 mb-4" />
-                              <p className="text-lg font-medium text-gray-900">Belum ada data siswa</p>
-                              <p className="text-sm text-gray-500">Data siswa akan muncul setelah sistem dimuat</p>
+                              <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                                <Users className="w-6 h-6 text-industrial-white" />
+                              </div>
+                              <p className="text-lg font-semibold text-industrial-black industrial-h2 mb-2">Belum ada data siswa</p>
+                              <p className="text-sm text-industrial-text-secondary">Data siswa akan muncul setelah sistem dimuat</p>
                             </div>
                           </td>
                         </tr>
                       ) : (
-                        filteredStudents.map((student, index) => {
+                        paginatedStudents.map((student, index) => {
                         // Safety check for student data
                         if (!student) return null;
                         
@@ -1659,32 +1720,32 @@ const GamifikasiPage = () => {
                         return (
                           <motion.tr 
                             key={`${student.id}-${index}`} 
-                            className="hover:bg-gray-50"
+                            className="hover:bg-industrial-light"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                           >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                  <span className="text-sm font-medium text-purple-600">
+                                <div className="w-10 h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                                  <span className="text-sm font-semibold text-industrial-white">
                                     {(student.name || 'N').charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                                 <div className="ml-3">
-                                  <div className="text-sm font-medium text-gray-900">{student.name || 'Nama tidak tersedia'}</div>
-                                  <div className="text-sm text-gray-500">{student.username || 'Username tidak tersedia'}</div>
+                                  <div className="text-sm font-semibold text-industrial-black">{student.name || 'Nama tidak tersedia'}</div>
+                                  <div className="text-sm text-industrial-text-secondary">{student.username || 'Username tidak tersedia'}</div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-industrial-text-secondary">
                               {student.class || 'Kelas tidak tersedia'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white ${getLevelColor(student.level || 1)}`}>
+                              <Badge variant="industrial-primary" className="text-sm">
                                 Level {student.level || 1}
-                              </span>
+                              </Badge>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-industrial-black industrial-mono">
                               {(student.points || 0).toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -1697,40 +1758,40 @@ const GamifikasiPage = () => {
                                         className="group relative"
                                         title={`${badge.name}: ${badge.description}`}
                                       >
-                                        <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center border-2 border-yellow-200 hover:border-yellow-400 transition-colors cursor-help">
+                                        <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center cursor-help hover:bg-industrial-steel transition-colors">
                                           {badge.icon.match(/\p{Emoji}/u) ? (
                                             <span className="text-sm">{badge.icon}</span>
                                           ) : (
-                                            <Medal className="w-4 h-4 text-yellow-600" />
+                                            <Medal className="w-4 h-4 text-industrial-white" />
                                           )}
                                         </div>
-                                        {/* Tooltip */}
-                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                                          <div className="font-medium">{badge.name}</div>
-                                          <div className="text-gray-300">{badge.description}</div>
-                                          <div className="text-yellow-300">+{badge.pointValue} poin</div>
+                                        {/* Tooltip - Industrial Minimalism */}
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-industrial-black border-2 border-industrial-black text-industrial-white text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-[0_4px_8px_rgba(0,0,0,0.3)]">
+                                          <div className="font-semibold">{badge.name}</div>
+                                          <div className="text-industrial-text-muted">{badge.description}</div>
+                                          <div className="text-industrial-white industrial-mono">+{badge.pointValue} poin</div>
                                           {/* Arrow */}
-                                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-industrial-black"></div>
                                         </div>
                                       </div>
                                     ))}
                                     {studentBadges.length > 4 && (
-                                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border-2 border-gray-200 text-xs text-gray-600 font-medium">
+                                      <div className="w-8 h-8 bg-industrial-light border-2 border-industrial-black flex items-center justify-center text-xs text-industrial-black font-semibold">
                                         +{studentBadges.length - 4}
                                       </div>
                                     )}
                                   </>
                                 ) : (
-                                  <span className="text-sm text-gray-400 italic">Belum ada badge</span>
+                                  <span className="text-sm text-industrial-text-secondary italic">Belum ada badge</span>
                                 )}
                               </div>
-                              <div className="text-xs text-gray-500 mt-1">
+                              <div className="text-xs text-industrial-text-secondary mt-1">
                                 {studentBadges.length} badge total
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <Button
-                                variant="outline"
+                                variant="industrial-primary"
                                 size="sm"
                                 onClick={() => openAwardModal(student)}
                                 className="flex items-center gap-2"
@@ -1746,7 +1807,64 @@ const GamifikasiPage = () => {
                     </tbody>
                   </table>
                 </div>
-                </div>
+                
+                {/* Pagination Controls - Industrial Minimalism */}
+                {filteredStudents.length > 0 && totalPages > 1 && (
+                  <div className="border-t-2 border-industrial-black p-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="text-sm text-industrial-text-secondary">
+                        Menampilkan <span className="font-semibold text-industrial-black industrial-mono">{startIndex + 1}</span> - <span className="font-semibold text-industrial-black industrial-mono">{Math.min(endIndex, filteredStudents.length)}</span> dari <span className="font-semibold text-industrial-black industrial-mono">{filteredStudents.length}</span> siswa
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="industrial-secondary"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                          className="h-8 px-3"
+                        >
+                          Sebelumnya
+                        </Button>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={currentPage === pageNum ? "industrial-primary" : "industrial-secondary"}
+                                size="sm"
+                                onClick={() => setCurrentPage(pageNum)}
+                                className="h-8 w-8 p-0"
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                        <Button
+                          variant="industrial-secondary"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                          className="h-8 px-3"
+                        >
+                          Selanjutnya
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
               </div>
             )}
           </motion.div>
@@ -1754,7 +1872,7 @@ const GamifikasiPage = () => {
       </div>
 
       {/* Modals */}
-      {/* Create/Edit Badge Modal */}
+      {/* Create/Edit Badge Modal - Industrial Minimalism */}
       <Modal
         isOpen={showCreateBadgeModal}
         onClose={() => {
@@ -1768,10 +1886,11 @@ const GamifikasiPage = () => {
         <div className="p-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nama Badge <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Nama Badge <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 value={badgeForm.name}
                 onChange={(e) => setBadgeForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Masukkan nama badge"
@@ -1779,21 +1898,21 @@ const GamifikasiPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Deskripsi <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Deskripsi <span className="text-industrial-red">*</span>
               </label>
               <textarea
                 value={badgeForm.description}
                 onChange={(e) => setBadgeForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Masukkan deskripsi badge"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel resize-none"
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Icon</label>
                 <EmojiPicker
                   selectedEmoji={badgeForm.icon}
                   onEmojiSelect={(emoji) => setBadgeForm(prev => ({ ...prev, icon: emoji }))}
@@ -1802,8 +1921,9 @@ const GamifikasiPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nilai Poin</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Nilai Poin</label>
                 <Input
+                  variant="industrial"
                   type="number"
                   value={badgeForm.pointValue}
                   onChange={(e) => setBadgeForm(prev => ({ ...prev, pointValue: parseInt(e.target.value) || 0 }))}
@@ -1814,11 +1934,11 @@ const GamifikasiPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Kategori</label>
               <select
                 value={badgeForm.category}
                 onChange={(e) => setBadgeForm(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel"
               >
                 <option value="achievement">Achievement</option>
                 <option value="activity">Activity</option>
@@ -1828,9 +1948,9 @@ const GamifikasiPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-6 border-t">
+          <div className="flex gap-3 mt-6 pt-6 border-t-2 border-industrial-black">
             <Button
-              variant="outline"
+              variant="industrial-secondary"
               onClick={() => {
                 setShowCreateBadgeModal(false);
                 setEditingBadge(null);
@@ -1842,18 +1962,19 @@ const GamifikasiPage = () => {
               Batal
             </Button>
             <Button
+              variant="industrial-primary"
               onClick={handleSaveBadge}
               disabled={saving || !badgeForm.name.trim() || !badgeForm.description.trim()}
               className="flex-1 flex items-center gap-2"
             >
-              <Save className="w-4 h-4" />
+              <FloppyDisk className="w-4 h-4" />
               {saving ? 'Menyimpan...' : (editingBadge ? 'Update' : 'Simpan')}
             </Button>
           </div>
         </div>
       </Modal>
 
-      {/* Create/Edit Level Modal */}
+      {/* Create/Edit Level Modal - Industrial Minimalism */}
       <Modal
         isOpen={showCreateLevelModal}
         onClose={() => {
@@ -1866,10 +1987,11 @@ const GamifikasiPage = () => {
         <div className="p-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nama Level <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Nama Level <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 value={levelForm.name}
                 onChange={(e) => setLevelForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Contoh: Pemula, Mahir, Expert"
@@ -1877,10 +1999,11 @@ const GamifikasiPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Poin Diperlukan <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Poin Diperlukan <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="number"
                 value={levelForm.pointsRequired}
                 onChange={(e) => setLevelForm(prev => ({ ...prev, pointsRequired: parseInt(e.target.value) || 0 }))}
@@ -1890,29 +2013,31 @@ const GamifikasiPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Manfaat</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Manfaat</label>
               <textarea
                 value={levelForm.benefits}
                 onChange={(e) => setLevelForm(prev => ({ ...prev, benefits: e.target.value }))}
                 placeholder="Jelaskan manfaat mencapai level ini"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel resize-none"
                 rows={3}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Warna</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Warna</label>
               <Input
+                variant="industrial"
                 type="color"
                 value={levelForm.color}
                 onChange={(e) => setLevelForm(prev => ({ ...prev, color: e.target.value }))}
+                className="h-12"
               />
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-6 border-t">
+          <div className="flex gap-3 mt-6 pt-6 border-t-2 border-industrial-black">
             <Button
-              variant="outline"
+              variant="industrial-secondary"
               onClick={() => {
                 setShowCreateLevelModal(false);
                 setEditingLevel(null);
@@ -1923,18 +2048,19 @@ const GamifikasiPage = () => {
               Batal
             </Button>
             <Button
+              variant="industrial-primary"
               onClick={handleSaveLevel}
               disabled={saving || !levelForm.name.trim() || levelForm.pointsRequired <= 0}
               className="flex-1 flex items-center gap-2"
             >
-              <Save className="w-4 h-4" />
+              <FloppyDisk className="w-4 h-4" />
               {saving ? 'Menyimpan...' : (editingLevel ? 'Update' : 'Simpan')}
             </Button>
           </div>
         </div>
       </Modal>
 
-      {/* Create/Edit Challenge Modal */}
+      {/* Create/Edit Challenge Modal - Industrial Minimalism */}
       <Modal
         isOpen={showCreateChallengeModal}
         onClose={() => {
@@ -1947,10 +2073,11 @@ const GamifikasiPage = () => {
         <div className="p-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Judul Challenge <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Judul Challenge <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 value={challengeForm.title}
                 onChange={(e) => setChallengeForm(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Masukkan judul challenge"
@@ -1958,22 +2085,23 @@ const GamifikasiPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Deskripsi <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Deskripsi <span className="text-industrial-red">*</span>
               </label>
               <textarea
                 value={challengeForm.description}
                 onChange={(e) => setChallengeForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Jelaskan detail challenge"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel resize-none"
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Reward Poin</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Reward Poin</label>
                 <Input
+                  variant="industrial"
                   type="number"
                   value={challengeForm.reward}
                   onChange={(e) => setChallengeForm(prev => ({ ...prev, reward: parseInt(e.target.value) || 0 }))}
@@ -1982,8 +2110,9 @@ const GamifikasiPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Deadline</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Deadline</label>
                 <Input
+                  variant="industrial"
                   type="date"
                   value={challengeForm.deadline}
                   onChange={(e) => setChallengeForm(prev => ({ ...prev, deadline: e.target.value }))}
@@ -1992,9 +2121,9 @@ const GamifikasiPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-6 border-t">
+          <div className="flex gap-3 mt-6 pt-6 border-t-2 border-industrial-black">
             <Button
-              variant="outline"
+              variant="industrial-secondary"
               onClick={() => {
                 setShowCreateChallengeModal(false);
                 setEditingChallenge(null);
@@ -2005,11 +2134,12 @@ const GamifikasiPage = () => {
               Batal
             </Button>
             <Button
+              variant="industrial-primary"
               onClick={handleSaveChallenge}
               disabled={saving || !challengeForm.title.trim() || !challengeForm.description.trim()}
               className="flex-1 flex items-center gap-2"
             >
-              <Save className="w-4 h-4" />
+              <FloppyDisk className="w-4 h-4" />
               {saving ? 'Menyimpan...' : (editingChallenge ? 'Update' : 'Simpan')}
             </Button>
           </div>
@@ -2266,25 +2396,27 @@ const GamifikasiPage = () => {
         size="large"
       >
         <div className="p-6">
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Zap className="w-5 h-5 text-blue-600" />
+          <Card variant="industrial" className="mb-4">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-industrial-black border-2 border-industrial-black">
+                  <Lightning className="w-5 h-5 text-industrial-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-industrial-black">Berikan Poin ke Multiple Siswa</p>
+                  <p className="text-sm text-industrial-text-secondary">Pilih siswa dan tentukan jumlah poin yang akan diberikan</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-gray-900">Berikan Poin ke Multiple Siswa</p>
-                <p className="text-sm text-gray-500">Pilih siswa dan tentukan jumlah poin yang akan diberikan</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Filter Kelas</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Filter Kelas</label>
               <select
                 value={classFilter}
                 onChange={(e) => setClassFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel"
               >
                 <option value="all">Semua kelas ({students.length} siswa)</option>
                 {uniqueClasses.map((classData) => (
@@ -2295,11 +2427,11 @@ const GamifikasiPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Filter Level</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Filter Level</label>
               <select
                 value={levelFilter}
                 onChange={(e) => setLevelFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 focus:outline-none focus:border-industrial-steel"
               >
                 <option value="all">Semua level</option>
                 {uniqueLevels.map((level) => (
@@ -2313,10 +2445,11 @@ const GamifikasiPage = () => {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Jumlah Poin <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Jumlah Poin <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="number"
                 value={bulkPointsForm.points}
                 onChange={(e) => setBulkPointsForm(prev => ({ ...prev, points: parseInt(e.target.value) || 0 }))}
@@ -2325,8 +2458,9 @@ const GamifikasiPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Alasan (Opsional)</label>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">Alasan (Opsional)</label>
               <Input
+                variant="industrial"
                 value={bulkPointsForm.reason}
                 onChange={(e) => setBulkPointsForm(prev => ({ ...prev, reason: e.target.value }))}
                 placeholder="Alasan pemberian poin"
@@ -2336,59 +2470,63 @@ const GamifikasiPage = () => {
 
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-industrial-black">
                 Pilih Siswa ({getFilteredStudentsForBulkPoints().length} tersedia)
               </label>
               <Button
-                variant="outline"
+                variant="industrial-secondary"
                 size="sm"
                 onClick={handleSelectAllBulkPointsStudents}
               >
                 {getFilteredStudentsForBulkPoints().every(student => selectedStudentsForBulkPoints.includes(student.id)) ? 'Batal Pilih Semua' : 'Pilih Semua'}
               </Button>
             </div>
-            <div className="max-h-60 overflow-y-auto border rounded-lg">
-              {getFilteredStudentsForBulkPoints().map((student) => (
-                <div key={student.id} className="flex items-center gap-3 p-3 hover:bg-gray-50">
-                  <input
-                    type="checkbox"
-                    checked={selectedStudentsForBulkPoints.includes(student.id)}
-                    onChange={() => handleBulkPointsStudentSelection(student.id)}
-                    className="rounded border-gray-300"
-                  />
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-purple-600">
-                        {student.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{student.name}</p>
-                      <p className="text-xs text-gray-500">{student.class} • Level {student.level} • {student.points} poin</p>
+            <Card variant="industrial">
+              <CardContent className="p-0 max-h-60 overflow-y-auto">
+                {getFilteredStudentsForBulkPoints().map((student) => (
+                  <div key={student.id} className="flex items-center gap-3 p-3 border-b-2 border-industrial-black last:border-b-0 hover:bg-industrial-light transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={selectedStudentsForBulkPoints.includes(student.id)}
+                      onChange={() => handleBulkPointsStudentSelection(student.id)}
+                      className="w-4 h-4 border-2 border-industrial-black accent-industrial-black"
+                    />
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                        <span className="text-xs font-semibold text-industrial-white">
+                          {student.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-industrial-black">{student.name}</p>
+                        <p className="text-xs text-industrial-text-secondary">{student.class} • Level {student.level} • {student.points} poin</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              {getFilteredStudentsForBulkPoints().length === 0 && (
-                <div className="p-4 text-center text-gray-500">
-                  Tidak ada siswa yang sesuai filter
-                </div>
-              )}
-            </div>
+                ))}
+                {getFilteredStudentsForBulkPoints().length === 0 && (
+                  <div className="p-4 text-center text-industrial-text-secondary">
+                    Tidak ada siswa yang sesuai filter
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {selectedStudentsForBulkPoints.length > 0 && (
-            <div className="mb-4 p-3 bg-green-50 rounded-lg">
-              <p className="text-sm text-green-800">
-                <strong>{selectedStudentsForBulkPoints.length} siswa dipilih</strong> akan menerima <strong>{bulkPointsForm.points} poin</strong> masing-masing
-                {bulkPointsForm.reason && <span> untuk: {bulkPointsForm.reason}</span>}
-              </p>
-            </div>
+            <Card variant="industrial" className="mb-4">
+              <CardContent className="p-3">
+                <p className="text-sm text-industrial-black">
+                  <strong className="font-semibold">{selectedStudentsForBulkPoints.length} siswa dipilih</strong> akan menerima <strong className="font-semibold industrial-mono">{bulkPointsForm.points} poin</strong> masing-masing
+                  {bulkPointsForm.reason && <span> untuk: {bulkPointsForm.reason}</span>}
+                </p>
+              </CardContent>
+            </Card>
           )}
 
-          <div className="flex gap-3 mt-6 pt-6 border-t">
+          <div className="flex gap-3 mt-6 pt-6 border-t-2 border-industrial-black">
             <Button
-              variant="outline"
+              variant="industrial-secondary"
               onClick={() => {
                 setShowBulkPointsModal(false);
                 setSelectedStudentsForBulkPoints([]);
@@ -2399,11 +2537,12 @@ const GamifikasiPage = () => {
               Batal
             </Button>
             <Button
+              variant="industrial-primary"
               onClick={handleBulkPointsAward}
               disabled={saving || selectedStudentsForBulkPoints.length === 0 || bulkPointsForm.points <= 0}
               className="flex-1 flex items-center gap-2"
             >
-              <Zap className="w-4 h-4" />
+              <Lightning className="w-4 h-4" />
               {saving ? 'Memberikan...' : `Berikan ${bulkPointsForm.points} Poin ke ${selectedStudentsForBulkPoints.length} Siswa`}
             </Button>
           </div>
@@ -2423,37 +2562,37 @@ const GamifikasiPage = () => {
         <div className="p-6">
           {selectedClassForLeaderboard && (
             <>
-              {/* Class Info Header */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
+              {/* Class Info Header - Industrial Minimalism */}
+              <Card variant="industrial" className="mb-6">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                        <Users className="w-6 h-6 text-industrial-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-industrial-black industrial-h2">{selectedClassForLeaderboard.name}</h3>
+                        <p className="text-sm text-industrial-text-secondary">
+                          {selectedClassForLeaderboard.studentCount} siswa • Rata-rata: <span className="font-semibold industrial-mono">{selectedClassForLeaderboard.averagePoints}</span> poin
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{selectedClassForLeaderboard.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        {selectedClassForLeaderboard.studentCount} siswa • Rata-rata: {selectedClassForLeaderboard.averagePoints} poin
-                      </p>
-                    </div>
+                    <Card variant="industrial" className="px-3 py-2">
+                      <p className="text-xs text-industrial-text-secondary uppercase tracking-wide font-semibold">Top Student</p>
+                      <p className="font-semibold text-industrial-black">{selectedClassForLeaderboard.topStudent?.name || 'N/A'}</p>
+                      <p className="text-sm text-industrial-text-secondary industrial-mono">{selectedClassForLeaderboard.topStudent?.points || 0} poin</p>
+                    </Card>
                   </div>
-                  <div className="text-right">
-                    <div className="bg-white px-3 py-2 rounded-lg border">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">Top Student</p>
-                      <p className="font-bold text-gray-900">{selectedClassForLeaderboard.topStudent?.name || 'N/A'}</p>
-                      <p className="text-sm text-gray-600">{selectedClassForLeaderboard.topStudent?.points || 0} poin</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              {/* Class Leaderboard */}
+              {/* Class Leaderboard - Industrial Minimalism */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-yellow-500" />
+                <h4 className="font-semibold text-industrial-black industrial-h3 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-industrial-black" />
                   Ranking Siswa dalam Kelas
                 </h4>
-                <div className="max-h-96 overflow-y-auto">
+                <div className="max-h-96 overflow-y-auto space-y-2">
                   {students
                     .filter(student => student.classId === selectedClassForLeaderboard.id)
                     .sort((a, b) => b.points - a.points)
@@ -2473,124 +2612,138 @@ const GamifikasiPage = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                              index === 0 ? 'bg-yellow-500' : 
-                              index === 1 ? 'bg-gray-400' : 
-                              index === 2 ? 'bg-amber-600' : 'bg-blue-500'
-                            }`}>
-                              {index + 1}
-                            </div>
-                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                              <span className="text-sm font-medium text-purple-600">
-                                {student.name.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">{student.name}</p>
-                              <p className="text-sm text-gray-500">@{student.username}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-4">
-                            {/* Badges */}
-                            <div className="flex items-center gap-1">
-                              {studentBadges.length > 0 ? (
-                                <>
-                                  {studentBadges.slice(0, 3).map((badge, badgeIndex) => (
-                                    <div
-                                      key={`${badge.id}-${badgeIndex}`}
-                                      className="group relative w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center border border-yellow-200 hover:border-yellow-400 transition-colors cursor-help"
-                                    >
-                                      {badge.icon.match(/\p{Emoji}/u) ? (
-                                        <span className="text-xs">{badge.icon}</span>
-                                      ) : (
-                                        <Medal className="w-3 h-3 text-yellow-600" />
-                                      )}
-                                      
-                                      {/* Tooltip */}
-                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
-                                        <div className="font-medium">{badge.name}</div>
-                                        <div className="text-gray-300">{badge.description}</div>
-                                        <div className="text-yellow-300">+{badge.pointValue} poin</div>
-                                        {/* Arrow */}
-                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                  {studentBadges.length > 3 && (
-                                    <div 
-                                      className="group relative w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200 text-xs text-gray-600 font-medium hover:border-gray-400 transition-colors cursor-help"
-                                      title={`${studentBadges.length - 3} badge lainnya`}
-                                    >
-                                      +{studentBadges.length - 3}
-                                      
-                                      {/* Tooltip for additional badges */}
-                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
-                                        <div className="font-medium">Badge Lainnya</div>
-                                        <div className="text-gray-300">
-                                          {studentBadges.slice(3).map(b => b.name).join(', ')}
-                                        </div>
-                                        {/* Arrow */}
-                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </>
-                              ) : (
-                                <span className="text-xs text-gray-400">No badges</span>
-                              )}
-                            </div>
-                            
-                            {/* Level */}
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getLevelColor(student.level)}`}>
-                              Lvl {student.level}
-                            </div>
-                            
-                            {/* Points */}
-                            <div className="text-right min-w-[80px]">
-                              <p className="font-bold text-gray-900">{student.points.toLocaleString()}</p>
-                              <p className="text-xs text-gray-500">poin</p>
-                            </div>
-                          </div>
+                          <Card variant="industrial" className="hover:bg-industrial-light transition-colors">
+                            <CardContent className="p-4">
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-10 h-10 border-2 border-industrial-black flex items-center justify-center text-sm font-semibold ${
+                                    index === 0 ? 'bg-industrial-black text-industrial-white' : 
+                                    index === 1 ? 'bg-industrial-gray text-industrial-white' : 
+                                    index === 2 ? 'bg-industrial-steel text-industrial-white' : 'bg-industrial-light text-industrial-black'
+                                  }`}>
+                                    {index + 1}
+                                  </div>
+                                  <div className="w-10 h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                                    <span className="text-sm font-semibold text-industrial-white">
+                                      {student.name.charAt(0).toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-industrial-black">{student.name}</p>
+                                    <p className="text-sm text-industrial-text-secondary">@{student.username}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-4">
+                                  {/* Badges */}
+                                  <div className="flex items-center gap-1">
+                                    {studentBadges.length > 0 ? (
+                                      <>
+                                        {studentBadges.slice(0, 3).map((badge, badgeIndex) => (
+                                          <div
+                                            key={`${badge.id}-${badgeIndex}`}
+                                            className="group relative w-6 h-6 bg-industrial-black border-2 border-industrial-black flex items-center justify-center cursor-help hover:bg-industrial-steel transition-colors"
+                                          >
+                                            {badge.icon.match(/\p{Emoji}/u) ? (
+                                              <span className="text-xs">{badge.icon}</span>
+                                            ) : (
+                                              <Medal className="w-3 h-3 text-industrial-white" />
+                                            )}
+                                            
+                                            {/* Tooltip - Industrial Minimalism */}
+                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-industrial-black border-2 border-industrial-black text-industrial-white text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-[0_4px_8px_rgba(0,0,0,0.3)]">
+                                              <div className="font-semibold">{badge.name}</div>
+                                              <div className="text-industrial-text-muted">{badge.description}</div>
+                                              <div className="text-industrial-white industrial-mono">+{badge.pointValue} poin</div>
+                                              {/* Arrow */}
+                                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-industrial-black"></div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                        {studentBadges.length > 3 && (
+                                          <div 
+                                            className="group relative w-6 h-6 bg-industrial-light border-2 border-industrial-black flex items-center justify-center text-xs text-industrial-black font-semibold hover:bg-industrial-gray hover:text-industrial-white transition-colors cursor-help"
+                                            title={`${studentBadges.length - 3} badge lainnya`}
+                                          >
+                                            +{studentBadges.length - 3}
+                                            
+                                            {/* Tooltip for additional badges - Industrial Minimalism */}
+                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-industrial-black border-2 border-industrial-black text-industrial-white text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-[0_4px_8px_rgba(0,0,0,0.3)]">
+                                              <div className="font-semibold">Badge Lainnya</div>
+                                              <div className="text-industrial-text-muted">
+                                                {studentBadges.slice(3).map(b => b.name).join(', ')}
+                                              </div>
+                                              {/* Arrow */}
+                                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-industrial-black"></div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <span className="text-xs text-industrial-text-secondary italic">Belum ada badge</span>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Level */}
+                                  <Badge variant="industrial-primary" className="text-xs">
+                                    Lvl {student.level}
+                                  </Badge>
+                                  
+                                  {/* Points */}
+                                  <div className="text-right min-w-[80px]">
+                                    <p className="font-semibold text-industrial-black industrial-mono">{student.points.toLocaleString()}</p>
+                                    <p className="text-xs text-industrial-text-secondary">poin</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
                         </motion.div>
                       );
                     })}
                 </div>
               </div>
 
-              {/* Class Statistics */}
-              <div className="mt-6 pt-6 border-t">
-                <h4 className="font-semibold text-gray-900 mb-3">Statistik Kelas</h4>
+              {/* Class Statistics - Industrial Minimalism */}
+              <div className="mt-6 pt-6 border-t-2 border-industrial-black">
+                <h4 className="font-semibold text-industrial-black industrial-h3 mb-3">Statistik Kelas</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-blue-50 p-3 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-blue-600">{selectedClassForLeaderboard.studentCount}</p>
-                    <p className="text-xs text-blue-600 uppercase tracking-wide">Total Siswa</p>
-                  </div>
-                  <div className="bg-green-50 p-3 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-green-600">{selectedClassForLeaderboard.averagePoints}</p>
-                    <p className="text-xs text-green-600 uppercase tracking-wide">Rata-rata Poin</p>
-                  </div>
-                  <div className="bg-yellow-50 p-3 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-yellow-600">{selectedClassForLeaderboard.totalPoints.toLocaleString()}</p>
-                    <p className="text-xs text-yellow-600 uppercase tracking-wide">Total Poin</p>
-                  </div>
-                  <div className="bg-purple-50 p-3 rounded-lg text-center">
-                    <p className="text-2xl font-bold text-purple-600">
-                      {students
-                        .filter(s => s.classId === selectedClassForLeaderboard.id)
-                        .reduce((sum, s) => sum + (s.achievements?.length || 0), 0)
-                      }
-                    </p>
-                    <p className="text-xs text-purple-600 uppercase tracking-wide">Total Badge</p>
-                  </div>
+                  <Card variant="industrial" className="text-center">
+                    <CardContent className="p-3">
+                      <p className="text-2xl font-semibold text-industrial-black industrial-mono">{selectedClassForLeaderboard.studentCount}</p>
+                      <p className="text-xs text-industrial-text-secondary uppercase tracking-wide font-semibold">Total Siswa</p>
+                    </CardContent>
+                  </Card>
+                  <Card variant="industrial" className="text-center">
+                    <CardContent className="p-3">
+                      <p className="text-2xl font-semibold text-industrial-black industrial-mono">{selectedClassForLeaderboard.averagePoints}</p>
+                      <p className="text-xs text-industrial-text-secondary uppercase tracking-wide font-semibold">Rata-rata Poin</p>
+                    </CardContent>
+                  </Card>
+                  <Card variant="industrial" className="text-center">
+                    <CardContent className="p-3">
+                      <p className="text-2xl font-semibold text-industrial-black industrial-mono">{selectedClassForLeaderboard.totalPoints.toLocaleString()}</p>
+                      <p className="text-xs text-industrial-text-secondary uppercase tracking-wide font-semibold">Total Poin</p>
+                    </CardContent>
+                  </Card>
+                  <Card variant="industrial" className="text-center">
+                    <CardContent className="p-3">
+                      <p className="text-2xl font-semibold text-industrial-black industrial-mono">
+                        {students
+                          .filter(s => s.classId === selectedClassForLeaderboard.id)
+                          .reduce((sum, s) => sum + (s.achievements?.length || 0), 0)
+                        }
+                      </p>
+                      <p className="text-xs text-industrial-text-secondary uppercase tracking-wide font-semibold">Total Badge</p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
 
-              <div className="flex justify-end mt-6 pt-6 border-t">
+              <div className="flex justify-end mt-6 pt-6 border-t-2 border-industrial-black">
                 <Button
+                  variant="industrial-secondary"
                   onClick={() => {
                     setShowClassLeaderboardModal(false);
                     setSelectedClassForLeaderboard(null);

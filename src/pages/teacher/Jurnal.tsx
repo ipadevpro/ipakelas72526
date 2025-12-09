@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Calendar, BookOpen, Check, Pencil, Trash2, FileText, Clock, CalendarDays, X, Save, AlertCircle, RefreshCw, BarChart3, Eye } from 'lucide-react';
+import { Plus, MagnifyingGlass, Calendar, BookOpen, Check, Pencil, Trash, FileText, Clock, CalendarBlank, X, FloppyDisk, WarningCircle, ArrowClockwise, ChartBar, Eye } from 'phosphor-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { classApi, journalApi } from '@/lib/api';
 
 // Interfaces
@@ -69,16 +70,16 @@ const NotificationToast = ({ notification, onClose }: {
   if (!notification.visible) return null;
 
   const styles = {
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800'
+    success: 'bg-industrial-white border-2 border-industrial-black text-industrial-black',
+    error: 'bg-industrial-white border-2 border-industrial-red text-industrial-red',
+    warning: 'bg-industrial-white border-2 border-industrial-black text-industrial-black',
+    info: 'bg-industrial-white border-2 border-industrial-steel text-industrial-black'
   };
 
   const icons = {
     success: <Check className="w-4 h-4 sm:w-5 sm:h-5" />,
-    error: <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
-    warning: <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
+    error: <WarningCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
+    warning: <WarningCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
     info: <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
   };
   
@@ -90,11 +91,11 @@ const NotificationToast = ({ notification, onClose }: {
         exit={{ opacity: 0, y: -50 }}
         className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 max-w-md"
       >
-        <div className={`p-3 sm:p-4 rounded-xl border shadow-lg ${styles[notification.type]}`}>
+        <div className={`p-3 sm:p-4 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${styles[notification.type]}`}>
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">{icons[notification.type]}</div>
-            <span className="text-sm font-medium flex-1 truncate">{notification.message}</span>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 flex-shrink-0">
+            <span className="text-sm font-semibold flex-1 truncate">{notification.message}</span>
+            <button onClick={onClose} className="text-industrial-text-secondary hover:text-industrial-black flex-shrink-0">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -104,27 +105,31 @@ const NotificationToast = ({ notification, onClose }: {
   );
 };
 
-// Enhanced Loading Component
+// Enhanced Loading Component - Industrial Minimalism
 const LoadingSkeleton = () => (
-  <div className="animate-pulse space-y-4">
+  <div className="space-y-4">
     {[...Array(3)].map((_, i) => (
-      <div key={i} className="bg-white rounded-2xl border border-gray-200/50 p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-300 rounded-lg"></div>
-            <div className="h-5 sm:h-6 bg-gray-300 rounded w-32 sm:w-48"></div>
+      <Card key={i} variant="industrial">
+        <CardContent className="p-4 sm:p-6">
+          <div className="animate-pulse">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-industrial-light border-2 border-industrial-black"></div>
+                <div className="h-5 sm:h-6 bg-industrial-light w-32 sm:w-48"></div>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-12 sm:w-16 h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black"></div>
+                <div className="w-12 sm:w-16 h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black"></div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="h-3 sm:h-4 bg-industrial-light w-full"></div>
+              <div className="h-3 sm:h-4 bg-industrial-light w-3/4"></div>
+              <div className="h-3 sm:h-4 bg-industrial-light w-1/2"></div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <div className="w-12 sm:w-16 h-6 sm:h-8 bg-gray-300 rounded-lg"></div>
-            <div className="w-12 sm:w-16 h-6 sm:h-8 bg-gray-300 rounded-lg"></div>
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div className="h-3 sm:h-4 bg-gray-300 rounded w-full"></div>
-          <div className="h-3 sm:h-4 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-3 sm:h-4 bg-gray-300 rounded w-1/2"></div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     ))}
   </div>
 );
@@ -526,14 +531,14 @@ const JurnalPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6">
+      <div className="min-h-screen p-4 sm:p-6">
         <div className="space-y-4 sm:space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="h-6 sm:h-8 bg-gray-300 rounded w-48 sm:w-64 animate-pulse"></div>
-              <div className="h-4 sm:h-5 bg-gray-200 rounded w-56 sm:w-80 mt-2 animate-pulse"></div>
+              <div className="h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black w-48 sm:w-64 animate-pulse"></div>
+              <div className="h-4 sm:h-5 bg-industrial-light border-2 border-industrial-black w-56 sm:w-80 mt-2 animate-pulse"></div>
             </div>
-            <div className="h-9 sm:h-10 bg-gray-300 rounded w-32 sm:w-40 animate-pulse"></div>
+            <div className="h-9 sm:h-10 bg-industrial-light border-2 border-industrial-black w-32 sm:w-40 animate-pulse"></div>
           </div>
           <LoadingSkeleton />
         </div>
@@ -545,17 +550,17 @@ const JurnalPage = () => {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50/50 p-4 sm:p-6 space-y-4 sm:space-y-6"
+      className="min-h-screen p-4 sm:p-6 space-y-4 sm:space-y-6"
     >
-      {/* Header */}
+      {/* Header - Industrial Minimalism */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col md:flex-row md:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Jurnal Pembelajaran</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">Dokumentasi dan refleksi kegiatan pembelajaran</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1">Jurnal Pembelajaran</h1>
+          <p className="text-industrial-text-secondary mt-1 text-sm sm:text-base">Dokumentasi dan refleksi kegiatan pembelajaran</p>
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -563,7 +568,9 @@ const JurnalPage = () => {
           transition={{ delay: 0.1 }}
         >
           <Button 
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base w-full sm:w-auto"
+            variant="industrial-primary"
+            size="default"
+            className="flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base w-full sm:w-auto"
             onClick={handleCreateJournal}
           >
             <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -572,25 +579,20 @@ const JurnalPage = () => {
         </motion.div>
       </motion.div>
 
-      {/* Enhanced Tab Navigation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl border border-gray-200/50 shadow-sm overflow-hidden"
-      >
-        <div className="flex border-b border-gray-200/50 overflow-x-auto">
+      {/* Enhanced Tab Navigation - Industrial Minimalism */}
+      <Card variant="industrial" className="overflow-hidden">
+        <div className="flex border-b-2 border-industrial-black overflow-x-auto">
           {[
             { id: 'journals', label: 'Semua Jurnal', icon: BookOpen },
             { id: 'templates', label: 'Template', icon: FileText },
-            { id: 'reports', label: 'Laporan', icon: BarChart3 }
+            { id: 'reports', label: 'Laporan', icon: ChartBar }
           ].map((tab) => (
             <button
               key={tab.id}
-              className={`flex-1 px-4 sm:px-6 py-3 sm:py-4 font-medium text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              className={`flex-1 px-4 sm:px-6 py-3 sm:py-4 font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'text-blue-600 bg-blue-50/50 border-b-2 border-blue-500'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
+                  ? 'bg-industrial-black text-industrial-white'
+                  : 'text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -601,78 +603,74 @@ const JurnalPage = () => {
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6">
+        <CardContent className="p-4 sm:p-6">
           {activeTab === 'journals' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-4 sm:space-y-6"
             >
-              {/* Enhanced Search and Filter Bar */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Cari jurnal berdasarkan topik, kelas, atau aktivitas..."
-                    className="pl-10 h-10 sm:h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 rounded-xl text-sm sm:text-base"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { id: 'all', label: 'Semua' },
-                    { id: 'complete', label: 'Lengkap' },
-                    { id: 'incomplete', label: 'Belum Lengkap' }
-                  ].map((filterOption) => (
-                    <Button
-                      key={filterOption.id}
-                      variant={filter === filterOption.id ? 'default' : 'outline'}
-                      size="sm"
-                      className={`transition-all duration-200 h-8 sm:h-9 text-xs sm:text-sm px-2 sm:px-3 ${
-                        filter === filterOption.id
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                      onClick={() => setFilter(filterOption.id)}
-                    >
-                      {filterOption.label}
-                    </Button>
-                  ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-200 hover:bg-gray-50 h-8 sm:h-9 px-2 sm:px-3"
-                    onClick={fetchJournals}
-                  >
-                    <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Button>
-                </div>
-              </div>
+              {/* Enhanced Search and Filter Bar - Industrial Minimalism */}
+              <Card variant="industrial">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between">
+                    <div className="relative flex-1 max-w-md">
+                      <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4" />
+                      <Input
+                        variant="industrial"
+                        placeholder="Cari jurnal berdasarkan topik, kelas, atau aktivitas..."
+                        className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: 'all', label: 'Semua' },
+                        { id: 'complete', label: 'Lengkap' },
+                        { id: 'incomplete', label: 'Belum Lengkap' }
+                      ].map((filterOption) => (
+                        <Button
+                          key={filterOption.id}
+                          variant={filter === filterOption.id ? 'industrial-primary' : 'industrial-secondary'}
+                          size="sm"
+                          className="h-8 sm:h-9 text-xs sm:text-sm px-2 sm:px-3"
+                          onClick={() => setFilter(filterOption.id)}
+                        >
+                          {filterOption.label}
+                        </Button>
+                      ))}
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
+                        className="h-8 sm:h-9 px-2 sm:px-3"
+                        onClick={fetchJournals}
+                      >
+                        <ArrowClockwise className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               <div className="space-y-4">
                 {filteredJournals.length > 0 ? (
                   <AnimatePresence>
                     {filteredJournals.map((journal, index) => (
-                      <motion.div
-                        key={journal.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        className="bg-white border border-gray-200/50 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
-                      >
-                        <div className="p-4 sm:p-6">
+                      <Card key={journal.id} variant="industrial" className="overflow-hidden">
+                        <CardContent className="p-4 sm:p-6">
                           <div className="flex flex-col gap-4 mb-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-industrial-black pb-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3 mb-2">
-                                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
-                                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 line-clamp-1 flex-1">{journal.topic}</h2>
+                                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0">
+                                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
+                                  </div>
+                                  <h2 className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2 line-clamp-1 flex-1">{journal.topic}</h2>
                                 </div>
-                                <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 gap-3 sm:gap-4">
+                                <div className="flex flex-wrap items-center text-xs sm:text-sm text-industrial-text-secondary gap-3 sm:gap-4">
                                   <div className="flex items-center gap-1">
-                                    <CalendarDays className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <CalendarBlank className="w-3 h-3 sm:w-4 sm:h-4" />
                                     <span>{formatDate(journal.date)}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
@@ -683,11 +681,8 @@ const JurnalPage = () => {
                               </div>
                               <div className="flex items-center gap-3">
                                 <Badge
-                                  className={`${
-                                    journal.isComplete
-                                      ? 'bg-green-100 text-green-800 border-green-200'
-                                      : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                                  }`}
+                                  variant={journal.isComplete ? 'industrial-success' : 'industrial-warning'}
+                                  className="text-xs"
                                 >
                                   {journal.isComplete ? (
                                     <>
@@ -705,30 +700,30 @@ const JurnalPage = () => {
                             </div>
                             <div className="flex flex-wrap gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                               <Button 
-                                variant="outline" 
+                                variant="industrial-secondary" 
                                 size="sm" 
-                                className="border-gray-200 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all duration-200 h-8 text-xs flex-1 sm:flex-none"
+                                className="h-8 text-xs flex-1 sm:flex-none"
                                 onClick={() => handleViewJournal(journal)}
                               >
                                 <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                                 Lihat
                               </Button>
                               <Button 
-                                variant="outline" 
+                                variant="industrial-secondary" 
                                 size="sm" 
-                                className="border-gray-200 hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition-all duration-200 h-8 text-xs flex-1 sm:flex-none"
+                                className="h-8 text-xs flex-1 sm:flex-none"
                                 onClick={() => handleEditJournal(journal)}
                               >
                                 <Pencil className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                                 Edit
                               </Button>
                               <Button 
-                                variant="outline" 
+                                variant="industrial-danger" 
                                 size="sm" 
-                                className="border-gray-200 hover:bg-red-50 hover:border-red-200 hover:text-red-700 transition-all duration-200 h-8 text-xs px-3"
+                                className="h-8 text-xs px-3"
                                 onClick={() => handleDeleteJournal(journal)}
                               >
-                                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                             </div>
                           </div>
@@ -736,48 +731,48 @@ const JurnalPage = () => {
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             <div className="space-y-3 sm:space-y-4">
                               <div>
-                                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Topik Pembelajaran</h3>
-                                <p className="text-gray-900 text-sm line-clamp-2">{journal.topic || '-'}</p>
+                                <h3 className="text-xs sm:text-sm font-semibold text-industrial-black mb-2">Topik Pembelajaran</h3>
+                                <p className="text-industrial-text-secondary text-sm line-clamp-2">{journal.topic || '-'}</p>
                               </div>
                               <div>
-                                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Aktivitas Pembelajaran</h3>
-                                <p className="text-gray-900 text-sm line-clamp-3">{journal.activities || '-'}</p>
+                                <h3 className="text-xs sm:text-sm font-semibold text-industrial-black mb-2">Aktivitas Pembelajaran</h3>
+                                <p className="text-industrial-text-secondary text-sm line-clamp-3">{journal.activities || '-'}</p>
                               </div>
                             </div>
                             <div className="space-y-3 sm:space-y-4">
                               <div>
-                                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Catatan & Refleksi</h3>
-                                <p className="text-gray-900 text-sm line-clamp-3">{journal.notes || 'Tidak ada catatan'}</p>
+                                <h3 className="text-xs sm:text-sm font-semibold text-industrial-black mb-2">Catatan & Refleksi</h3>
+                                <p className="text-industrial-text-secondary text-sm line-clamp-3">{journal.notes || 'Tidak ada catatan'}</p>
                               </div>
                               <div>
-                                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Tanggal Dibuat</h3>
-                                <p className="text-gray-600 text-xs sm:text-sm">{journal.createdAt ? formatDate(journal.createdAt) : '-'}</p>
+                                <h3 className="text-xs sm:text-sm font-semibold text-industrial-black mb-2">Tanggal Dibuat</h3>
+                                <p className="text-industrial-text-muted text-xs sm:text-sm">{journal.createdAt ? formatDate(journal.createdAt) : '-'}</p>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </AnimatePresence>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-8 sm:p-12 text-center"
-                  >
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Tidak ada jurnal yang ditemukan</h3>
-                    <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">Coba ubah filter atau buat jurnal baru untuk memulai</p>
-                    <Button
-                      onClick={handleCreateJournal}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-10 sm:h-11 text-sm sm:text-base"
-                    >
-                      <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      Buat Jurnal Pertama
-                    </Button>
-                  </motion.div>
+                  <Card variant="industrial">
+                    <CardContent className="p-8 sm:p-12 text-center">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                        <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-industrial-white" />
+                      </div>
+                      <h3 className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2 mb-2">Tidak ada jurnal yang ditemukan</h3>
+                      <p className="text-industrial-text-secondary mb-4 sm:mb-6 text-sm sm:text-base">Coba ubah filter atau buat jurnal baru untuk memulai</p>
+                      <Button
+                        variant="industrial-primary"
+                        size="default"
+                        onClick={handleCreateJournal}
+                        className="h-10 sm:h-11 text-sm sm:text-base"
+                      >
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                        Buat Jurnal Pertama
+                      </Button>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             </motion.div>
@@ -791,262 +786,274 @@ const JurnalPage = () => {
             >
               <AnimatePresence>
                 {templates.map((template, index) => (
-                  <motion.div
-                    key={template.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white border border-gray-200/50 rounded-2xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{template.name}</h3>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-2">{template.description}</p>
+                  <Card key={template.id} variant="industrial" className="group">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-industrial-black text-sm sm:text-base industrial-h3">{template.name}</h3>
+                          <p className="text-xs sm:text-sm text-industrial-text-secondary mt-1 line-clamp-2">{template.description}</p>
+                        </div>
+                        {template.isDefault && (
+                          <Badge variant="industrial-primary" className="text-xs ml-2 flex-shrink-0">
+                            Default
+                          </Badge>
+                        )}
                       </div>
-                      {template.isDefault && (
-                        <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs ml-2 flex-shrink-0">
-                          Default
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 h-8 text-xs"
-                        onClick={() => handleViewTemplate(template)}
-                      >
-                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Lihat
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-gray-200 hover:bg-green-50 hover:border-green-200 hover:text-green-700 h-8 text-xs"
-                        onClick={() => handleUseTemplate(template)}
-                      >
-                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Gunakan
-                      </Button>
-                      {!template.isDefault && (
+                      <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                         <Button 
-                          variant="outline" 
+                          variant="industrial-secondary" 
                           size="sm" 
-                          className="border-gray-200 hover:bg-red-50 hover:border-red-200 hover:text-red-700 h-8 px-3"
-                          onClick={() => handleDeleteTemplate(template.id)}
+                          className="flex-1 h-8 text-xs"
+                          onClick={() => handleViewTemplate(template)}
                         >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          Lihat
                         </Button>
-                      )}
-                    </div>
-                  </motion.div>
+                        <Button 
+                          variant="industrial-primary" 
+                          size="sm" 
+                          className="flex-1 h-8 text-xs"
+                          onClick={() => handleUseTemplate(template)}
+                        >
+                          <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          Gunakan
+                        </Button>
+                        {!template.isDefault && (
+                          <Button 
+                            variant="industrial-danger" 
+                            size="sm" 
+                            className="h-8 px-3"
+                            onClick={() => handleDeleteTemplate(template.id)}
+                          >
+                            <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: templates.length * 0.1 }}
-                className="bg-gray-50/50 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center p-4 sm:p-6 text-center cursor-pointer hover:bg-gray-100/50 hover:border-gray-400 transition-all duration-200 group"
-                onClick={() => setShowTemplateModal(true)}
-              >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full flex items-center justify-center mb-3 group-hover:bg-gray-300 transition-colors">
-                  <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
-                </div>
-                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Buat Template Baru</h3>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">Sesuaikan format jurnal sesuai kebutuhan</p>
-              </motion.div>
+              <Card variant="industrial" className="cursor-pointer hover:shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-all duration-200" onClick={() => setShowTemplateModal(true)}>
+                <CardContent className="flex flex-col items-center justify-center p-4 sm:p-6 text-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mb-3">
+                    <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-white" />
+                  </div>
+                  <h3 className="font-semibold text-industrial-black text-sm sm:text-base industrial-h3">Buat Template Baru</h3>
+                  <p className="text-xs sm:text-sm text-industrial-text-secondary mt-1">Sesuaikan format jurnal sesuai kebutuhan</p>
+                </CardContent>
+              </Card>
             </motion.div>
           )}
 
           {activeTab === 'reports' && reportData && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="lg:col-span-2 bg-white rounded-lg border shadow-sm p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">Ringkasan Jurnal Pembelajaran</h2>
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="p-3 sm:p-4 border rounded-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4">
-                      <h3 className="font-medium text-sm sm:text-base">Jurnal Per Kelas</h3>
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 w-full sm:w-auto">
-                        <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                        Ekspor Data
-                      </Button>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Kelas</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Total</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Lengkap</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Belum</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">%</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {reportData.journalsByClass.length > 0 ? (
-                            reportData.journalsByClass.map((classData, index) => (
-                              <tr key={index}>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium">{classData.className}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm">{classData.total}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-green-600">{classData.completed}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-yellow-600">{classData.incomplete}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-12 sm:w-16 bg-gray-200 rounded-full h-2">
-                                      <div 
-                                        className="bg-green-500 h-2 rounded-full" 
-                                        style={{ width: `${classData.total > 0 ? (classData.completed / classData.total) * 100 : 0}%` }}
-                                      ></div>
+              <Card variant="industrial" className="lg:col-span-2">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Ringkasan Jurnal Pembelajaran</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4">
+                        <h3 className="font-semibold text-sm sm:text-base text-industrial-black">Jurnal Per Kelas</h3>
+                        <Button variant="industrial-secondary" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 w-full sm:w-auto">
+                          <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                          Ekspor Data
+                        </Button>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="industrial-table w-full">
+                          <thead>
+                            <tr>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Kelas</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Total</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Lengkap</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Belum</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">%</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {reportData.journalsByClass.length > 0 ? (
+                              reportData.journalsByClass.map((classData, index) => (
+                                <tr key={index}>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-industrial-black">{classData.className}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-industrial-black industrial-mono">{classData.total}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-industrial-black industrial-mono">{classData.completed}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-industrial-text-secondary industrial-mono">{classData.incomplete}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-12 sm:w-16 bg-industrial-light border-2 border-industrial-black h-2">
+                                        <div 
+                                          className="bg-industrial-black h-2" 
+                                          style={{ width: `${classData.total > 0 ? (classData.completed / classData.total) * 100 : 0}%` }}
+                                        ></div>
+                                      </div>
+                                      <span className="text-xs text-industrial-black industrial-mono">
+                                        {classData.total > 0 ? Math.round((classData.completed / classData.total) * 100) : 0}%
+                                      </span>
                                     </div>
-                                    <span className="text-xs">
-                                      {classData.total > 0 ? Math.round((classData.completed / classData.total) * 100) : 0}%
-                                    </span>
-                                  </div>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={5} className="px-2 sm:px-3 py-4 sm:py-6 text-center text-industrial-text-secondary text-xs sm:text-sm">
+                                  Belum ada data jurnal
                                 </td>
                               </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={5} className="px-2 sm:px-3 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm">
-                                Belum ada data jurnal
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="p-3 sm:p-4 border rounded-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4">
-                      <h3 className="font-medium text-sm sm:text-base">Distribusi Jurnal Per Bulan</h3>
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 w-full sm:w-auto">
-                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                        Lihat Detail
-                      </Button>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Bulan</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Jumlah Jurnal</th>
-                            <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-500">Persentase</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {reportData.journalsByMonth.length > 0 ? (
-                            reportData.journalsByMonth.map((monthData, index) => (
-                              <tr key={index}>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium">{monthData.month}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm">{monthData.count}</td>
-                                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm">
-                                  {reportData.totalJournals > 0 ? 
-                                    Math.round((monthData.count / reportData.totalJournals) * 100) : 0}%
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4">
+                        <h3 className="font-semibold text-sm sm:text-base text-industrial-black">Distribusi Jurnal Per Bulan</h3>
+                        <Button variant="industrial-secondary" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 w-full sm:w-auto">
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                          Lihat Detail
+                        </Button>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="industrial-table w-full">
+                          <thead>
+                            <tr>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Bulan</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Jumlah Jurnal</th>
+                              <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs sm:text-sm font-semibold text-industrial-white">Persentase</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {reportData.journalsByMonth.length > 0 ? (
+                              reportData.journalsByMonth.map((monthData, index) => (
+                                <tr key={index}>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-industrial-black">{monthData.month}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-industrial-black industrial-mono">{monthData.count}</td>
+                                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-industrial-black industrial-mono">
+                                    {reportData.totalJournals > 0 ? 
+                                      Math.round((monthData.count / reportData.totalJournals) * 100) : 0}%
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={3} className="px-2 sm:px-3 py-4 sm:py-6 text-center text-industrial-text-secondary text-xs sm:text-sm">
+                                  Belum ada data jurnal bulan ini
                                 </td>
                               </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={3} className="px-2 sm:px-3 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm">
-                                Belum ada data jurnal bulan ini
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
               
-              <div className="bg-white rounded-lg border shadow-sm p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">Statistik Jurnal</h2>
-                <div className="space-y-4">
-                  <div className="border rounded-lg p-3 sm:p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xs sm:text-sm font-medium">Total Jurnal</h3>
-                      <span className="text-xl sm:text-2xl font-bold text-blue-600">{reportData.totalJournals}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="text-gray-500">Tahun {new Date().getFullYear()}</span>
-                      <span className="text-blue-600">📚 Jurnal aktif</span>
-                    </div>
-                  </div>
+              <Card variant="industrial">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Statistik Jurnal</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 space-y-4">
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xs sm:text-sm font-semibold text-industrial-black">Total Jurnal</h3>
+                        <span className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{reportData.totalJournals}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs sm:text-sm">
+                        <span className="text-industrial-text-secondary">Tahun {new Date().getFullYear()}</span>
+                        <span className="text-industrial-text-secondary">Jurnal aktif</span>
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="border rounded-lg p-3 sm:p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xs sm:text-sm font-medium">Jurnal Lengkap</h3>
-                      <span className="text-green-600 font-bold text-lg sm:text-xl">{reportData.completionRate}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3 mb-2">
-                      <div 
-                        className="bg-green-500 h-2 sm:h-3 rounded-full transition-all duration-300" 
-                        style={{ width: `${reportData.completionRate}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {reportData.completedJournals} dari {reportData.totalJournals} jurnal
-                    </div>
-                  </div>
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xs sm:text-sm font-semibold text-industrial-black">Jurnal Lengkap</h3>
+                        <span className="text-industrial-black font-bold text-lg sm:text-xl industrial-mono">{reportData.completionRate}%</span>
+                      </div>
+                      <div className="w-full bg-industrial-light border-2 border-industrial-black h-3 mb-2">
+                        <div 
+                          className="bg-industrial-black h-3 transition-all duration-300" 
+                          style={{ width: `${reportData.completionRate}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-industrial-text-secondary">
+                        {reportData.completedJournals} dari {reportData.totalJournals} jurnal
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="border rounded-lg p-3 sm:p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xs sm:text-sm font-medium">Jurnal Belum Lengkap</h3>
-                      <span className="text-yellow-600 font-bold text-lg sm:text-xl">
-                        {reportData.totalJournals > 0 ? 100 - reportData.completionRate : 0}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3 mb-2">
-                      <div 
-                        className="bg-yellow-500 h-2 sm:h-3 rounded-full transition-all duration-300" 
-                        style={{ width: `${reportData.totalJournals > 0 ? 100 - reportData.completionRate : 0}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {reportData.incompleteJournals} jurnal perlu dilengkapi
-                    </div>
-                  </div>
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xs sm:text-sm font-semibold text-industrial-black">Jurnal Belum Lengkap</h3>
+                        <span className="text-industrial-text-secondary font-bold text-lg sm:text-xl industrial-mono">
+                          {reportData.totalJournals > 0 ? 100 - reportData.completionRate : 0}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-industrial-light border-2 border-industrial-black h-3 mb-2">
+                        <div 
+                          className="bg-industrial-gray h-3 transition-all duration-300" 
+                          style={{ width: `${reportData.totalJournals > 0 ? 100 - reportData.completionRate : 0}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-industrial-text-secondary">
+                        {reportData.incompleteJournals} jurnal perlu dilengkapi
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="border rounded-lg p-3 sm:p-4">
-                    <h3 className="text-xs sm:text-sm font-medium mb-3">Distribusi per Bulan</h3>
-                    <div className="flex items-end h-24 sm:h-32 gap-1 justify-between">
-                      {reportData.journalsByMonth.length > 0 ? (
-                        reportData.journalsByMonth.map((monthData, index) => {
-                          const maxCount = Math.max(...reportData.journalsByMonth.map(m => m.count));
-                          const height = maxCount > 0 ? (monthData.count / maxCount) * 100 : 0;
-                          return (
-                            <div key={index} className="flex flex-col items-center">
-                              <div 
-                                className="bg-blue-500 w-4 sm:w-6 rounded-t transition-all duration-300 hover:bg-blue-600" 
-                                style={{ height: `${Math.max(height, 5)}%` }}
-                                title={`${monthData.month}: ${monthData.count} jurnal`}
-                              ></div>
-                              <span className="text-xs mt-1 text-gray-600">{monthData.month}</span>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="w-full text-center text-gray-500 text-xs sm:text-sm">
-                          Belum ada data
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  <Card variant="industrial">
+                    <CardContent className="p-3 sm:p-4">
+                      <h3 className="text-xs sm:text-sm font-semibold text-industrial-black mb-3">Distribusi per Bulan</h3>
+                      <div className="flex items-end h-24 sm:h-32 gap-1 justify-between">
+                        {reportData.journalsByMonth.length > 0 ? (
+                          reportData.journalsByMonth.map((monthData, index) => {
+                            const maxCount = Math.max(...reportData.journalsByMonth.map(m => m.count));
+                            const height = maxCount > 0 ? (monthData.count / maxCount) * 100 : 0;
+                            return (
+                              <div key={index} className="flex flex-col items-center">
+                                <div 
+                                  className="bg-industrial-black w-4 sm:w-6 transition-all duration-300 hover:bg-industrial-gray border-2 border-industrial-black" 
+                                  style={{ height: `${Math.max(height, 5)}%` }}
+                                  title={`${monthData.month}: ${monthData.count} jurnal`}
+                                ></div>
+                                <span className="text-xs mt-1 text-industrial-text-secondary">{monthData.month}</span>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="w-full text-center text-industrial-text-secondary text-xs sm:text-sm">
+                            Belum ada data
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
             </div>
           )}
 
           {activeTab === 'reports' && !reportData && (
-            <div className="bg-white rounded-lg border shadow-sm p-8 text-center">
-              <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-              <h3 className="text-lg font-medium">Memuat Data Laporan</h3>
-              <p className="text-gray-500 mt-1">Sedang menganalisis data jurnal pembelajaran...</p>
-            </div>
+            <Card variant="industrial">
+              <CardContent className="p-8 text-center">
+                <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-6 h-6 text-industrial-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-industrial-black industrial-h2">Memuat Data Laporan</h3>
+                <p className="text-industrial-text-secondary mt-1">Sedang menganalisis data jurnal pembelajaran...</p>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Create Journal Modal */}
+          {/* Create Journal Modal - Industrial Minimalism */}
           <Modal
             isOpen={showCreateModal}
             onClose={() => setShowCreateModal(false)}
@@ -1056,9 +1063,9 @@ const JurnalPage = () => {
             <div className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Kelas *</label>
+                  <label className="block text-sm font-semibold text-industrial-black mb-2">Kelas *</label>
                   <select
-                    className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                    className="w-full px-3 py-2 h-10 sm:h-11 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base"
                     value={journalForm.classId}
                     onChange={(e) => setJournalForm(prev => ({ ...prev, classId: e.target.value }))}
                   >
@@ -1070,10 +1077,11 @@ const JurnalPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal *</label>
-                  <input
+                  <label className="block text-sm font-semibold text-industrial-black mb-2">Tanggal *</label>
+                  <Input
+                    variant="industrial"
                     type="date"
-                    className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                    className="w-full h-10 sm:h-11 text-sm sm:text-base"
                     value={journalForm.date}
                     onChange={(e) => setJournalForm(prev => ({ ...prev, date: e.target.value }))}
                   />
@@ -1081,10 +1089,11 @@ const JurnalPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Topik Pembelajaran *</label>
-                <input
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Topik Pembelajaran *</label>
+                <Input
+                  variant="industrial"
                   type="text"
-                  className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                  className="w-full h-10 sm:h-11 text-sm sm:text-base"
                   placeholder="Masukkan topik pembelajaran"
                   value={journalForm.topic}
                   onChange={(e) => setJournalForm(prev => ({ ...prev, topic: e.target.value }))}
@@ -1092,9 +1101,9 @@ const JurnalPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Aktivitas Pembelajaran *</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Aktivitas Pembelajaran *</label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base resize-none"
+                  className="w-full px-3 py-2 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base resize-none"
                   rows={6}
                   placeholder="Deskripsikan aktivitas pembelajaran yang dilakukan"
                   value={journalForm.activities}
@@ -1103,9 +1112,9 @@ const JurnalPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Catatan & Refleksi</label>
+                <label className="block text-sm font-semibold text-industrial-black mb-2">Catatan & Refleksi</label>
                 <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base resize-none"
+                  className="w-full px-3 py-2 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base resize-none"
                   rows={4}
                   placeholder="Catatan, refleksi, atau hal-hal penting lainnya"
                   value={journalForm.notes}
@@ -1113,9 +1122,9 @@ const JurnalPage = () => {
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-industrial-black">
                 <Button
-                  variant="outline"
+                  variant="industrial-secondary"
                   className="flex-1 order-2 sm:order-1 h-10 sm:h-11"
                   onClick={() => setShowCreateModal(false)}
                   disabled={saving}
@@ -1123,11 +1132,12 @@ const JurnalPage = () => {
                   Batal
                 </Button>
                 <Button
+                  variant="industrial-primary"
                   className="flex-1 order-1 sm:order-2 h-10 sm:h-11"
                   onClick={handleSaveJournal}
                   disabled={saving}
                 >
-                  <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   {saving ? 'Menyimpan...' : 'Simpan'}
                 </Button>
               </div>
@@ -1211,7 +1221,7 @@ const JurnalPage = () => {
                   onClick={handleUpdateJournal}
                   disabled={saving}
                 >
-                  <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </Button>
               </div>
@@ -1290,7 +1300,7 @@ const JurnalPage = () => {
             {selectedJournal && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 sm:p-4 bg-red-50 rounded-lg">
-                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+                  <WarningCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                   <div>
                     <h4 className="font-medium text-red-800 text-sm sm:text-base">Konfirmasi Penghapusan</h4>
                     <p className="text-xs sm:text-sm text-red-600">Tindakan ini tidak dapat dibatalkan</p>
@@ -1319,7 +1329,7 @@ const JurnalPage = () => {
                     onClick={handleConfirmDelete}
                     disabled={saving}
                   >
-                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    <Trash className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     {saving ? 'Menghapus...' : 'Hapus Jurnal'}
                   </Button>
                 </div>
@@ -1327,7 +1337,7 @@ const JurnalPage = () => {
             )}
           </Modal>
 
-          {/* Template Detail Modal */}
+          {/* Template Detail Modal - Industrial Minimalism */}
           <Modal
             isOpen={showTemplateModal}
             onClose={() => setShowTemplateModal(false)}
@@ -1338,60 +1348,67 @@ const JurnalPage = () => {
               <div className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Nama Template</h3>
-                    <p className="mt-1 font-medium text-sm sm:text-base">{selectedTemplate.name}</p>
+                    <h3 className="text-sm font-semibold text-industrial-black mb-2">Nama Template</h3>
+                    <p className="mt-1 font-semibold text-sm sm:text-base text-industrial-black">{selectedTemplate.name}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                    <h3 className="text-sm font-semibold text-industrial-black mb-2">Status</h3>
                     <div className="mt-1">
                       {selectedTemplate.isDefault ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <Badge variant="industrial-primary" className="text-xs">
                           Template Default
-                        </span>
+                        </Badge>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <Badge variant="industrial-secondary" className="text-xs">
                           Template Kustom
-                        </span>
+                        </Badge>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Deskripsi</h3>
-                  <p className="mt-1 text-sm sm:text-base">{selectedTemplate.description}</p>
+                  <h3 className="text-sm font-semibold text-industrial-black mb-2">Deskripsi</h3>
+                  <p className="mt-1 text-sm sm:text-base text-industrial-text-secondary">{selectedTemplate.description}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Template Topik</h3>
-                  <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                    <p className="text-sm">{selectedTemplate.topic}</p>
-                  </div>
+                  <h3 className="text-sm font-semibold text-industrial-black mb-2">Template Topik</h3>
+                  <Card variant="industrial">
+                    <CardContent className="p-3">
+                      <p className="text-sm text-industrial-black">{selectedTemplate.topic}</p>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Template Aktivitas</h3>
-                  <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                    <pre className="text-sm whitespace-pre-wrap">{selectedTemplate.activities}</pre>
-                  </div>
+                  <h3 className="text-sm font-semibold text-industrial-black mb-2">Template Aktivitas</h3>
+                  <Card variant="industrial">
+                    <CardContent className="p-3">
+                      <pre className="text-sm whitespace-pre-wrap text-industrial-black">{selectedTemplate.activities}</pre>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Template Catatan</h3>
-                  <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                    <p className="text-sm">{selectedTemplate.notes}</p>
-                  </div>
+                  <h3 className="text-sm font-semibold text-industrial-black mb-2">Template Catatan</h3>
+                  <Card variant="industrial">
+                    <CardContent className="p-3">
+                      <p className="text-sm text-industrial-black">{selectedTemplate.notes}</p>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-industrial-black">
                   <Button
-                    variant="outline"
+                    variant="industrial-secondary"
                     className="flex-1 order-2 sm:order-1 h-10 sm:h-11"
                     onClick={() => setShowTemplateModal(false)}
                   >
                     Tutup
                   </Button>
                   <Button
+                    variant="industrial-primary"
                     className="flex-1 order-1 sm:order-2 h-10 sm:h-11"
                     onClick={() => handleUseTemplate(selectedTemplate)}
                   >
@@ -1402,8 +1419,8 @@ const JurnalPage = () => {
               </div>
             )}
           </Modal>
-        </div>
-      </motion.div>
+        </CardContent>
+      </Card>
       
       {/* Notification Toast */}
       <NotificationToast

@@ -600,4 +600,240 @@
   select:focus-visible {
     @apply outline-2 outline-primary outline-offset-2;
   }
+}
+
+/* ============================================
+   NEO-BRUTALISM + INDUSTRIAL MINIMALISM FOUNDATION
+   ============================================ */
+
+/* Industrial Minimalism Typography System */
+@layer base {
+  .industrial-h1 {
+    @apply text-[28px] sm:text-[32px] font-bold leading-[1.2] text-industrial-black;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-h2 {
+    @apply text-[24px] font-semibold leading-[1.3] text-industrial-black;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-h3 {
+    @apply text-[20px] font-semibold leading-[1.4] text-industrial-black;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-body {
+    @apply text-[14px] sm:text-[16px] leading-[1.5] text-industrial-text-primary;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-small {
+    @apply text-[12px] leading-[1.5] text-industrial-text-secondary;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-mono {
+    @apply font-mono text-industrial-text-primary;
+    font-family: 'Roboto Mono', 'JetBrains Mono', monospace;
+  }
+}
+
+/* Industrial Minimalism Component Utilities */
+@layer components {
+  /* Card Styles - Neo-Brutalism */
+  .industrial-card {
+    @apply bg-industrial-white border-2 border-industrial-black;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    border-radius: 0px;
+    transition: all 0.2s ease;
+  }
+
+  .industrial-card-hover {
+    @apply industrial-card transition-all duration-200;
+  }
+
+  .industrial-card-hover:hover {
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  /* Button Styles - Neo-Brutalism */
+  .industrial-btn-primary {
+    @apply bg-industrial-black text-industrial-white border-2 border-industrial-black;
+    @apply px-6 py-3 font-semibold text-sm;
+    @apply transition-all duration-200;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .industrial-btn-primary:hover {
+    @apply bg-industrial-gray;
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  .industrial-btn-primary:active {
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(2px, 2px);
+  }
+
+  .industrial-btn-secondary {
+    @apply bg-industrial-white text-industrial-black border-2 border-industrial-black;
+    @apply px-6 py-3 font-semibold text-sm;
+    @apply transition-all duration-200;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .industrial-btn-secondary:hover {
+    @apply bg-industrial-light;
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  .industrial-btn-secondary:active {
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(2px, 2px);
+  }
+
+  .industrial-btn-danger {
+    @apply bg-industrial-bright-red text-industrial-white border-2 border-industrial-bright-red;
+    @apply px-6 py-3 font-semibold text-sm;
+    @apply transition-all duration-200;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  }
+
+  .industrial-btn-danger:hover {
+    @apply bg-[#FF5252];
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-2px, -2px);
+  }
+
+  .industrial-btn-danger:active {
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(2px, 2px);
+  }
+
+  /* Input Styles */
+  .industrial-input {
+    @apply bg-industrial-white border-2 border-industrial-black;
+    @apply px-4 py-3 text-sm text-industrial-text-primary;
+    @apply transition-all duration-200;
+    border-radius: 0px;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .industrial-input:focus {
+    @apply border-industrial-blue outline-none;
+    box-shadow: 4px 4px 0px 0px rgba(78, 205, 196, 1);
+  }
+
+  .industrial-input::placeholder {
+    @apply text-industrial-text-muted;
+  }
+
+  /* Table Styles */
+  .industrial-table {
+    @apply w-full border-collapse;
+  }
+
+  .industrial-table thead {
+    @apply bg-industrial-dark text-industrial-white;
+  }
+
+  .industrial-table th {
+    @apply border-2 border-industrial-black px-4 py-3 text-left font-semibold text-sm;
+  }
+
+  .industrial-table td {
+    @apply border border-industrial-border px-4 py-3 text-sm;
+  }
+
+  .industrial-table tbody tr:nth-child(even) {
+    @apply bg-industrial-light;
+  }
+
+  .industrial-table tbody tr:hover {
+    @apply bg-[#E5E5E5];
+  }
+
+  /* Badge Styles */
+  .industrial-badge {
+    @apply inline-flex items-center px-3 py-1 text-xs font-semibold;
+    @apply border-2 border-industrial-black;
+    border-radius: 0px;
+  }
+
+  .industrial-badge-primary {
+    @apply industrial-badge bg-industrial-black text-industrial-white;
+  }
+
+  .industrial-badge-secondary {
+    @apply industrial-badge bg-industrial-white text-industrial-black;
+  }
+
+  .industrial-badge-success {
+    @apply industrial-badge bg-green-100 text-green-800 border-green-800;
+  }
+
+  .industrial-badge-warning {
+    @apply industrial-badge bg-yellow-100 text-yellow-800 border-yellow-800;
+  }
+
+  .industrial-badge-danger {
+    @apply industrial-badge bg-industrial-red text-industrial-white border-industrial-red;
+  }
+}
+
+/* Industrial Minimalism Layout Utilities */
+@layer utilities {
+  .industrial-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .industrial-section {
+    @apply mb-8;
+  }
+
+  .industrial-grid {
+    @apply grid gap-4 sm:gap-6;
+  }
+
+  .industrial-grid-2 {
+    @apply industrial-grid grid-cols-1 sm:grid-cols-2;
+  }
+
+  .industrial-grid-3 {
+    @apply industrial-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .industrial-grid-4 {
+    @apply industrial-grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4;
+  }
+
+  .industrial-spacing {
+    @apply space-y-4 sm:space-y-6;
+  }
+
+  .industrial-border {
+    @apply border-2 border-industrial-black;
+  }
+
+  .industrial-border-light {
+    @apply border border-industrial-border;
+  }
+
+  .industrial-shadow {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .industrial-shadow-md {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .industrial-shadow-lg {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
 } 

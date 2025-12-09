@@ -51,6 +51,32 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Neo-Brutalism + Industrial Minimalism Color Palette
+        industrial: {
+          dark: "#1A1A1A",      // Dark Charcoal - for sidebar, dark backgrounds
+          gray: "#2D2D2D",      // Medium Gray - for secondary backgrounds
+          light: "#F5F5F5",     // Light Gray - for card backgrounds
+          white: "#FFFFFF",     // Pure White - for cards
+          black: "#000000",     // Pure Black - for borders, text
+          steel: "#3B82F6",     // Steel Blue - for accent
+          red: "#EF4444",       // Industrial Red - for errors, destructive
+          border: "#CCCCCC",    // Light Gray - for borders
+          "text-primary": "#000000",    // Black - primary text
+          "text-secondary": "#6B7280",  // Gray - secondary text
+          "text-muted": "#9CA3AF",      // Light Gray - muted text
+          // Neo-Brutalism Colors
+          yellow: "#FFE66D",    // Bright Yellow
+          pink: "#FF6B9D",      // Bright Pink
+          blue: "#4ECDC4",     // Bright Cyan Blue
+          green: "#95E1D3",    // Bright Green
+          orange: "#FFA07A",   // Bright Orange
+          purple: "#C44569",   // Bright Purple
+          "bright-red": "#FF6B6B", // Bright Red
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['Roboto Mono', 'JetBrains Mono', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -70,6 +96,15 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      boxShadow: {
+        'brutal-sm': '2px 2px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal': '4px 4px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal-md': '6px 6px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal-lg': '8px 8px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal-xl': '12px 12px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal-hover': '6px 6px 0px 0px rgba(0, 0, 0, 1)',
+        'brutal-active': '2px 2px 0px 0px rgba(0, 0, 0, 1)',
       },
     },
   },

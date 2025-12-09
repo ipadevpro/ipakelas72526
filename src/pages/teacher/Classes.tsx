@@ -8,20 +8,20 @@ import { LoadingCard, LoadingSpinner } from '@/components/ui/loading';
 import { AnimatedContainer, StaggeredList, fadeInUp, slideInFromLeft } from '@/components/ui/motion';
 import { 
   Plus, 
-  Search, 
+  MagnifyingGlass, 
   BookOpen, 
   Users, 
-  Edit,
-  Trash2,
+  Pencil,
+  Trash,
   Eye,
   Calendar,
-  Award,
-  TrendingUp,
-  AlertTriangle,
+  Trophy,
+  TrendUp,
+  Warning,
   CheckCircle,
   X,
-  RefreshCw
-} from 'lucide-react';
+  ArrowClockwise
+} from 'phosphor-react';
 import { classApi } from '@/lib/api';
 
 interface ClassItem {
@@ -403,8 +403,8 @@ const Classes = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 bg-gray-50/50 min-h-screen">
-      {/* Notification */}
+    <div className="space-y-4 sm:space-y-6 min-h-screen">
+      {/* Notification - Industrial Minimalism */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -413,20 +413,20 @@ const Classes = () => {
             exit={{ opacity: 0, y: -50 }}
             className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50"
           >
-            <div className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg shadow-lg ${
+            <div className={`flex items-center gap-3 p-3 sm:p-4 border-2 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${
               notification.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
+                ? 'bg-industrial-white text-industrial-black border-industrial-black' 
+                : 'bg-industrial-white text-industrial-red border-industrial-red'
             }`}>
               {notification.type === 'success' ? (
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-industrial-black" />
               ) : (
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <Warning className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-industrial-red" />
               )}
-              <span className="font-medium text-sm sm:text-base flex-1">{notification.message}</span>
+              <span className="font-semibold text-sm sm:text-base flex-1">{notification.message}</span>
               <button
                 onClick={() => setNotification(null)}
-                className="ml-2 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                className="ml-2 text-industrial-text-secondary hover:text-industrial-black transition-colors flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -435,16 +435,16 @@ const Classes = () => {
         )}
       </AnimatePresence>
 
-      {/* Header */}
+      {/* Header - Industrial Minimalism */}
       <AnimatedContainer variant={fadeInUp}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Kelas</h1>
-            <p className="text-gray-600 mt-2 text-sm sm:text-base">
+            <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1">Kelas</h1>
+            <p className="text-industrial-text-secondary mt-2 text-sm sm:text-base industrial-body">
               Kelola semua kelas Anda dengan mudah
-              {isLoadingStats && <span className="ml-2 text-blue-600">• Memuat statistik...</span>}
+              {isLoadingStats && <span className="ml-2 text-industrial-steel">• Memuat statistik...</span>}
               {loadingProgress > 0 && loadingProgress < 100 && (
-                <span className="ml-2 text-blue-600">• Loading {loadingProgress}%</span>
+                <span className="ml-2 text-industrial-steel">• Loading {loadingProgress}%</span>
               )}
             </p>
           </div>
@@ -452,17 +452,18 @@ const Classes = () => {
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <Button 
               onClick={handleRefresh}
-              variant="outline" 
+              variant="industrial-secondary"
               size="sm"
               disabled={isLoadingStats}
               className="flex items-center gap-2 flex-1 sm:flex-none h-9 sm:h-10"
             >
-              <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoadingStats ? 'animate-spin' : ''}`} />
+              <ArrowClockwise className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoadingStats ? 'animate-spin' : ''}`} />
               <span className="text-xs sm:text-sm">{isLoadingStats ? 'Memuat...' : 'Refresh'}</span>
             </Button>
             <Button 
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex-1 sm:flex-none h-9 sm:h-10"
+              variant="industrial-primary"
+              className="flex-1 sm:flex-none h-9 sm:h-10"
             >
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               <span className="text-xs sm:text-sm">Buat Kelas</span>
@@ -471,14 +472,15 @@ const Classes = () => {
         </div>
       </AnimatedContainer>
 
-      {/* Search and Filters */}
+      {/* Search and Filters - Industrial Minimalism */}
       <AnimatedContainer variant={slideInFromLeft} delay={0.1}>
-        <Card className="border-0 shadow-lg">
+        <Card variant="industrial">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4" />
                 <Input
+                  variant="industrial"
                   placeholder="Cari kelas, mata pelajaran, atau deskripsi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -486,7 +488,7 @@ const Classes = () => {
                 />
               </div>
               <div className="flex gap-2 self-start sm:self-center">
-                <Badge variant="outline" className="text-xs sm:text-sm whitespace-nowrap">
+                <Badge variant="industrial-secondary" className="text-xs sm:text-sm whitespace-nowrap">
                   {filteredClasses.length} Kelas
                 </Badge>
               </div>
@@ -504,17 +506,17 @@ const Classes = () => {
             return (
               <AnimatedContainer key={classItem.id} delay={index * 0.1}>
                 <motion.div
-                  whileHover={{ y: -5 }}
+                  whileHover={{ y: -2 }}
                   className="group"
                 >
-                  <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    {/* Card Header with Gradient */}
-                    <div className={`bg-gradient-to-r ${getRandomGradient()} p-4 sm:p-6 text-white relative`}>
+                  <Card variant="industrial" className="hover:shadow-[0_6px_12px_rgba(0,0,0,0.2)] transition-all duration-200 overflow-hidden">
+                    {/* Card Header - Industrial Minimalism */}
+                    <div className="bg-industrial-black border-b-2 border-industrial-black p-4 sm:p-6 text-industrial-white relative">
                       <div className="flex justify-between items-start">
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg sm:text-xl font-bold mb-2 truncate">{classItem.name}</h3>
+                          <h3 className="text-lg sm:text-xl font-bold mb-2 truncate text-industrial-white">{classItem.name}</h3>
                           {classItem.subject && (
-                            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-xs">
+                            <Badge variant="industrial-secondary" className="text-xs border-industrial-white bg-industrial-white text-industrial-black">
                               {classItem.subject}
                             </Badge>
                           )}
@@ -523,85 +525,85 @@ const Classes = () => {
                       
                       {/* Decorative elements */}
                       <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 opacity-10">
-                        <BookOpen className="w-full h-full" />
+                        <BookOpen className="w-full h-full text-industrial-white" />
                       </div>
                     </div>
 
                     <CardContent className="p-4 sm:p-6">
-                      <p className="text-gray-600 mb-4 line-clamp-2 text-sm sm:text-base">
+                      <p className="text-industrial-text-secondary mb-4 line-clamp-2 text-sm sm:text-base">
                         {classItem.description || 'Tidak ada deskripsi'}
                       </p>
 
-                      {/* Stats */}
+                      {/* Stats - Industrial Minimalism */}
                       <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
                         <div className="text-center">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                           </div>
-                          <div className="text-base sm:text-lg font-bold text-gray-900">
+                          <div className="text-base sm:text-lg font-bold text-industrial-black industrial-mono">
                             {!stats || isLoadingStats ? (
-                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-gray-200 rounded animate-pulse"></div>
+                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-industrial-light border-2 border-industrial-border animate-pulse"></div>
                             ) : (
                               stats.studentsCount
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">Siswa</div>
+                          <div className="text-xs text-industrial-text-secondary">Siswa</div>
                         </div>
                         <div className="text-center">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                            <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                            <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                           </div>
-                          <div className="text-base sm:text-lg font-bold text-gray-900">
+                          <div className="text-base sm:text-lg font-bold text-industrial-black industrial-mono">
                             {!stats || isLoadingStats ? (
-                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-gray-200 rounded animate-pulse"></div>
+                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-industrial-light border-2 border-industrial-border animate-pulse"></div>
                             ) : (
                               stats.assignmentsCount
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">Tugas</div>
+                          <div className="text-xs text-industrial-text-secondary">Tugas</div>
                         </div>
                         <div className="text-center">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                            <TrendUp className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                           </div>
-                          <div className="text-base sm:text-lg font-bold text-gray-900">
+                          <div className="text-base sm:text-lg font-bold text-industrial-black industrial-mono">
                             {!stats || isLoadingStats ? (
-                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-gray-200 rounded animate-pulse"></div>
+                              <div className="w-6 h-5 sm:w-8 sm:h-6 mx-auto bg-industrial-light border-2 border-industrial-border animate-pulse"></div>
                             ) : (
                               stats.averageGrade !== null ? stats.averageGrade.toFixed(1) : '-'
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">Rata-rata</div>
+                          <div className="text-xs text-industrial-text-secondary">Rata-rata</div>
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons - Industrial Minimalism */}
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="flex-1 h-8 sm:h-9 text-xs sm:text-sm">
+                        <Button variant="industrial-secondary" size="sm" className="flex-1 h-8 sm:h-9 text-xs sm:text-sm">
                           <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                           <span className="hidden sm:inline">Lihat</span>
                           <span className="sm:hidden">Detail</span>
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="industrial-secondary" 
                           size="sm"
                           onClick={() => handleEditClass(classItem)}
                           className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                         >
-                          <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="industrial-danger" 
                           size="sm" 
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                           onClick={() => handleDeleteClass(classItem)}
                         >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                       </div>
 
-                      {/* Created date */}
-                      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t flex items-center text-xs text-gray-500">
+                      {/* Created date - Industrial Minimalism */}
+                      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t-2 border-industrial-border flex items-center text-xs text-industrial-text-secondary">
                         <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
                         <span className="truncate">
                           Dibuat {new Date(classItem.createdAt).toLocaleDateString('id-ID', {
@@ -620,18 +622,18 @@ const Classes = () => {
         </div>
       </StaggeredList>
 
-      {/* Empty State */}
+      {/* Empty State - Industrial Minimalism */}
       {!isLoading && filteredClasses.length === 0 && (
         <AnimatedContainer variant={fadeInUp} delay={0.3}>
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="text-center py-8 sm:py-12 px-4 sm:px-6">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-industrial-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-industrial-black mb-2 industrial-h2">
                 {searchTerm ? 'Tidak ada kelas yang ditemukan' : 'Belum ada kelas'}
               </h3>
-              <p className="text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
+              <p className="text-industrial-text-secondary mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
                 {searchTerm 
                   ? 'Coba ubah kata kunci pencarian Anda'
                   : 'Mulai dengan membuat kelas pertama Anda untuk mengelola siswa dan pembelajaran'
@@ -640,7 +642,8 @@ const Classes = () => {
               {!searchTerm && (
                 <Button 
                   onClick={() => setShowCreateForm(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-10 sm:h-11 text-sm sm:text-base"
+                  variant="industrial-primary"
+                  className="h-10 sm:h-11 text-sm sm:text-base"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Buat Kelas Pertama
@@ -668,18 +671,19 @@ const Classes = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-md bg-white shadow-2xl mx-4">
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">Buat Kelas Baru</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
+              <Card variant="industrial" className="w-full max-w-md shadow-[0_8px_16px_rgba(0,0,0,0.3)] mx-4">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-lg sm:text-xl text-industrial-black industrial-h2">Buat Kelas Baru</CardTitle>
+                  <CardDescription className="text-sm sm:text-base text-industrial-text-secondary">
                     Isi informasi kelas yang akan Anda buat
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleCreateClass}>
                   <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Nama Kelas</label>
+                      <label className="text-sm font-semibold text-industrial-black">Nama Kelas</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: 9A, X-IPA-1"
                         value={newClass.name}
                         onChange={(e) => setNewClass(prev => ({ ...prev, name: e.target.value }))}
@@ -688,8 +692,9 @@ const Classes = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Mata Pelajaran</label>
+                      <label className="text-sm font-semibold text-industrial-black">Mata Pelajaran</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: Matematika, Fisika, Bahasa Indonesia"
                         value={newClass.subject}
                         onChange={(e) => setNewClass(prev => ({ ...prev, subject: e.target.value }))}
@@ -698,8 +703,9 @@ const Classes = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Deskripsi</label>
+                      <label className="text-sm font-semibold text-industrial-black">Deskripsi</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: Kelas pagi, Semester ganjil"
                         value={newClass.description}
                         onChange={(e) => setNewClass(prev => ({ ...prev, description: e.target.value }))}
@@ -707,10 +713,10 @@ const Classes = () => {
                       />
                     </div>
                   </CardContent>
-                  <div className="flex gap-3 p-4 sm:p-6 pt-0">
+                  <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="industrial-secondary"
                       className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                       onClick={() => setShowCreateForm(false)}
                       disabled={isCreating}
@@ -719,7 +725,8 @@ const Classes = () => {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-10 sm:h-11 text-sm sm:text-base"
+                      variant="industrial-primary"
+                      className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                       disabled={isCreating}
                     >
                       {isCreating ? (
@@ -756,18 +763,19 @@ const Classes = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-md bg-white shadow-2xl mx-4">
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">Edit Kelas</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
+              <Card variant="industrial" className="w-full max-w-md shadow-[0_8px_16px_rgba(0,0,0,0.3)] mx-4">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-lg sm:text-xl text-industrial-black industrial-h2">Edit Kelas</CardTitle>
+                  <CardDescription className="text-sm sm:text-base text-industrial-text-secondary">
                     Perbarui informasi kelas "{editingClass.name}"
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleUpdateClass}>
                   <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Nama Kelas</label>
+                      <label className="text-sm font-semibold text-industrial-black">Nama Kelas</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: 9A, X-IPA-1"
                         value={editForm.name}
                         onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
@@ -776,8 +784,9 @@ const Classes = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Mata Pelajaran</label>
+                      <label className="text-sm font-semibold text-industrial-black">Mata Pelajaran</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: Matematika, Fisika, Bahasa Indonesia"
                         value={editForm.subject}
                         onChange={(e) => setEditForm(prev => ({ ...prev, subject: e.target.value }))}
@@ -786,8 +795,9 @@ const Classes = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Deskripsi</label>
+                      <label className="text-sm font-semibold text-industrial-black">Deskripsi</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: Kelas pagi, Semester ganjil"
                         value={editForm.description}
                         onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
@@ -795,10 +805,10 @@ const Classes = () => {
                       />
                     </div>
                   </CardContent>
-                  <div className="flex gap-3 p-4 sm:p-6 pt-0">
+                  <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="industrial-secondary"
                       className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                       onClick={() => setShowEditForm(false)}
                       disabled={isUpdating}
@@ -807,7 +817,8 @@ const Classes = () => {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-10 sm:h-11 text-sm sm:text-base"
+                      variant="industrial-primary"
+                      className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                       disabled={isUpdating}
                     >
                       {isUpdating ? (
@@ -844,28 +855,28 @@ const Classes = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-md bg-white shadow-2xl mx-4">
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="flex items-center gap-2 text-red-600 text-lg sm:text-xl">
-                    <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Card variant="industrial" className="w-full max-w-md shadow-[0_8px_16px_rgba(0,0,0,0.3)] mx-4">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-red">
+                  <CardTitle className="flex items-center gap-2 text-industrial-red text-lg sm:text-xl industrial-h2">
+                    <Warning className="w-4 h-4 sm:w-5 sm:h-5" />
                     Konfirmasi Hapus
                   </CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
+                  <CardDescription className="text-sm sm:text-base text-industrial-text-secondary">
                     Tindakan ini tidak dapat dibatalkan
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 pt-0">
-                  <p className="text-gray-700 text-sm sm:text-base">
+                  <p className="text-industrial-black text-sm sm:text-base">
                     Apakah Anda yakin ingin menghapus kelas <strong>"{deletingClass.name}"</strong>?
                   </p>
-                  <p className="text-xs sm:text-sm text-gray-500 mt-2">
+                  <p className="text-xs sm:text-sm text-industrial-text-secondary mt-2">
                     Semua data yang terkait dengan kelas ini akan ikut terhapus.
                   </p>
                 </CardContent>
-                <div className="flex gap-3 p-4 sm:p-6 pt-0">
+                <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="industrial-secondary"
                     className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={isDeleting}
@@ -874,7 +885,7 @@ const Classes = () => {
                   </Button>
                   <Button
                     type="button"
-                    variant="destructive"
+                    variant="industrial-danger"
                     className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                     onClick={confirmDeleteClass}
                     disabled={isDeleting}
@@ -886,7 +897,7 @@ const Classes = () => {
                       </div>
                     ) : (
                       <>
-                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                        <Trash className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                         Hapus Kelas
                       </>
                     )}

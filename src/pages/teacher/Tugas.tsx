@@ -11,29 +11,29 @@ import {
   Calendar,
   Clock,
   CheckCircle,
-  AlertCircle,
+  WarningCircle,
   XCircle,
   Eye,
-  Edit,
-  Trash2,
+  Pencil,
+  Trash,
   Plus,
-  Search,
-  Filter,
+  MagnifyingGlass,
+  Funnel,
   FileText,
-  TrendingUp,
-  TrendingDown,
+  TrendUp,
+  TrendDown,
   Target,
-  AlertTriangle,
-  Loader2,
-  RefreshCw,
+  Warning,
+  Spinner,
+  ArrowClockwise,
   X,
-  Save,
+  FloppyDisk,
   Activity,
-  Zap,
-  Award,
+  Lightning,
+  Trophy,
   GraduationCap,
   Copy
-} from 'lucide-react';
+} from 'phosphor-react';
 import { assignmentApi, classApi } from '@/lib/api';
 
 interface Assignment {
@@ -588,14 +588,14 @@ const TugasPage = () => {
           <CardContent className="p-4 sm:p-6">
             <div className="space-y-3 sm:space-y-4">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="flex items-center space-x-3 sm:space-x-4 animate-pulse">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-lg flex-shrink-0"></div>
+                <div key={index} className="flex items-center space-x-3 sm:space-x-4 border-2 border-industrial-black bg-industrial-white p-3 sm:p-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-industrial-light border-2 border-industrial-black flex-shrink-0"></div>
                   <div className="flex-1 space-y-2 min-w-0">
-                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-3 sm:h-4 bg-industrial-light w-3/4"></div>
+                    <div className="h-2 sm:h-3 bg-industrial-light w-1/2"></div>
                   </div>
-                  <div className="h-6 sm:h-8 bg-gray-200 rounded w-16 sm:w-20 flex-shrink-0"></div>
-                  <div className="h-6 sm:h-8 bg-gray-200 rounded w-20 sm:w-24 flex-shrink-0"></div>
+                  <div className="h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black w-16 sm:w-20 flex-shrink-0"></div>
+                  <div className="h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black w-20 sm:w-24 flex-shrink-0"></div>
                 </div>
               ))}
             </div>
@@ -606,8 +606,8 @@ const TugasPage = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-gray-50/50 min-h-screen">
-      {/* Notification */}
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 min-h-screen">
+      {/* Notification - Industrial Minimalism */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -616,20 +616,20 @@ const TugasPage = () => {
             exit={{ opacity: 0, y: -50 }}
             className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 max-w-md"
           >
-            <div className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg shadow-lg ${
+            <div className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 border-2 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${
               notification.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
+                ? 'bg-industrial-white text-industrial-black border-industrial-black' 
+                : 'bg-industrial-white text-industrial-red border-industrial-red'
             }`}>
               {notification.type === 'success' ? (
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-industrial-black" />
               ) : (
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <Warning className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-industrial-red" />
               )}
-              <span className="font-medium text-xs sm:text-sm flex-1">{notification.message}</span>
+              <span className="font-semibold text-xs sm:text-sm flex-1">{notification.message}</span>
               <button
                 onClick={() => setNotification(null)}
-                className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="ml-2 text-industrial-text-secondary hover:text-industrial-black transition-colors"
               >
                 <X className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
@@ -638,14 +638,14 @@ const TugasPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Header */}
+      {/* Header - Industrial Minimalism */}
       <AnimatedContainer variant={fadeInUp}>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1">
               Tugas
             </h1>
-            <p className="text-gray-600 mt-2 text-sm sm:text-base">Kelola semua tugas dan aktivitas pembelajaran siswa</p>
+            <p className="text-industrial-text-secondary mt-2 text-sm sm:text-base industrial-body">Kelola semua tugas dan aktivitas pembelajaran siswa</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {selectedAssignments.length > 0 && (
@@ -654,33 +654,34 @@ const TugasPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex items-center gap-2 order-3 sm:order-1"
               >
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 text-xs sm:text-sm">
+                <Badge variant="industrial-secondary" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">
                   {selectedAssignments.length} dipilih
                 </Badge>
                 <Button 
-                  variant="destructive" 
+                  variant="industrial-danger" 
                   size="sm"
                   onClick={() => setShowBulkActions(true)}
-                  className="bg-red-500 hover:bg-red-600 text-xs sm:text-sm h-8 sm:h-9"
+                  className="text-xs sm:text-sm h-8 sm:h-9"
                 >
-                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <Trash className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Hapus
                 </Button>
               </motion.div>
             )}
             <Button 
-              variant="outline" 
+              variant="industrial-secondary" 
               size="sm"
               onClick={handleRefreshData}
               disabled={isLoading}
-              className="border-gray-200 hover:bg-gray-50 order-2 h-8 sm:h-9 text-xs sm:text-sm"
+              className="order-2 h-8 sm:h-9 text-xs sm:text-sm"
             >
-              <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              <ArrowClockwise className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             <Button 
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg order-1 sm:order-3 h-8 sm:h-9 text-xs sm:text-sm"
+              variant="industrial-primary"
+              className="order-1 sm:order-3 h-8 sm:h-9 text-xs sm:text-sm"
             >
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               <span className="hidden sm:inline">Buat Tugas Baru</span>
@@ -690,25 +691,26 @@ const TugasPage = () => {
         </div>
       </AnimatedContainer>
 
-      {/* Enhanced Filters */}
+      {/* Enhanced Filters - Industrial Minimalism */}
       <AnimatedContainer variant={slideInFromLeft} delay={0.1}>
-        <Card className="border-0 shadow-lg">
+        <Card variant="industrial">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
+                <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-3 h-3 sm:w-4 sm:h-4" />
                 <Input
+                  variant="industrial"
                   placeholder="Cari tugas berdasarkan judul atau deskripsi..."
-                  className="pl-8 sm:pl-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500 h-9 sm:h-10 text-xs sm:text-sm"
+                  className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm"
                   value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                 />
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                 <div className="flex items-center gap-2">
-                  <Filter className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                  <Funnel className="w-3 h-3 sm:w-4 sm:h-4 text-industrial-text-muted flex-shrink-0" />
                   <select
-                    className="flex h-9 sm:h-10 rounded-md border border-gray-200 bg-background px-2 sm:px-3 py-2 text-xs sm:text-sm focus:border-blue-500 focus:ring-blue-500 min-w-0 flex-1"
+                    className="flex h-9 sm:h-10 border-2 border-industrial-black bg-industrial-white px-2 sm:px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel min-w-0 flex-1"
                     value={selectedClassId}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedClassId(e.target.value)}
                   >
@@ -719,9 +721,9 @@ const TugasPage = () => {
                   </select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                  <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-industrial-text-muted flex-shrink-0" />
                   <select
-                    className="flex h-9 sm:h-10 rounded-md border border-gray-200 bg-background px-2 sm:px-3 py-2 text-xs sm:text-sm focus:border-blue-500 focus:ring-blue-500 min-w-0 flex-1"
+                    className="flex h-9 sm:h-10 border-2 border-industrial-black bg-industrial-white px-2 sm:px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel min-w-0 flex-1"
                     value={sortBy}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value as any)}
                   >
@@ -732,15 +734,15 @@ const TugasPage = () => {
                   </select>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="industrial-secondary"
                   size="sm"
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="border-gray-200 hover:bg-gray-50 h-9 px-2 sm:px-3"
+                  className="h-9 px-2 sm:px-3"
                 >
                   {sortOrder === 'asc' ? (
-                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <TrendUp className="w-3 h-3 sm:w-4 sm:h-4" />
                   ) : (
-                    <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <TrendDown className="w-3 h-3 sm:w-4 sm:h-4" />
                   )}
                 </Button>
               </div>
@@ -752,13 +754,13 @@ const TugasPage = () => {
                     type="checkbox"
                     checked={selectedAssignments.length === filteredAssignments.length}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="border-2 border-industrial-black text-industrial-steel focus:ring-industrial-steel"
                   />
-                  <span className="text-xs sm:text-sm text-gray-600">
+                  <span className="text-xs sm:text-sm text-industrial-text-secondary">
                     Pilih semua ({filteredAssignments.length} tugas)
                   </span>
                 </div>
-                <span className="text-xs sm:text-sm text-gray-500">
+                <span className="text-xs sm:text-sm text-industrial-text-muted">
                   Menampilkan {filteredAssignments.length} dari {assignments.length} tugas
                 </span>
               </div>
@@ -767,88 +769,88 @@ const TugasPage = () => {
         </Card>
       </AnimatedContainer>
 
-      {/* Enhanced Statistics Cards */}
+      {/* Enhanced Statistics Cards - Industrial Minimalism */}
       <AnimatedContainer variant={slideInFromLeft} delay={0.2}>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Total Tugas</p>
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600 truncate">{getEnhancedStats().total}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Total Tugas</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{getEnhancedStats().total}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Tugas Aktif</p>
-                  <p className="text-xl sm:text-2xl font-bold text-green-600 truncate">{getEnhancedStats().active}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Tugas Aktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{getEnhancedStats().active}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Lewat Deadline</p>
-                  <p className="text-xl sm:text-2xl font-bold text-red-600 truncate">{getEnhancedStats().overdue}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Lewat Deadline</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-red industrial-mono truncate">{getEnhancedStats().overdue}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-red border-2 border-industrial-red flex items-center justify-center flex-shrink-0 ml-2">
+                  <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Selesai</p>
-                  <p className="text-xl sm:text-2xl font-bold text-purple-600 truncate">{getEnhancedStats().completed}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Selesai</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{getEnhancedStats().completed}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Minggu Ini</p>
-                  <p className="text-xl sm:text-2xl font-bold text-orange-600 truncate">{getEnhancedStats().thisWeek}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Minggu Ini</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{getEnhancedStats().thisWeek}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <Lightning className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card variant="industrial">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Rata-rata Poin</p>
-                  <p className="text-xl sm:text-2xl font-bold text-indigo-600 truncate">{getEnhancedStats().averagePoints}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Rata-rata Poin</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{getEnhancedStats().averagePoints}</p>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
-                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-white" />
                 </div>
               </div>
             </CardContent>
@@ -856,21 +858,21 @@ const TugasPage = () => {
         </div>
       </AnimatedContainer>
 
-      {/* Assignments List */}
+      {/* Assignments List - Industrial Minimalism */}
       <AnimatedContainer variant={fadeInUp} delay={0.3}>
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="border-b border-gray-100 p-4 sm:p-6">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+        <Card variant="industrial">
+          <CardHeader className="border-b-2 border-industrial-black p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
               Daftar Tugas
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
               Menampilkan {filteredAssignments.length} dari {assignments.length} tugas
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {filteredAssignments.length > 0 ? (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-industrial-border">
                 <AnimatePresence>
                   {filteredAssignments.map((assignment, index) => (
                     <motion.div
@@ -879,7 +881,7 @@ const TugasPage = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-4 sm:p-6 hover:bg-gray-50 transition-colors"
+                      className="p-4 sm:p-6 hover:bg-industrial-light transition-colors border-b border-industrial-border"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
@@ -888,18 +890,18 @@ const TugasPage = () => {
                               type="checkbox"
                               checked={selectedAssignments.includes(assignment.id)}
                               onChange={() => handleSelectAssignment(assignment.id)}
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="border-2 border-industrial-black text-industrial-steel focus:ring-industrial-steel"
                             />
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center text-industrial-white font-bold text-sm sm:text-base">
                               {assignment.title.charAt(0).toUpperCase()}
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-2 gap-2">
-                              <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{assignment.title}</h3>
+                              <h3 className="font-semibold text-industrial-black text-sm sm:text-base truncate">{assignment.title}</h3>
                               <Badge 
-                                variant="outline" 
-                                className={`${getStatusClass(assignment.status || 'active')} font-medium text-xs flex-shrink-0`}
+                                variant={assignment.status === 'completed' ? 'industrial-primary' : assignment.status === 'overdue' ? 'industrial-danger' : 'industrial-secondary'}
+                                className="font-semibold text-xs flex-shrink-0"
                               >
                                 <div className="flex items-center gap-1">
                                   {getStatusIcon(assignment.status || 'active')}
@@ -907,8 +909,8 @@ const TugasPage = () => {
                                 </div>
                               </Badge>
                             </div>
-                            <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">{assignment.description}</p>
-                            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500">
+                            <p className="text-xs sm:text-sm text-industrial-text-secondary mb-3 line-clamp-2">{assignment.description}</p>
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-industrial-text-secondary">
                               <div className="flex items-center gap-1">
                                 <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                 <span className="truncate">{assignment.className}</span>
@@ -932,51 +934,51 @@ const TugasPage = () => {
                         </div>
                         <div className="flex flex-col sm:flex-row items-center gap-1 ml-2 sm:ml-4 flex-shrink-0">
                           <Button
-                            variant="ghost"
+                            variant="industrial-secondary"
                             size="sm"
                             onClick={() => handleViewAssignment(assignment)}
-                            className="hover:bg-blue-50 hover:text-blue-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                             title="Lihat Detail"
                           >
                             <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                           {assignment.status !== 'completed' && (
-                            <Button
-                              variant="ghost"
+                          <Button
+                              variant="industrial-secondary"
                               size="sm"
                               onClick={() => handleCompleteAssignment(assignment)}
-                              className="hover:bg-green-50 hover:text-green-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                              className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                               title="Tandai Selesai"
                             >
                               <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           )}
                           <Button
-                            variant="ghost"
+                            variant="industrial-secondary"
                             size="sm"
                             onClick={() => handleDuplicateAssignment(assignment)}
-                            className="hover:bg-purple-50 hover:text-purple-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                             title="Duplikasi Tugas"
                           >
                             <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="industrial-secondary"
                             size="sm"
                             onClick={() => handleEditAssignment(assignment)}
-                            className="hover:bg-amber-50 hover:text-amber-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                             title="Edit Tugas"
                           >
-                            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="industrial-danger"
                             size="sm"
                             onClick={() => handleDeleteAssignment(assignment)}
-                            className="hover:bg-red-50 hover:text-red-600 w-8 h-8 sm:w-9 sm:h-9 p-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 p-0"
                             title="Hapus Tugas"
                           >
-                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                         </div>
                       </div>
@@ -986,9 +988,9 @@ const TugasPage = () => {
               </div>
             ) : (
               <div className="text-center py-8 sm:py-12 px-4">
-                <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Belum ada tugas</h3>
-                <p className="text-gray-500 mb-4 text-xs sm:text-sm">
+                <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-industrial-border mx-auto mb-4" />
+                <h3 className="font-semibold text-industrial-black mb-2 text-sm sm:text-base industrial-h2">Belum ada tugas</h3>
+                <p className="text-industrial-text-secondary mb-4 text-xs sm:text-sm">
                   {searchTerm || selectedClassId !== 'all' 
                     ? 'Tidak ada tugas yang sesuai dengan filter Anda'
                     : 'Mulai dengan membuat tugas pertama untuk siswa Anda'
@@ -997,7 +999,8 @@ const TugasPage = () => {
                 {!searchTerm && selectedClassId === 'all' && (
                   <Button 
                     onClick={() => setShowCreateForm(true)}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-xs sm:text-sm h-8 sm:h-9"
+                    variant="industrial-primary"
+                    className="text-xs sm:text-sm h-8 sm:h-9"
                   >
                     <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     Buat Tugas Pertama
@@ -1026,18 +1029,19 @@ const TugasPage = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto mx-4">
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-base sm:text-lg">Buat Tugas Baru</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
+              <Card variant="industrial" className="w-full max-w-2xl shadow-[0_8px_16px_rgba(0,0,0,0.3)] max-h-[90vh] overflow-y-auto mx-4">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Buat Tugas Baru</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Isi informasi tugas yang akan diberikan kepada siswa
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleCreateAssignment}>
                   <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
                     <div className="space-y-2">
-                      <label className="text-xs sm:text-sm font-medium">Judul Tugas</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Judul Tugas</label>
                       <Input
+                        variant="industrial"
                         placeholder="Contoh: Tugas Matematika - Persamaan Kuadrat"
                         value={newAssignment.title}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewAssignment(prev => ({ ...prev, title: e.target.value }))}
@@ -1046,21 +1050,21 @@ const TugasPage = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs sm:text-sm font-medium">Deskripsi</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Deskripsi</label>
                       <textarea
                         placeholder="Jelaskan detail tugas, instruksi, dan kriteria penilaian..."
                         value={newAssignment.description}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewAssignment(prev => ({ ...prev, description: e.target.value }))}
                         rows={4}
-                        className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                        className="flex w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm placeholder:text-industrial-text-muted focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                         required
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs sm:text-sm font-medium">Kelas</label>
+                        <label className="text-xs sm:text-sm font-semibold text-industrial-black">Kelas</label>
                         <select
-                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background focus:border-blue-500 focus:ring-blue-500"
+                          className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                           value={newAssignment.classId}
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setNewAssignment(prev => ({ ...prev, classId: e.target.value }))}
                           required
@@ -1072,18 +1076,18 @@ const TugasPage = () => {
                         </select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs sm:text-sm font-medium">Batas Waktu</label>
+                        <label className="text-xs sm:text-sm font-semibold text-industrial-black">Batas Waktu</label>
                         <input
                           type="datetime-local"
                           value={newAssignment.dueDate}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewAssignment(prev => ({ ...prev, dueDate: e.target.value }))}
-                          className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background focus:border-blue-500 focus:ring-blue-500"
+                          className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                           required
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs sm:text-sm font-medium">Nilai Maksimal</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Nilai Maksimal</label>
                       <input
                         type="number"
                         min="1"
@@ -1091,15 +1095,15 @@ const TugasPage = () => {
                         placeholder="100"
                         value={newAssignment.maxPoints}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewAssignment(prev => ({ ...prev, maxPoints: parseInt(e.target.value) || 100 }))}
-                        className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm ring-offset-background focus:border-blue-500 focus:ring-blue-500"
+                        className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                         required
                       />
                     </div>
                   </CardContent>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 pt-0">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="industrial-secondary"
                       className="flex-1 h-9 sm:h-10 text-xs sm:text-sm order-2 sm:order-1"
                       onClick={() => setShowCreateForm(false)}
                       disabled={isCreating}
@@ -1108,7 +1112,8 @@ const TugasPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-9 sm:h-10 text-xs sm:text-sm order-1 sm:order-2"
+                      variant="industrial-primary"
+                      className="flex-1 h-9 sm:h-10 text-xs sm:text-sm order-1 sm:order-2"
                       disabled={isCreating}
                     >
                       {isCreating ? (
@@ -1145,37 +1150,40 @@ const TugasPage = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
-                <CardHeader>
-                  <CardTitle>Edit Tugas</CardTitle>
-                  <CardDescription>
+              <Card variant="industrial" className="w-full max-w-2xl shadow-[0_8px_16px_rgba(0,0,0,0.3)] max-h-[90vh] overflow-y-auto">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Edit Tugas</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Perbarui informasi tugas "{editingAssignment.title}"
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleUpdateAssignment}>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Judul Tugas</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Judul Tugas</label>
                       <Input
+                        variant="industrial"
                         value={editForm.title}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                        className="h-9 sm:h-10 text-xs sm:text-sm"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Deskripsi</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Deskripsi</label>
                       <textarea
                         value={editForm.description}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                         rows={4}
+                        className="flex w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm placeholder:text-industrial-text-muted focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Kelas</label>
+                        <label className="text-xs sm:text-sm font-semibold text-industrial-black">Kelas</label>
                         <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs sm:text-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel"
                           value={editForm.classId}
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setEditForm(prev => ({ ...prev, classId: e.target.value }))}
                           required
@@ -1187,32 +1195,34 @@ const TugasPage = () => {
                         </select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Batas Waktu</label>
+                        <label className="text-xs sm:text-sm font-semibold text-industrial-black">Batas Waktu</label>
                         <input
                           type="datetime-local"
                           value={editForm.dueDate}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, dueDate: e.target.value }))}
+                          className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                           required
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Nilai Maksimal</label>
+                      <label className="text-xs sm:text-sm font-semibold text-industrial-black">Nilai Maksimal</label>
                       <input
                         type="number"
                         min="1"
                         max="1000"
                         value={editForm.maxPoints}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, maxPoints: parseInt(e.target.value) || 100 }))}
+                        className="flex h-9 sm:h-10 w-full border-2 border-industrial-black bg-industrial-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-industrial-steel focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                         required
                       />
                     </div>
                   </CardContent>
-                  <div className="flex gap-3 p-6 pt-0">
+                  <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                     <Button
                       type="button"
-                      variant="outline"
-                      className="flex-1"
+                      variant="industrial-secondary"
+                      className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                       onClick={() => setShowEditForm(false)}
                       disabled={isUpdating}
                     >
@@ -1220,7 +1230,8 @@ const TugasPage = () => {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                      variant="industrial-primary"
+                      className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                       disabled={isUpdating}
                     >
                       {isUpdating ? (
@@ -1257,25 +1268,25 @@ const TugasPage = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-md bg-white shadow-2xl mx-4">
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="flex items-center gap-2 text-red-600 text-base sm:text-lg">
-                    <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Card variant="industrial" className="w-full max-w-md shadow-[0_8px_16px_rgba(0,0,0,0.3)] mx-4">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-red">
+                  <CardTitle className="flex items-center gap-2 text-industrial-red text-base sm:text-lg industrial-h2">
+                    <Warning className="w-4 h-4 sm:w-5 sm:h-5" />
                     Konfirmasi Hapus
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Tindakan ini tidak dapat dibatalkan
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 pt-0">
-                  <p className="text-gray-600 text-xs sm:text-sm">
+                  <p className="text-industrial-black text-xs sm:text-sm">
                     Apakah Anda yakin ingin menghapus tugas "{deletingAssignment.title}"? 
                     Semua data terkait termasuk pengumpulan dan nilai akan ikut terhapus.
                   </p>
                 </CardContent>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 pt-0">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                   <Button
-                    variant="outline"
+                    variant="industrial-secondary"
                     className="flex-1 h-9 sm:h-10 text-xs sm:text-sm order-2 sm:order-1"
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={isDeleting}
@@ -1283,7 +1294,7 @@ const TugasPage = () => {
                     Batal
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="industrial-danger"
                     className="flex-1 h-9 sm:h-10 text-xs sm:text-sm order-1 sm:order-2"
                     onClick={confirmDeleteAssignment}
                     disabled={isDeleting}
@@ -1304,7 +1315,7 @@ const TugasPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Detail Modal */}
+      {/* Detail Modal - Industrial Minimalism */}
       <AnimatePresence>
         {showDetailModal && selectedAssignment && (
           <>
@@ -1312,7 +1323,7 @@ const TugasPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40"
+              className="fixed inset-0 bg-industrial-black/80 z-40"
               onClick={() => setShowDetailModal(false)}
             />
             <motion.div
@@ -1321,45 +1332,45 @@ const TugasPage = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
+              <Card variant="industrial" className="w-full max-w-2xl shadow-[0_8px_16px_rgba(0,0,0,0.3)] max-h-[90vh] overflow-y-auto">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="flex items-center gap-2 text-industrial-black industrial-h2">
+                    <FileText className="w-5 h-5 text-industrial-black" />
                     Detail Tugas
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Informasi lengkap tugas "{selectedAssignment.title}"
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold mb-2">Judul</h3>
-                    <p className="text-gray-600">{selectedAssignment.title}</p>
+                <CardContent className="space-y-6 p-4 sm:p-6">
+                  <div className="border-b-2 border-industrial-border pb-4">
+                    <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Judul</h3>
+                    <p className="text-industrial-text-secondary">{selectedAssignment.title}</p>
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">Deskripsi</h3>
-                    <p className="text-gray-600 whitespace-pre-wrap">{selectedAssignment.description}</p>
+                  <div className="border-b-2 border-industrial-border pb-4">
+                    <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Deskripsi</h3>
+                    <p className="text-industrial-text-secondary whitespace-pre-wrap">{selectedAssignment.description}</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b-2 border-industrial-border pb-4">
+                    <div>
+                      <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Kelas</h3>
+                      <p className="text-industrial-text-secondary">{selectedAssignment.className}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Batas Waktu</h3>
+                      <p className="text-industrial-text-secondary">{formatDate(selectedAssignment.dueDate)}</p>
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h3 className="font-semibold mb-2">Kelas</h3>
-                      <p className="text-gray-600">{selectedAssignment.className}</p>
+                      <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Nilai Maksimal</h3>
+                      <p className="text-industrial-text-secondary industrial-mono">{selectedAssignment.maxPoints} poin</p>
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-2">Batas Waktu</h3>
-                      <p className="text-gray-600">{formatDate(selectedAssignment.dueDate)}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-semibold mb-2">Nilai Maksimal</h3>
-                      <p className="text-gray-600">{selectedAssignment.maxPoints} poin</p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-2">Status</h3>
+                      <h3 className="font-semibold mb-2 text-industrial-black text-sm sm:text-base">Status</h3>
                       <Badge 
-                        variant="outline" 
-                        className={`${getStatusClass(selectedAssignment.status || 'active')} font-medium`}
+                        variant={selectedAssignment.status === 'completed' ? 'industrial-primary' : selectedAssignment.status === 'overdue' ? 'industrial-danger' : 'industrial-secondary'}
+                        className="font-semibold"
                       >
                         <div className="flex items-center gap-1">
                           {getStatusIcon(selectedAssignment.status || 'active')}
@@ -1369,22 +1380,23 @@ const TugasPage = () => {
                     </div>
                   </div>
                 </CardContent>
-                <div className="flex gap-3 p-6 pt-0">
+                <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="industrial-secondary"
+                    className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                     onClick={() => setShowDetailModal(false)}
                   >
                     Tutup
                   </Button>
                   <Button
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    variant="industrial-primary"
+                    className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                     onClick={() => {
                       setShowDetailModal(false);
                       handleEditAssignment(selectedAssignment);
                     }}
                   >
-                    <Edit className="w-4 h-4 mr-2" />
+                    <Pencil className="w-4 h-4 mr-2" />
                     Edit Tugas
                   </Button>
                 </div>
@@ -1394,7 +1406,7 @@ const TugasPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Bulk Actions Confirmation Modal */}
+      {/* Bulk Actions Confirmation Modal - Industrial Minimalism */}
       <AnimatePresence>
         {showBulkActions && (
           <>
@@ -1402,7 +1414,7 @@ const TugasPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40"
+              className="fixed inset-0 bg-industrial-black/80 z-40"
               onClick={() => !isDeleting && setShowBulkActions(false)}
             />
             <motion.div
@@ -1411,34 +1423,34 @@ const TugasPage = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <Card className="w-full max-w-md bg-white shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-600">
-                    <AlertTriangle className="w-5 h-5" />
+              <Card variant="industrial" className="w-full max-w-md shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-red">
+                  <CardTitle className="flex items-center gap-2 text-industrial-red text-base sm:text-lg industrial-h2">
+                    <Warning className="w-5 h-5" />
                     Konfirmasi Hapus
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                     Tindakan ini tidak dapat dibatalkan
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <p className="text-industrial-black text-xs sm:text-sm">
                     Apakah Anda yakin ingin menghapus {selectedAssignments.length > 1 ? 'tugas ini' : 'tugas terpilih'}? 
                     Semua data terkait termasuk pengumpulan dan nilai akan ikut terhapus.
                   </p>
                 </CardContent>
-                <div className="flex gap-3 p-6 pt-0">
+                <div className="flex gap-3 p-4 sm:p-6 pt-0 border-t-2 border-industrial-black">
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="industrial-secondary"
+                    className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                     onClick={() => setShowBulkActions(false)}
                     disabled={isDeleting}
                   >
                     Batal
                   </Button>
                   <Button
-                    variant="destructive"
-                    className="flex-1"
+                    variant="industrial-danger"
+                    className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
                     onClick={handleBulkDelete}
                     disabled={isDeleting}
                   >

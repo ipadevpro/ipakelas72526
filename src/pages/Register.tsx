@@ -11,11 +11,11 @@ import {
   User,
   Lock,
   Eye,
-  EyeOff,
+  EyeSlash,
   ArrowRight,
   UserPlus,
   Shield
-} from 'lucide-react';
+} from 'phosphor-react';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -104,45 +104,46 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-industrial-white flex items-center justify-center p-4">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
         className="w-full max-w-md relative"
       >
-        {/* Header */}
+        {/* Header - Neo-Brutalism */}
         <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-8">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-industrial-green border-2 border-industrial-black flex items-center justify-center mx-auto mb-4 shadow-brutal">
+            <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-industrial-black" weight="bold" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Daftar Akun</h1>
-          <p className="text-sm sm:text-base text-gray-600">Bergabung dengan platform pembelajaran modern</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1 mb-2">Daftar Akun</h1>
+          <p className="text-sm sm:text-base text-industrial-text-secondary">Bergabung dengan platform pembelajaran modern</p>
         </motion.div>
 
-        {/* Register Card */}
+        {/* Register Card - Neo-Brutalism */}
         <motion.div variants={itemVariants}>
-          <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-xl">
-            <CardHeader className="pb-4 sm:pb-6">
-              <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+          <Card variant="industrial" className="w-full max-w-md mx-auto">
+            <CardHeader className="pb-4 sm:pb-6 border-b-2 border-industrial-black">
+              <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3 text-industrial-black industrial-h2">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-green" weight="bold" />
                 <span>Buat Akun Baru</span>
               </CardTitle>
-              <CardDescription className="text-sm sm:text-base">
+              <CardDescription className="text-sm sm:text-base text-industrial-text-secondary">
                 Isi data diri Anda untuk membuat akun baru di Kelas Guru
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4 sm:space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-                {/* Full Name Field */}
+                {/* Full Name Field - Neo-Brutalism */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-semibold text-industrial-black">
                     Nama Lengkap
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     <Input
+                      variant="industrial"
                       id="fullName"
                       name="fullName"
                       type="text"
@@ -156,47 +157,50 @@ const Register = () => {
                   </div>
                 </div>
 
-                {/* Role Selection */}
+                {/* Role Selection - Neo-Brutalism */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-semibold text-industrial-black">
                     Daftar Sebagai
                   </label>
-                  <div className="flex bg-gray-100 rounded-xl p-1">
-                    <button
-                      type="button"
-                      className={`flex-1 py-3 px-3 sm:px-4 flex items-center justify-center gap-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${
-                        form.role === 'student' 
-                          ? 'bg-white text-green-600 shadow-sm font-medium' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                      onClick={() => setForm(prev => ({ ...prev, role: 'student' }))}
-                    >
-                      <GraduationCap size={18} className="sm:w-5 sm:h-5" />
-                      <span>Siswa</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={`flex-1 py-3 px-3 sm:px-4 flex items-center justify-center gap-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${
-                        form.role === 'teacher' 
-                          ? 'bg-white text-green-600 shadow-sm font-medium' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                      onClick={() => setForm(prev => ({ ...prev, role: 'teacher' }))}
-                    >
-                      <BookOpen size={18} className="sm:w-5 sm:h-5" />
-                      <span>Guru</span>
-                    </button>
-                  </div>
+                  <Card variant="industrial" className="p-1">
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        className={`flex-1 py-3 px-3 sm:px-4 flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base font-semibold ${
+                          form.role === 'student' 
+                            ? 'bg-industrial-green text-industrial-black shadow-brutal-sm' 
+                            : 'bg-industrial-white text-industrial-black border-2 border-industrial-black hover:bg-industrial-light'
+                        }`}
+                        onClick={() => setForm(prev => ({ ...prev, role: 'student' }))}
+                      >
+                        <GraduationCap size={18} className="sm:w-5 sm:h-5" weight="bold" />
+                        <span>Siswa</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`flex-1 py-3 px-3 sm:px-4 flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base font-semibold ${
+                          form.role === 'teacher' 
+                            ? 'bg-industrial-green text-industrial-black shadow-brutal-sm' 
+                            : 'bg-industrial-white text-industrial-black border-2 border-industrial-black hover:bg-industrial-light'
+                        }`}
+                        onClick={() => setForm(prev => ({ ...prev, role: 'teacher' }))}
+                      >
+                        <BookOpen size={18} className="sm:w-5 sm:h-5" weight="bold" />
+                        <span>Guru</span>
+                      </button>
+                    </div>
+                  </Card>
                 </div>
 
-                {/* Username Field */}
+                {/* Username Field - Neo-Brutalism */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-semibold text-industrial-black">
                     Username
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     <Input
+                      variant="industrial"
                       id="username"
                       name="username"
                       type="text"
@@ -211,14 +215,15 @@ const Register = () => {
                   </div>
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - Neo-Brutalism */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-semibold text-industrial-black">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     <Input
+                      variant="industrial"
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
@@ -233,26 +238,27 @@ const Register = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted hover:text-industrial-black transition-colors"
                       disabled={loading}
                     >
                       {showPassword ? (
-                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <EyeSlash className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                       ) : (
-                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                       )}
                     </button>
                   </div>
                 </div>
 
-                {/* Confirm Password Field */}
+                {/* Confirm Password Field - Neo-Brutalism */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-semibold text-industrial-black">
                     Konfirmasi Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     <Input
+                      variant="industrial"
                       id="confirmPassword"
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
@@ -267,36 +273,37 @@ const Register = () => {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted hover:text-industrial-black transition-colors"
                       disabled={loading}
                     >
                       {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <EyeSlash className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                       ) : (
-                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                       )}
                     </button>
                   </div>
                 </div>
 
-                {/* Error Message */}
+                {/* Error Message - Neo-Brutalism */}
                 <AnimatePresence>
                   {error && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+                      className="bg-industrial-white border-2 border-industrial-red text-industrial-red px-4 py-3 text-sm font-semibold shadow-brutal-sm"
                     >
                       {error}
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Register Button */}
+                {/* Register Button - Neo-Brutalism */}
                 <Button
                   type="submit"
-                  className="w-full h-11 sm:h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium text-sm sm:text-base"
+                  variant="industrial-primary"
+                  className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold"
                   disabled={loading || !form.fullName || !form.username || !form.password || !form.confirmPassword}
                 >
                   {loading ? (
@@ -307,20 +314,20 @@ const Register = () => {
                   ) : (
                     <div className="flex items-center gap-2">
                       <span>Daftar Sekarang</span>
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" weight="bold" />
                     </div>
                   )}
                 </Button>
               </form>
 
-              {/* Login Link */}
-              <div className="pt-4 border-t border-gray-200">
+              {/* Login Link - Neo-Brutalism */}
+              <div className="pt-4 border-t-2 border-industrial-black">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-industrial-text-secondary">
                     Sudah punya akun?{' '}
                     <Link 
                       to="/login" 
-                      className="text-green-600 font-medium hover:text-green-700 hover:underline transition-colors"
+                      className="text-industrial-green font-semibold hover:text-industrial-black transition-colors"
                     >
                       Masuk disini
                     </Link>
@@ -328,15 +335,15 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Terms notice */}
+              {/* Terms notice - Neo-Brutalism */}
               <div className="text-center">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-industrial-text-secondary">
                   Dengan mendaftar, Anda menyetujui{' '}
-                  <span className="text-green-600 hover:underline cursor-pointer">
+                  <span className="text-industrial-green hover:text-industrial-black cursor-pointer font-semibold">
                     Syarat & Ketentuan
                   </span>{' '}
                   dan{' '}
-                  <span className="text-green-600 hover:underline cursor-pointer">
+                  <span className="text-industrial-green hover:text-industrial-black cursor-pointer font-semibold">
                     Kebijakan Privasi
                   </span>{' '}
                   kami.
@@ -346,12 +353,12 @@ const Register = () => {
           </Card>
         </motion.div>
 
-        {/* Footer */}
+        {/* Footer - Neo-Brutalism */}
         <motion.div 
           variants={itemVariants}
           className="text-center mt-6 sm:mt-8"
         >
-          <p className="text-xs sm:text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-industrial-text-secondary">
             © 2024 Kelas Guru. Platform pembelajaran digital.
           </p>
         </motion.div>

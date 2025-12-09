@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  UserCheck, Calendar, ChevronLeft, ChevronRight, 
-  Download, RefreshCw, Users, CheckCircle, 
-  XCircle, AlertTriangle, Heart, BarChart3, Save, PieChart
-} from 'lucide-react';
+  UserCircle, Calendar, CaretLeft, CaretRight, 
+  Download, ArrowClockwise, Users, CheckCircle, 
+  XCircle, Warning, Heart, ChartBar, FloppyDisk, ChartPie
+} from 'phosphor-react';
 import { classApi, studentsApi as studentApi, attendanceApi } from '../../lib/api';
 import * as XLSX from 'xlsx';
 
@@ -81,19 +81,19 @@ const statusConfig = {
   absent: { label: 'Alfa', color: 'bg-red-500', textColor: 'text-red-700', bgColor: 'bg-red-100' }
 };
 
-// Enhanced Loading Skeleton
+// Enhanced Loading Skeleton - Industrial Minimalism
 const LoadingSkeleton = () => (
-  <div className="animate-pulse space-y-3 sm:space-y-4">
+  <div className="space-y-3 sm:space-y-4">
     {[...Array(5)].map((_, i) => (
-      <div key={i} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-xl">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-300 rounded-full"></div>
+      <div key={i} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 border-2 border-industrial-black bg-industrial-white">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-industrial-light border-2 border-industrial-black"></div>
         <div className="flex-1 space-y-2">
-          <div className="h-3 sm:h-4 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-2 sm:h-3 bg-gray-300 rounded w-1/2"></div>
+          <div className="h-3 sm:h-4 bg-industrial-light w-3/4"></div>
+          <div className="h-2 sm:h-3 bg-industrial-light w-1/2"></div>
         </div>
         <div className="flex space-x-1 sm:space-x-2">
           {[...Array(4)].map((_, j) => (
-            <div key={j} className="w-12 sm:w-16 h-6 sm:h-8 bg-gray-300 rounded-lg"></div>
+            <div key={j} className="w-12 sm:w-16 h-6 sm:h-8 bg-industrial-light border-2 border-industrial-black"></div>
           ))}
         </div>
       </div>
@@ -109,10 +109,10 @@ const NotificationToast = ({ notification, onClose }: {
   if (!notification.visible) return null;
 
   const styles = {
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800'
+    success: 'bg-industrial-white border-2 border-industrial-black text-industrial-black',
+    error: 'bg-industrial-white border-2 border-industrial-red text-industrial-red',
+    warning: 'bg-industrial-white border-2 border-industrial-black text-industrial-black',
+    info: 'bg-industrial-white border-2 border-industrial-steel text-industrial-black'
   };
 
   return (
@@ -123,10 +123,10 @@ const NotificationToast = ({ notification, onClose }: {
         exit={{ opacity: 0, y: -50 }}
         className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 max-w-md"
       >
-        <div className={`p-3 sm:p-4 rounded-xl border shadow-lg ${styles[notification.type]}`}>
+        <div className={`p-3 sm:p-4 shadow-[0_4px_8px_rgba(0,0,0,0.15)] ${styles[notification.type]}`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs sm:text-sm font-medium flex-1 pr-2">{notification.message}</span>
-            <button onClick={onClose} className="ml-2 text-gray-500 hover:text-gray-700 text-lg">
+            <span className="text-xs sm:text-sm font-semibold flex-1 pr-2">{notification.message}</span>
+            <button onClick={onClose} className="ml-2 text-industrial-text-secondary hover:text-industrial-black text-lg">
               ×
             </button>
           </div>
@@ -880,17 +880,17 @@ const PresensiPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen p-4 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/80 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl max-w-sm mx-4"
+          className="bg-industrial-white border-2 border-industrial-black shadow-[0_8px_16px_rgba(0,0,0,0.3)] p-6 sm:p-8 max-w-sm mx-4"
         >
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-industrial-black border-t-industrial-steel animate-spin"></div>
             <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Memuat Data Presensi</h3>
-              <p className="text-xs sm:text-sm text-gray-500">Mohon tunggu sebentar...</p>
+              <h3 className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2">Memuat Data Presensi</h3>
+              <p className="text-xs sm:text-sm text-industrial-text-secondary">Mohon tunggu sebentar...</p>
             </div>
           </div>
         </motion.div>
@@ -899,331 +899,354 @@ const PresensiPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen p-4 sm:p-6">
       <NotificationToast 
         notification={notification} 
         onClose={() => setNotification(prev => ({ ...prev, visible: false }))} 
       />
 
-      {/* Enhanced Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-30">
+      {/* Enhanced Header - Industrial Minimalism */}
+      <div className="bg-industrial-white border-b-2 border-industrial-black sticky top-0 z-30 mb-4 sm:mb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <UserCheck className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0">
+                <UserCircle className="w-4 h-4 sm:w-6 sm:h-6 text-industrial-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent truncate">
+                <h1 className="text-lg sm:text-xl font-bold text-industrial-black industrial-h1 truncate">
                   Presensi Siswa
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Kelola kehadiran siswa dengan mudah</p>
+                <p className="text-xs sm:text-sm text-industrial-text-secondary hidden sm:block">Kelola kehadiran siswa dengan mudah</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <button
+              <Button
+                variant="industrial-secondary"
+                size="sm"
                 onClick={fetchInitialData}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                className="w-8 h-8 sm:w-10 sm:h-10 p-0"
               >
-                <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+                <ArrowClockwise className="w-4 h-4 sm:w-5 sm:h-5" />
+              </Button>
               
-              <button
+              <Button
+                variant="industrial-secondary"
+                size="sm"
                       onClick={() => {
                         setExportType(activeTab === 'class-recap' ? 'recap' : 'all');
                         setSelectedExportClass('');
                         setShowExportModal(true);
                       }}
-                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg text-xs sm:text-sm"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
                 <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Export</span>
                 <span className="sm:hidden">Data</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Enhanced Statistics */}
+      <div className="max-w-7xl mx-auto">
+        {/* Enhanced Statistics - Industrial Minimalism */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 sm:mb-8"
+          className="mb-4 sm:mb-6"
         >
           {/* Statistics Header */}
           <div className="mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-3">
-              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h2 className="text-xl sm:text-2xl font-bold text-industrial-black industrial-h1">
                 Statistik Presensi Real-Time
               </h2>
-              <button
+              <Button
+                variant="industrial-secondary"
+                size="sm"
                 onClick={fetchAllRecords}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 text-xs sm:text-sm"
               >
-                <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                <ArrowClockwise className="w-3 h-3 sm:w-4 sm:h-4" />
                 Refresh Data
-              </button>
+              </Button>
             </div>
             
             {/* Statistics Info */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4 border border-blue-200/50">
+            <Card variant="industrial">
+              <CardContent className="p-3 sm:p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-600">Total Records:</span>
-                  <span className="font-semibold text-gray-900">{statsInfo.totalRecords}</span>
+                    <div className="w-2 h-2 bg-industrial-steel flex-shrink-0"></div>
+                    <span className="text-industrial-text-secondary">Total Records:</span>
+                    <span className="font-semibold text-industrial-black industrial-mono">{statsInfo.totalRecords}</span>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-600">Tanggal Recorded:</span>
-                  <span className="font-semibold text-gray-900">{statsInfo.uniqueDatesCount} hari</span>
+                    <div className="w-2 h-2 bg-industrial-black flex-shrink-0"></div>
+                    <span className="text-industrial-text-secondary">Tanggal Recorded:</span>
+                    <span className="font-semibold text-industrial-black industrial-mono">{statsInfo.uniqueDatesCount} hari</span>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-600">Siswa Tercatat:</span>
-                  <span className="font-semibold text-gray-900">{statsInfo.uniqueStudentsCount} siswa</span>
+                    <div className="w-2 h-2 bg-industrial-steel flex-shrink-0"></div>
+                    <span className="text-industrial-text-secondary">Siswa Tercatat:</span>
+                    <span className="font-semibold text-industrial-black industrial-mono">{statsInfo.uniqueStudentsCount} siswa</span>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-600">Periode:</span>
-                  <span className="font-semibold text-gray-900 truncate">
+                    <div className="w-2 h-2 bg-industrial-black flex-shrink-0"></div>
+                    <span className="text-industrial-text-secondary">Periode:</span>
+                    <span className="font-semibold text-industrial-black truncate">
                     {statsInfo.dateRange || 'Belum ada data'}
                   </span>
                 </div>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </motion.div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl"
-          >
+        {/* Statistics Cards - Industrial Minimalism */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <Card variant="industrial">
+            <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-green-100 text-xs sm:text-sm font-medium">Total Hadir</p>
-                <p className="text-2xl sm:text-3xl font-bold truncate">{stats.totalPresent}</p>
-                <p className="text-green-200 text-xs mt-1">Semua data</p>
+                  <p className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Total Hadir</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{stats.totalPresent}</p>
+                  <p className="text-industrial-text-muted text-xs mt-1">Semua data</p>
               </div>
-              <CheckCircle className="w-8 h-8 sm:w-12 sm:h-12 text-white/80 flex-shrink-0 ml-2" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-industrial-white" />
             </div>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl"
-          >
+          <Card variant="industrial">
+            <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-blue-100 text-xs sm:text-sm font-medium">Sakit</p>
-                <p className="text-2xl sm:text-3xl font-bold truncate">{stats.totalSick}</p>
-                <p className="text-blue-200 text-xs mt-1">Semua data</p>
+                  <p className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Sakit</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-steel industrial-mono truncate">{stats.totalSick}</p>
+                  <p className="text-industrial-text-muted text-xs mt-1">Semua data</p>
               </div>
-              <Heart className="w-8 h-8 sm:w-12 sm:h-12 text-white/80 flex-shrink-0 ml-2" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-steel border-2 border-industrial-steel flex items-center justify-center flex-shrink-0 ml-2">
+                  <Heart className="w-4 h-4 sm:w-6 sm:h-6 text-industrial-white" />
             </div>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl"
-          >
+          <Card variant="industrial">
+            <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-yellow-100 text-xs sm:text-sm font-medium">Izin</p>
-                <p className="text-2xl sm:text-3xl font-bold truncate">{stats.totalPermission}</p>
-                <p className="text-yellow-200 text-xs mt-1">Semua data</p>
+                  <p className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Izin</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono truncate">{stats.totalPermission}</p>
+                  <p className="text-industrial-text-muted text-xs mt-1">Semua data</p>
               </div>
-              <AlertTriangle className="w-8 h-8 sm:w-12 sm:h-12 text-white/80 flex-shrink-0 ml-2" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0 ml-2">
+                  <Warning className="w-4 h-4 sm:w-6 sm:h-6 text-industrial-white" />
             </div>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-4 sm:p-6 text-white shadow-xl"
-          >
+          <Card variant="industrial">
+            <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-red-100 text-xs sm:text-sm font-medium">Alfa</p>
-                <p className="text-2xl sm:text-3xl font-bold truncate">{stats.totalAbsent}</p>
-                <p className="text-red-200 text-xs mt-1">Semua data</p>
+                  <p className="text-industrial-text-secondary text-xs sm:text-sm font-semibold">Alfa</p>
+                  <p className="text-xl sm:text-2xl font-bold text-industrial-red industrial-mono truncate">{stats.totalAbsent}</p>
+                  <p className="text-industrial-text-muted text-xs mt-1">Semua data</p>
               </div>
-              <XCircle className="w-8 h-8 sm:w-12 sm:h-12 text-white/80 flex-shrink-0 ml-2" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-red border-2 border-industrial-red flex items-center justify-center flex-shrink-0 ml-2">
+                  <XCircle className="w-4 h-4 sm:w-6 sm:h-6 text-industrial-white" />
             </div>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Enhanced Tab Navigation */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-xl">
-          <div className="flex border-b border-gray-200/50 overflow-x-auto scrollbar-hide">
+        {/* Enhanced Tab Navigation - Industrial Minimalism */}
+        <Card variant="industrial" className="mb-4 sm:mb-6">
+          <div className="flex border-b-2 border-industrial-black overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setActiveTab('daily')}
-              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
+              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-semibold transition-all text-xs sm:text-sm ${
                 activeTab === 'daily'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  ? 'bg-industrial-black text-industrial-white'
+                  : 'text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
               }`}
             >
               <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
-                <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-xs sm:text-sm truncate">Presensi Harian</span>
+                <UserCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="truncate">Presensi Harian</span>
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('class-recap')}
-              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-medium transition-all ${
+              className={`flex-1 min-w-0 px-2 sm:px-4 py-3 sm:py-4 text-center font-semibold transition-all text-xs sm:text-sm ${
                 activeTab === 'class-recap'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  ? 'bg-industrial-black text-industrial-white'
+                  : 'text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
               }`}
             >
               <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
-                <PieChart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-xs sm:text-sm truncate">Rekap</span>
+                <ChartPie className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="truncate">Rekap</span>
               </div>
             </button>
           </div>
 
-          <div className="p-4 sm:p-6">
+          <CardContent className="p-4 sm:p-6">
             {activeTab === 'daily' && (
               <div className="space-y-4 sm:space-y-6">
-                {/* Overview Status untuk Semua Kelas */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200/50">
-                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">
-                    Status Presensi Semua Kelas - {formatDate(selectedDate).split(',')[0]}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {classes.map((cls) => {
-                      const status = getClassAttendanceStatus(cls.id, selectedDate);
-                      return (
-                        <div 
-                          key={cls.id}
-                          className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                            selectedClass === cls.id 
-                              ? 'bg-blue-100 border-blue-300' 
-                              : 'bg-white border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => handleClassSelect(cls.id)}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-xs sm:text-sm font-medium text-gray-900 truncate flex-1 mr-2">
-                              {cls.name}
-                            </h4>
-                            {status.status === 'complete' && (
-                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                            )}
-                            {status.status === 'partial' && (
-                              <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                            )}
-                            {status.status === 'not-taken' && (
-                              <XCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                            )}
+                {/* Overview Status untuk Semua Kelas - Industrial Minimalism */}
+                <Card variant="industrial">
+                  <CardHeader className="p-4 border-b-2 border-industrial-black">
+                    <CardTitle className="text-sm sm:text-base text-industrial-black industrial-h2">
+                      Status Presensi Semua Kelas - {formatDate(selectedDate).split(',')[0]}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {classes.map((cls) => {
+                        const status = getClassAttendanceStatus(cls.id, selectedDate);
+                        return (
+                          <div 
+                            key={cls.id}
+                            className={`p-3 border-2 cursor-pointer transition-all ${
+                              selectedClass === cls.id 
+                                ? 'bg-industrial-black border-industrial-black' 
+                                : 'bg-industrial-white border-industrial-black hover:bg-industrial-light'
+                            }`}
+                            onClick={() => handleClassSelect(cls.id)}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className={`text-xs sm:text-sm font-semibold truncate flex-1 mr-2 ${
+                                selectedClass === cls.id ? 'text-industrial-white' : 'text-industrial-black'
+                              }`}>
+                                {cls.name}
+                              </h4>
+                              {status.status === 'complete' && (
+                                <CheckCircle className={`w-4 h-4 flex-shrink-0 ${
+                                  selectedClass === cls.id ? 'text-industrial-white' : 'text-industrial-black'
+                                }`} />
+                              )}
+                              {status.status === 'partial' && (
+                                <Warning className={`w-4 h-4 flex-shrink-0 ${
+                                  selectedClass === cls.id ? 'text-industrial-white' : 'text-industrial-black'
+                                }`} />
+                              )}
+                              {status.status === 'not-taken' && (
+                                <XCircle className={`w-4 h-4 flex-shrink-0 ${
+                                  selectedClass === cls.id ? 'text-industrial-white' : 'text-industrial-text-muted'
+                                }`} />
+                              )}
+                            </div>
+                            <div className={`text-xs ${
+                              selectedClass === cls.id ? 'text-industrial-white' : 'text-industrial-text-secondary'
+                            }`}>
+                              {status.status === 'complete' && `✓ Lengkap (${status.count}/${status.total})`}
+                              {status.status === 'partial' && `⚠ Sebagian (${status.count}/${status.total})`}
+                              {status.status === 'not-taken' && '○ Belum diambil'}
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-600">
-                            {status.status === 'complete' && `✓ Lengkap (${status.count}/${status.total})`}
-                            {status.status === 'partial' && `⚠ Sebagian (${status.count}/${status.total})`}
-                            {status.status === 'not-taken' && '○ Belum diambil'}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Controls */}
                 <div className="space-y-4 sm:space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    <label className="block text-xs sm:text-sm font-semibold text-industrial-black">
                       Pilih Kelas
                     </label>
                     <div className="space-y-3">
-                      <select
-                        value={selectedClass}
-                        onChange={(e) => handleClassSelect(e.target.value)}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base"
-                      >
-                        <option value="">Pilih Kelas...</option>
-                        {classes.map((cls) => (
-                          <option key={cls.id} value={cls.id}>
-                            {cls.name}
-                          </option>
-                        ))}
-                      </select>
+                    <select
+                      value={selectedClass}
+                      onChange={(e) => handleClassSelect(e.target.value)}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-industrial-white border-2 border-industrial-black focus:outline-none focus:border-industrial-steel text-xs sm:text-sm"
+                    >
+                      <option value="">Pilih Kelas...</option>
+                      {classes.map((cls) => (
+                        <option key={cls.id} value={cls.id}>
+                          {cls.name}
+                        </option>
+                      ))}
+                    </select>
                       
                       {/* Status Presensi untuk Kelas Terpilih */}
                       {selectedClass && (
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs sm:text-sm font-medium text-gray-700">
-                              Status Presensi:
-                            </span>
-                            {(() => {
-                              const attendanceStatus = getClassAttendanceStatus(selectedClass, selectedDate);
-                              
-                              if (attendanceStatus.status === 'complete') {
-                                return (
-                                  <Badge className="bg-green-100 text-green-700 border-green-200">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    Lengkap ({attendanceStatus.count}/{attendanceStatus.total})
-                                  </Badge>
-                                );
-                              } else if (attendanceStatus.status === 'partial') {
-                                return (
-                                  <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
-                                    <AlertTriangle className="w-3 h-3 mr-1" />
-                                    Sebagian ({attendanceStatus.count}/{attendanceStatus.total})
-                                  </Badge>
-                                );
-                              } else {
-                                return (
-                                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">
-                                    <XCircle className="w-3 h-3 mr-1" />
-                                    Belum Diambil
-                                  </Badge>
-                                );
-                              }
-                            })()}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {formatDate(selectedDate).split(',')[0]}
-                          </div>
-                        </div>
+                        <Card variant="industrial">
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs sm:text-sm font-semibold text-industrial-black">
+                                Status Presensi:
+                              </span>
+                              {(() => {
+                                const attendanceStatus = getClassAttendanceStatus(selectedClass, selectedDate);
+                                
+                                if (attendanceStatus.status === 'complete') {
+                                  return (
+                                    <Badge variant="industrial-success" className="text-xs">
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      Lengkap ({attendanceStatus.count}/{attendanceStatus.total})
+                                    </Badge>
+                                  );
+                                } else if (attendanceStatus.status === 'partial') {
+                                  return (
+                                    <Badge variant="industrial-warning" className="text-xs">
+                                      <Warning className="w-3 h-3 mr-1" />
+                                      Sebagian ({attendanceStatus.count}/{attendanceStatus.total})
+                                    </Badge>
+                                  );
+                                } else {
+                                  return (
+                                    <Badge variant="industrial-secondary" className="text-xs">
+                                      <XCircle className="w-3 h-3 mr-1" />
+                                      Belum Diambil
+                                    </Badge>
+                                  );
+                                }
+                              })()}
+                            </div>
+                            <div className="text-xs text-industrial-text-secondary">
+                              {formatDate(selectedDate).split(',')[0]}
+                            </div>
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
                   </div>
 
                     <div className="space-y-2 sm:col-span-2 lg:col-span-1">
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    <label className="block text-xs sm:text-sm font-semibold text-industrial-black">
                       Tanggal
                     </label>
                     <div className="flex gap-2">
-                      <button
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
                         onClick={goToPreviousDay}
-                          className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors flex-shrink-0"
+                        className="w-8 h-8 sm:w-10 sm:h-10 p-0"
                       >
-                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </button>
+                        <CaretLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </Button>
                       
-                        <div className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl min-w-0">
+                        <div className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-industrial-white border-2 border-industrial-black min-w-0">
                           <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
-                            <span className="text-gray-900 font-medium text-xs sm:text-sm truncate">
+                          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-text-muted flex-shrink-0" />
+                            <span className="text-industrial-black font-semibold text-xs sm:text-sm truncate">
                               {new Date(selectedDate).toLocaleDateString('id-ID', { 
                                 day: 'numeric',
                                 month: 'short',
@@ -1233,64 +1256,71 @@ const PresensiPage = () => {
                         </div>
                       </div>
                       
-                      <button
+                      <Button
+                        variant="industrial-secondary"
+                        size="sm"
                         onClick={goToNextDay}
-                          className="p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-xl transition-colors flex-shrink-0"
+                        className="w-8 h-8 sm:w-10 sm:h-10 p-0"
                       >
-                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </button>
+                        <CaretRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </Button>
                     </div>
                   </div>
 
                     <div className="space-y-2 sm:col-span-2 lg:col-span-1">
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700">
+                    <label className="block text-xs sm:text-sm font-semibold text-industrial-black">
                       Aksi Cepat
                     </label>
                     <div className="flex gap-2">
-                      <button
+                      <Button
+                        variant="industrial-primary"
+                        size="sm"
                         onClick={setToday}
-                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all text-xs sm:text-sm font-medium"
+                        className="flex-1 text-xs sm:text-sm"
                       >
                         Hari Ini
-                      </button>
+                      </Button>
                       
-                      <button
+                      <Button
+                        variant="industrial-primary"
+                        size="sm"
                         onClick={handleMarkAllPresent}
                         disabled={!selectedClass || students.length === 0}
-                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all text-xs sm:text-sm font-medium disabled:opacity-50"
+                        className="flex-1 text-xs sm:text-sm"
                       >
                         Semua Hadir
-                      </button>
+                      </Button>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Students List */}
+                {/* Students List - Industrial Minimalism */}
                 {selectedClass && (
-                  <div className="bg-white rounded-2xl border border-gray-200/50 shadow-lg overflow-hidden">
-                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b">
+                  <Card variant="industrial" className="overflow-hidden">
+                    <CardHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-industrial-black bg-industrial-black">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-base sm:text-lg font-bold text-gray-900">Daftar Siswa</h3>
-                        <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium">
+                        <CardTitle className="text-base sm:text-lg text-industrial-white industrial-h2">Daftar Siswa</CardTitle>
+                        <Badge variant="industrial-secondary" className="text-xs sm:text-sm">
                           {students.length} siswa
-                        </span>
+                        </Badge>
                       </div>
-                    </div>
+                    </CardHeader>
 
-                    <div>
                       {isLoadingStudents ? (
-                        <div className="p-4 sm:p-6">
+                      <CardContent className="p-4 sm:p-6">
                           <LoadingSkeleton />
-                        </div>
+                      </CardContent>
                       ) : students.length === 0 ? (
-                        <div className="p-8 sm:p-12 text-center">
-                          <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                          <p className="text-base sm:text-lg font-medium text-gray-900">Tidak ada siswa</p>
-                          <p className="text-xs sm:text-sm text-gray-500">Silakan pilih kelas yang memiliki siswa</p>
+                      <CardContent className="p-8 sm:p-12 text-center">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                          <Users className="w-6 h-6 sm:w-8 sm:h-8 text-industrial-white" />
                         </div>
+                        <p className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2">Tidak ada siswa</p>
+                        <p className="text-xs sm:text-sm text-industrial-text-secondary">Silakan pilih kelas yang memiliki siswa</p>
+                      </CardContent>
                       ) : (
-                        <>
+                      <CardContent>
                           {/* Mobile View */}
                           <div className="block sm:hidden">
                             <div className="space-y-3 p-4">
@@ -1300,30 +1330,28 @@ const PresensiPage = () => {
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ delay: index * 0.05 }}
-                                  className="bg-gray-50 rounded-xl p-4 space-y-3"
+                                  className="bg-industrial-white border-2 border-industrial-black p-4 space-y-3"
                                 >
                                   <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                    <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center text-industrial-white font-semibold text-xs flex-shrink-0">
                                       {index + 1}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                      <div className="text-sm font-medium text-gray-900 truncate">{student.fullName}</div>
-                                      <div className="text-xs text-gray-500 truncate">{student.username}</div>
+                                      <div className="text-sm font-semibold text-industrial-black truncate">{student.fullName}</div>
+                                      <div className="text-xs text-industrial-text-secondary truncate">{student.username}</div>
                                     </div>
                                   </div>
                                   <div className="grid grid-cols-2 gap-2">
                                     {(['present', 'sick', 'permission', 'absent'] as AttendanceStatus[]).map((status) => (
-                                      <button
+                                      <Button
                                         key={status}
+                                        variant={attendanceData[student.username] === status ? "industrial-primary" : "industrial-secondary"}
+                                        size="sm"
                                         onClick={() => setAttendanceData(prev => ({ ...prev, [student.username]: status }))}
-                                        className={`px-3 py-2 text-xs font-medium rounded-lg transition-all text-center ${
-                                          attendanceData[student.username] === status
-                                            ? `${statusConfig[status].color} text-white shadow-md`
-                                            : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-                                        }`}
+                                        className="text-xs"
                                       >
                                         {statusConfig[status].label}
-                                      </button>
+                                      </Button>
                                     ))}
                                   </div>
                                 </motion.div>
@@ -1333,57 +1361,54 @@ const PresensiPage = () => {
 
                           {/* Desktop View */}
                           <div className="hidden sm:block overflow-x-auto">
-                          <table className="w-full min-w-[600px]">
-                            <thead className="bg-gray-50">
+                          <table className="industrial-table w-full min-w-[600px]">
+                            <thead>
                               <tr>
-                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   No
                                 </th>
-                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-semibold text-industrial-white uppercase">
                                   Nama Siswa
                                 </th>
-                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-2 sm:py-3 text-center text-xs font-semibold text-industrial-white uppercase">
                                   Status Kehadiran
                                 </th>
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody>
                               {students.map((student, index) => (
                                 <motion.tr 
                                   key={student.id} 
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ delay: index * 0.05 }}
-                                  className="hover:bg-gray-50"
                                 >
-                                  <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                  <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-industrial-black industrial-mono">
                                     {index + 1}
                                   </td>
                                   <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                     <div className="flex items-center">
-                                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm mr-3 sm:mr-4 flex-shrink-0">
+                                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-industrial-black border-2 border-industrial-black flex items-center justify-center text-industrial-white font-semibold text-xs sm:text-sm mr-3 sm:mr-4 flex-shrink-0">
                                         {student.fullName.charAt(0).toUpperCase()}
                                       </div>
                                       <div className="min-w-0">
-                                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">{student.fullName}</div>
-                                        <div className="text-xs text-gray-500 truncate">{student.username}</div>
+                                        <div className="text-xs sm:text-sm font-semibold text-industrial-black truncate">{student.fullName}</div>
+                                        <div className="text-xs text-industrial-text-secondary truncate">{student.username}</div>
                                       </div>
                                     </div>
                                   </td>
                                   <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                     <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
                                       {(['present', 'sick', 'permission', 'absent'] as AttendanceStatus[]).map((status) => (
-                                        <button
+                                        <Button
                                           key={status}
+                                          variant={attendanceData[student.username] === status ? "industrial-primary" : "industrial-secondary"}
+                                          size="sm"
                                           onClick={() => setAttendanceData(prev => ({ ...prev, [student.username]: status }))}
-                                          className={`px-2 sm:px-3 py-1 sm:py-2 text-xs font-medium rounded-lg transition-all ${
-                                            attendanceData[student.username] === status
-                                              ? `${statusConfig[status].color} text-white shadow-md`
-                                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                          }`}
+                                          className="text-xs"
                                         >
                                           {statusConfig[status].label}
-                                        </button>
+                                        </Button>
                                       ))}
                                     </div>
                                   </td>
@@ -1392,48 +1417,48 @@ const PresensiPage = () => {
                             </tbody>
                           </table>
                         </div>
-                        </>
+                      </CardContent>
                       )}
-                    </div>
 
                     {selectedClass && students.length > 0 && (
-                      <div className="bg-gray-50/50 px-4 sm:px-6 py-3 sm:py-4 border-t">
+                      <div className="bg-industrial-light px-4 sm:px-6 py-3 sm:py-4 border-t-2 border-industrial-black">
                         <div className="flex justify-end">
-                          <button
+                          <Button
+                            variant="industrial-primary"
+                            size="sm"
                             onClick={handleSaveAttendance}
                             disabled={isSaving}
-                            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 text-xs sm:text-sm"
+                            className="flex items-center gap-2 text-xs sm:text-sm"
                           >
                             {isSaving ? (
                               <>
-                                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-industrial-white border-t-transparent rounded-full animate-spin" />
                                 <span>Menyimpan...</span>
                               </>
                             ) : (
                               <>
-                                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4" />
                                 <span>Simpan Presensi</span>
                               </>
                             )}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    </Button>
                   </div>
+                </div>
+                    )}
+                  </Card>
                 )}
               </div>
             )}
-
 
             {activeTab === 'class-recap' && (
               <div className="space-y-4 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                      <ChartPie className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                       Rekap Presensi Per Kelas
                     </CardTitle>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-industrial-text-secondary mt-1">
                       {classRecaps.length > 0 ? (
                         <>Menampilkan statistik presensi untuk {classRecaps.length} kelas • Data real-time</>
                       ) : (
@@ -1442,20 +1467,24 @@ const PresensiPage = () => {
                     </p>
           </div>
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <button
+                    <Button
+                      variant="industrial-secondary"
+                      size="sm"
                       onClick={fetchAllRecords}
-                      className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors"
+                      className="w-8 h-8 sm:w-10 sm:h-10 p-0"
                       title="Refresh data"
                     >
-                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
+                      <ArrowClockwise className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </Button>
                     <Button
+                      variant="industrial-primary"
+                      size="sm"
                       onClick={() => {
                         setExportType('recap');
                         setSelectedExportClass('');
                         setShowExportModal(true);
                       }}
-                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2"
+                      className="text-xs sm:text-sm"
                     >
                       <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       <span className="hidden sm:inline">Export Rekap</span>
@@ -1465,115 +1494,133 @@ const PresensiPage = () => {
       </div>
 
                 {classRecaps.length === 0 ? (
-                  <div className="bg-white rounded-2xl border shadow-lg p-8 sm:p-12 text-center">
-                    <PieChart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-base sm:text-lg font-medium text-gray-900">Belum ada data rekap kelas</p>
-                    <p className="text-xs sm:text-sm text-gray-500">Data akan muncul setelah presensi dilakukan di berbagai kelas</p>
+                  <Card variant="industrial">
+                    <CardContent className="p-8 sm:p-12 text-center">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                        <ChartPie className="w-6 h-6 sm:w-8 sm:h-8 text-industrial-white" />
                   </div>
+                      <p className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2">Belum ada data rekap kelas</p>
+                      <p className="text-xs sm:text-sm text-industrial-text-secondary">Data akan muncul setelah presensi dilakukan di berbagai kelas</p>
+                    </CardContent>
+                  </Card>
                 ) : (
                   <div className="grid gap-4 sm:gap-6">
                     {classRecaps.map((recap, index) => (
-                      <motion.div
-                        key={recap.classId}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white rounded-2xl border shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-                      >
+                      <Card key={recap.classId} variant="industrial" className="overflow-hidden">
                         {/* Class Header */}
-                        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 sm:p-6">
+                        <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black bg-industrial-black">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div>
-                              <h3 className="text-lg sm:text-xl font-bold">{recap.className}</h3>
-                              <p className="text-purple-100 text-sm">
+                              <CardTitle className="text-lg sm:text-xl text-industrial-white industrial-h1">{recap.className}</CardTitle>
+                              <p className="text-industrial-text-muted text-xs sm:text-sm mt-1">
                                 {recap.totalStudents} siswa • {recap.uniqueDates} hari tercatat • {recap.totalRecords} total records
                               </p>
                               {recap.dateRange && (
-                                <p className="text-purple-200 text-xs mt-1">
+                                <p className="text-industrial-text-muted text-xs mt-1">
                                   Periode: {recap.dateRange}
                                 </p>
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <div className="text-center bg-white/20 rounded-xl p-3">
-                                <div className="text-2xl font-bold">{recap.attendanceRate}%</div>
-                                <div className="text-xs text-purple-200">Tingkat Kehadiran</div>
+                              <div className="text-center bg-industrial-white border-2 border-industrial-white p-3">
+                                <div className="text-2xl font-bold text-industrial-black industrial-mono">{recap.attendanceRate}%</div>
+                                <div className="text-xs text-industrial-text-secondary">Tingkat Kehadiran</div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </CardHeader>
 
                         {/* Statistics Grid */}
-                        <div className="p-4 sm:p-6">
+                        <CardContent className="p-4 sm:p-6">
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                              <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                              <div className="text-2xl font-bold text-green-700">{recap.presentCount}</div>
-                              <div className="text-xs text-green-600">Hadir</div>
-                              <div className="text-xs text-gray-500 mt-1">
+                            <Card variant="industrial">
+                              <CardContent className="p-4 text-center">
+                                <div className="w-6 h-6 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                                  <CheckCircle className="w-4 h-4 text-industrial-white" />
+                                </div>
+                                <div className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{recap.presentCount}</div>
+                                <div className="text-xs text-industrial-text-secondary font-semibold">Hadir</div>
+                                <div className="text-xs text-industrial-text-muted mt-1">
                                 {recap.totalRecords > 0 ? Math.round((recap.presentCount / recap.totalRecords) * 100) : 0}%
                               </div>
-                            </div>
+                              </CardContent>
+                            </Card>
 
-                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                              <Heart className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                              <div className="text-2xl font-bold text-blue-700">{recap.sickCount}</div>
-                              <div className="text-xs text-blue-600">Sakit</div>
-                              <div className="text-xs text-gray-500 mt-1">
+                            <Card variant="industrial">
+                              <CardContent className="p-4 text-center">
+                                <div className="w-6 h-6 bg-industrial-steel border-2 border-industrial-steel flex items-center justify-center mx-auto mb-2">
+                                  <Heart className="w-4 h-4 text-industrial-white" />
+                                </div>
+                                <div className="text-xl sm:text-2xl font-bold text-industrial-steel industrial-mono">{recap.sickCount}</div>
+                                <div className="text-xs text-industrial-text-secondary font-semibold">Sakit</div>
+                                <div className="text-xs text-industrial-text-muted mt-1">
                                 {recap.totalRecords > 0 ? Math.round((recap.sickCount / recap.totalRecords) * 100) : 0}%
                               </div>
-                            </div>
+                              </CardContent>
+                            </Card>
 
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                              <AlertTriangle className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-                              <div className="text-2xl font-bold text-yellow-700">{recap.permissionCount}</div>
-                              <div className="text-xs text-yellow-600">Izin</div>
-                              <div className="text-xs text-gray-500 mt-1">
+                            <Card variant="industrial">
+                              <CardContent className="p-4 text-center">
+                                <div className="w-6 h-6 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-2">
+                                  <Warning className="w-4 h-4 text-industrial-white" />
+                                </div>
+                                <div className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{recap.permissionCount}</div>
+                                <div className="text-xs text-industrial-text-secondary font-semibold">Izin</div>
+                                <div className="text-xs text-industrial-text-muted mt-1">
                                 {recap.totalRecords > 0 ? Math.round((recap.permissionCount / recap.totalRecords) * 100) : 0}%
                               </div>
-                            </div>
+                              </CardContent>
+                            </Card>
 
-                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                              <XCircle className="w-6 h-6 text-red-600 mx-auto mb-2" />
-                              <div className="text-2xl font-bold text-red-700">{recap.absentCount}</div>
-                              <div className="text-xs text-red-600">Alfa</div>
-                              <div className="text-xs text-gray-500 mt-1">
+                            <Card variant="industrial">
+                              <CardContent className="p-4 text-center">
+                                <div className="w-6 h-6 bg-industrial-red border-2 border-industrial-red flex items-center justify-center mx-auto mb-2">
+                                  <XCircle className="w-4 h-4 text-industrial-white" />
+                                </div>
+                                <div className="text-xl sm:text-2xl font-bold text-industrial-red industrial-mono">{recap.absentCount}</div>
+                                <div className="text-xs text-industrial-text-secondary font-semibold">Alfa</div>
+                                <div className="text-xs text-industrial-text-muted mt-1">
                                 {recap.totalRecords > 0 ? Math.round((recap.absentCount / recap.totalRecords) * 100) : 0}%
                               </div>
-                            </div>
+                              </CardContent>
+                            </Card>
                           </div>
 
                           {/* Progress Bar */}
                           <div className="mb-4">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-gray-700">Distribusi Kehadiran</span>
-                              <span className="text-sm text-gray-500">{recap.totalRecords} total records</span>
+                              <span className="text-sm font-semibold text-industrial-black">Distribusi Kehadiran</span>
+                              <span className="text-sm text-industrial-text-secondary industrial-mono">{recap.totalRecords} total records</span>
                             </div>
-                            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="w-full h-4 bg-industrial-light border-2 border-industrial-black overflow-hidden">
                               <div className="h-full flex">
                                 {recap.totalRecords > 0 && (
                                   <>
                                     <div 
-                                      className="bg-green-500 transition-all duration-500"
+                                      className="bg-industrial-black transition-all duration-500"
                                       style={{ width: `${(recap.presentCount / recap.totalRecords) * 100}%` }}
+                                      title="Hadir"
                                     ></div>
                                     <div 
-                                      className="bg-blue-500 transition-all duration-500"
+                                      className="bg-industrial-steel transition-all duration-500"
                                       style={{ width: `${(recap.sickCount / recap.totalRecords) * 100}%` }}
+                                      title="Sakit"
                                     ></div>
                                     <div 
-                                      className="bg-yellow-500 transition-all duration-500"
+                                      className="bg-industrial-gray transition-all duration-500"
                                       style={{ width: `${(recap.permissionCount / recap.totalRecords) * 100}%` }}
+                                      title="Izin"
                                     ></div>
                                     <div 
-                                      className="bg-red-500 transition-all duration-500"
+                                      className="bg-industrial-red transition-all duration-500"
                                       style={{ width: `${(recap.absentCount / recap.totalRecords) * 100}%` }}
+                                      title="Alfa"
                                     ></div>
                                   </>
                                 )}
                               </div>
                             </div>
-                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <div className="flex justify-between text-xs text-industrial-text-secondary mt-1">
                               <span>Hadir: {recap.presentCount}</span>
                               <span>Sakit: {recap.sickCount}</span>
                               <span>Izin: {recap.permissionCount}</span>
@@ -1582,93 +1629,94 @@ const PresensiPage = () => {
                           </div>
 
                           {/* Class Summary */}
-                          <div className="bg-gray-50 rounded-xl p-4">
+                          <Card variant="industrial">
+                            <CardContent className="p-4">
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
                               <div>
-                                <div className="text-lg font-bold text-gray-900">{recap.totalStudents}</div>
-                                <div className="text-xs text-gray-600">Total Siswa</div>
+                                  <div className="text-lg font-bold text-industrial-black industrial-mono">{recap.totalStudents}</div>
+                                  <div className="text-xs text-industrial-text-secondary font-semibold">Total Siswa</div>
                               </div>
                               <div>
-                                <div className="text-lg font-bold text-gray-900">{recap.uniqueDates}</div>
-                                <div className="text-xs text-gray-600">Hari Aktif</div>
+                                  <div className="text-lg font-bold text-industrial-black industrial-mono">{recap.uniqueDates}</div>
+                                  <div className="text-xs text-industrial-text-secondary font-semibold">Hari Aktif</div>
                               </div>
                               <div className="col-span-2 sm:col-span-1">
-                                <div className="text-lg font-bold text-gray-900">
+                                  <div className="text-lg font-bold text-industrial-black industrial-mono">
                                   {recap.totalRecords > 0 && recap.totalStudents > 0 ? 
                                     Math.round(recap.totalRecords / (recap.totalStudents * recap.uniqueDates) * 100) : 0}%
                                 </div>
-                                <div className="text-xs text-gray-600">Partisipasi</div>
+                                  <div className="text-xs text-industrial-text-secondary font-semibold">Partisipasi</div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      </motion.div>
+                            </CardContent>
+                          </Card>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 )}
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Enhanced Export Modal */}
+      {/* Enhanced Export Modal - Industrial Minimalism */}
       {showExportModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
-          >
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Export Data Presensi</h3>
+        <div className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center z-50 p-4">
+          <Card variant="industrial" className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto shadow-[0_8px_16px_rgba(0,0,0,0.3)]">
+            <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+              <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Export Data Presensi</CardTitle>
+            </CardHeader>
             
+            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {/* Export Type Selection */}
-            <div className="mb-4 sm:mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Pilih Jenis Export:</label>
+              <div>
+                <label className="block text-sm font-semibold text-industrial-black mb-3">Pilih Jenis Export:</label>
               <div className="space-y-2">
-                <label className="flex items-center">
+                  <label className="flex items-center p-3 border-2 border-industrial-black cursor-pointer hover:bg-industrial-light">
                   <input
                     type="radio"
                     name="exportType"
                     value="all"
                     checked={exportType === 'all'}
                     onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
-                    className="mr-3 text-blue-600"
+                      className="mr-3"
                   />
                   <div>
-                    <div className="font-medium text-gray-900">Rekap Semua Kelas</div>
-                    <div className="text-xs text-gray-500">Ringkasan per siswa dari semua kelas</div>
+                      <div className="font-semibold text-industrial-black">Rekap Semua Kelas</div>
+                      <div className="text-xs text-industrial-text-secondary">Ringkasan per siswa dari semua kelas</div>
                   </div>
                 </label>
                 
-                <label className="flex items-center">
+                  <label className="flex items-center p-3 border-2 border-industrial-black cursor-pointer hover:bg-industrial-light">
                   <input
                     type="radio"
                     name="exportType"
                     value="class"
                     checked={exportType === 'class'}
                     onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
-                    className="mr-3 text-blue-600"
+                      className="mr-3"
                   />
                   <div>
-                    <div className="font-medium text-gray-900">Rekap Per Kelas</div>
-                    <div className="text-xs text-gray-500">Ringkasan per siswa untuk kelas tertentu</div>
+                      <div className="font-semibold text-industrial-black">Rekap Per Kelas</div>
+                      <div className="text-xs text-industrial-text-secondary">Ringkasan per siswa untuk kelas tertentu</div>
                   </div>
                 </label>
                 
                 {activeTab === 'class-recap' && (
-                  <label className="flex items-center">
+                    <label className="flex items-center p-3 border-2 border-industrial-black cursor-pointer hover:bg-industrial-light">
                     <input
                       type="radio"
                       name="exportType"
                       value="recap"
                       checked={exportType === 'recap'}
                       onChange={(e) => setExportType(e.target.value as 'all' | 'class' | 'recap')}
-                      className="mr-3 text-blue-600"
+                        className="mr-3"
                     />
                     <div>
-                      <div className="font-medium text-gray-900">Statistik Kelas</div>
-                      <div className="text-xs text-gray-500">Data statistik rekap per kelas</div>
+                        <div className="font-semibold text-industrial-black">Statistik Kelas</div>
+                        <div className="text-xs text-industrial-text-secondary">Data statistik rekap per kelas</div>
                     </div>
                   </label>
                 )}
@@ -1677,12 +1725,12 @@ const PresensiPage = () => {
 
             {/* Class Selection (when exportType is 'class') */}
             {exportType === 'class' && (
-              <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Pilih Kelas:</label>
+                <div>
+                  <label className="block text-sm font-semibold text-industrial-black mb-2">Pilih Kelas:</label>
                 <select
                   value={selectedExportClass}
                   onChange={(e) => setSelectedExportClass(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-3 py-2 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm"
                   required
                 >
                   <option value="">Pilih Kelas...</option>
@@ -1696,9 +1744,10 @@ const PresensiPage = () => {
             )}
 
             {/* Format Information */}
-            <div className="mb-4 sm:mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-medium text-blue-900 mb-2">Format Export:</h4>
-              <div className="text-xs text-blue-800 space-y-1">
+              <Card variant="industrial">
+                <CardContent className="p-3">
+                  <h4 className="font-semibold text-industrial-black mb-2">Format Export:</h4>
+                  <div className="text-xs text-industrial-text-secondary space-y-1">
                 {exportType === 'all' && (
                   <div>• Rekap per siswa dari semua kelas dengan judul, keterangan, tabel rapi, dan ringkasan</div>
                 )}
@@ -1711,29 +1760,35 @@ const PresensiPage = () => {
                 <div>• Format: Excel (.xlsx)</div>
                 <div>• Kolom: No, Nama, Username, Kelas, Total Hari, Hadir, Sakit, Izin, Alfa, Persentase</div>
               </div>
-            </div>
+                </CardContent>
+              </Card>
+            </CardContent>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <button
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 border-t-2 border-industrial-black">
+              <Button
+                variant="industrial-secondary"
+                size="sm"
                 onClick={() => {
                   setShowExportModal(false);
                   setExportType('all');
                   setSelectedExportClass('');
                 }}
-                className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium order-2 sm:order-1"
+                className="flex-1 text-xs sm:text-sm order-2 sm:order-1"
               >
                 Batal
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="industrial-primary"
+                size="sm"
                 onClick={handleExport}
                 disabled={exportType === 'class' && !selectedExportClass}
-                className="flex-1 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm font-medium order-1 sm:order-2"
+                className="flex-1 text-xs sm:text-sm order-1 sm:order-2"
               >
                 Export Data
-              </button>
+              </Button>
             </div>
-          </motion.div>
+          </Card>
         </div>
       )}
     </div>

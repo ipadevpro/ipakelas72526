@@ -9,18 +9,18 @@ import { AnimatedContainer, StaggeredList, fadeInUp, slideInFromLeft } from '@/c
 import { 
   Users, 
   BookOpen, 
-  TrendingUp, 
-  Award, 
+  TrendUp, 
+  Trophy, 
   Clock,
   Plus,
   Eye,
-  BarChart3,
+  ChartBar,
   Target,
   Activity,
-  AlertCircle,
+  WarningCircle,
   CheckCircle,
-  RefreshCw
-} from 'lucide-react';
+  ArrowClockwise
+} from 'phosphor-react';
 import { classApi, studentsApi, assignmentApi, gradeApi, attendanceApi, getCurrentUser } from '@/lib/api';
 
 interface DashboardStats {
@@ -562,7 +562,7 @@ const Dashboard = () => {
     {
       title: 'Rata-rata Nilai',
       value: stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : '-',
-      icon: Award,
+      icon: Trophy,
       color: 'bg-purple-500',
       description: 'Nilai keseluruhan',
       trend: stats.pendingGrades > 0 ? `${stats.pendingGrades} siswa belum dinilai` : 'Semua sudah dinilai'
@@ -572,7 +572,7 @@ const Dashboard = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'assignment': return Target;
-      case 'grade': return Award;
+      case 'grade': return Trophy;
       case 'attendance': return Clock;
       case 'student_joined': return Users;
       case 'assignment_submitted': return CheckCircle;
@@ -650,31 +650,31 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 bg-gray-50/50 min-h-screen">
-      {/* Welcome Section */}
+    <div className="space-y-4 sm:space-y-6 min-h-screen">
+      {/* Welcome Section - Industrial Minimalism */}
       <AnimatedContainer variant={fadeInUp}>
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+        <div className="bg-industrial-white border-2 border-industrial-black p-4 sm:p-6 shadow-[0_4px_8px_rgba(0,0,0,0.15)]">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
-                Selamat Datang, {user?.fullName || 'Guru'}! 👋
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-industrial-black industrial-h1">
+                Selamat Datang, {user?.fullName || 'Guru'}!
               </h1>
-              <p className="text-blue-100 mt-2 text-sm sm:text-base">
+              <p className="text-industrial-text-secondary mt-2 text-sm sm:text-base industrial-body">
                 Anda mengelola {stats.totalClasses} kelas dengan {stats.totalStudents} siswa
               </p>
               <div className="flex flex-wrap items-center gap-4 mt-3">
-                <div className="flex items-center gap-2 text-blue-200 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 text-industrial-text-secondary text-xs sm:text-sm">
                   <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Update terakhir: {lastUpdated.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="industrial-secondary"
                   size="sm"
                   onClick={handleRefreshData}
                   disabled={isLoading}
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 h-7 sm:h-8 text-xs"
+                  className="h-7 sm:h-8 text-xs"
                 >
-                  <RefreshCw className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                  <ArrowClockwise className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>
@@ -685,41 +685,36 @@ const Dashboard = () => {
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring" }}
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-full flex items-center justify-center">
-                <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-industrial-black border-2 border-industrial-black flex items-center justify-center">
+                <ChartBar className="w-8 h-8 sm:w-10 sm:h-10 text-industrial-white" />
               </div>
             </motion.div>
           </div>
         </div>
       </AnimatedContainer>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Industrial Minimalism */}
       <StaggeredList>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {statCards.map((stat, index) => (
             <AnimatedContainer key={stat.title} delay={index * 0.1}>
-              <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Card variant="industrial" className="relative overflow-hidden hover:shadow-[0_6px_12px_rgba(0,0,0,0.2)] transition-all duration-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
-                  <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 leading-tight">
+                  <CardTitle className="text-xs sm:text-sm font-semibold text-industrial-text-secondary leading-tight">
                     {stat.title}
                   </CardTitle>
-                  <div className={`p-1.5 sm:p-2 rounded-lg ${stat.color} text-white flex-shrink-0`}>
+                  <div className={`p-1.5 sm:p-2 border-2 border-industrial-black bg-industrial-black text-industrial-white flex-shrink-0`}>
                     <stat.icon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </div>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</div>
-                  <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
+                  <div className="text-xl sm:text-2xl font-bold text-industrial-black industrial-mono">{stat.value}</div>
+                  <p className="text-xs text-industrial-text-secondary mt-1">{stat.description}</p>
                   <div className="flex items-center mt-2">
-                    <TrendingUp className="w-3 h-3 text-green-500 mr-1 flex-shrink-0" />
-                    <span className="text-xs text-green-500 truncate">{stat.trend}</span>
+                    <TrendUp className="w-3 h-3 text-industrial-steel mr-1 flex-shrink-0" />
+                    <span className="text-xs text-industrial-text-secondary truncate">{stat.trend}</span>
                   </div>
                 </CardContent>
-                
-                {/* Decorative background */}
-                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 opacity-10">
-                  <div className={`w-full h-full rounded-full ${stat.color} transform translate-x-4 sm:translate-x-6 -translate-y-4 sm:-translate-y-6`} />
-                </div>
               </Card>
             </AnimatedContainer>
           ))}
@@ -727,20 +722,20 @@ const Dashboard = () => {
       </StaggeredList>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Recent Classes */}
+        {/* Recent Classes - Industrial Minimalism */}
         <AnimatedContainer variant={slideInFromLeft} delay={0.4} className="lg:col-span-2">
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 p-4 sm:p-6">
+          <Card variant="industrial">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 p-4 sm:p-6 border-b-2 border-industrial-black">
               <div className="flex-1">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                   Kelas Terbaru
                 </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
+                <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                   Kelas yang baru-baru ini Anda kelola
                 </CardDescription>
               </div>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-auto" onClick={handleCreateClass}>
+              <Button variant="industrial-primary" size="sm" className="h-9 sm:h-10 text-xs sm:text-sm w-full sm:w-auto" onClick={handleCreateClass}>
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Tambah Kelas
               </Button>
@@ -754,37 +749,37 @@ const Dashboard = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 * index }}
-                      className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors group"
+                      className="flex items-center justify-between p-3 sm:p-4 bg-industrial-light border-2 border-industrial-black hover:bg-industrial-white transition-colors group"
                     >
                       <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-white" />
                         </div>
                         <div className="flex-1 min-w-0 space-y-1">
-                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                          <h3 className="font-semibold text-industrial-black text-sm sm:text-base truncate">
                             {classItem.name}
                           </h3>
                           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-2">
                             <div className="flex items-center gap-2">
                               {classItem.subject && (
-                                <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                                <Badge variant="industrial-secondary" className="text-xs px-2 py-0.5">
                                   {classItem.subject}
                                 </Badge>
                               )}
-                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                              <div className="flex items-center gap-1 text-xs text-industrial-text-secondary">
                                 <Users className="w-3 h-3 flex-shrink-0" />
                                 <span>{classItem.studentCount || 0} siswa</span>
                               </div>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 line-clamp-1 sm:line-clamp-2">
+                          <p className="text-xs text-industrial-text-secondary line-clamp-1 sm:line-clamp-2">
                             {classItem.description || 'Tidak ada deskripsi'}
                           </p>
                         </div>
                       </div>
                       <Button 
                         size="sm" 
-                        variant="ghost" 
+                        variant="industrial-secondary"
                         className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0 w-8 h-8 sm:w-auto sm:h-auto"
                         onClick={() => handleViewClass(classItem.id)}
                       >
@@ -793,11 +788,11 @@ const Dashboard = () => {
                     </motion.div>
                   ))
                 ) : (
-                  <div className="text-center py-6 sm:py-8 text-gray-500">
-                    <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-sm sm:text-base">Belum ada kelas yang dibuat</p>
-                    <p className="text-xs text-gray-400 mt-1">Mulai dengan membuat kelas pertama Anda</p>
-                    <Button className="mt-4 h-9 sm:h-10 text-xs sm:text-sm" size="sm" onClick={handleCreateClass}>
+                  <div className="text-center py-6 sm:py-8 text-industrial-text-secondary">
+                    <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-industrial-border" />
+                    <p className="text-sm sm:text-base font-semibold text-industrial-black">Belum ada kelas yang dibuat</p>
+                    <p className="text-xs text-industrial-text-secondary mt-1">Mulai dengan membuat kelas pertama Anda</p>
+                    <Button variant="industrial-primary" className="mt-4 h-9 sm:h-10 text-xs sm:text-sm" size="sm" onClick={handleCreateClass}>
                       <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Buat Kelas Pertama
                     </Button>
@@ -808,15 +803,15 @@ const Dashboard = () => {
           </Card>
         </AnimatedContainer>
 
-        {/* Recent Activities */}
+        {/* Recent Activities - Industrial Minimalism */}
         <AnimatedContainer variant={fadeInUp} delay={0.6}>
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+          <Card variant="industrial">
+            <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-industrial-black industrial-h2">
+                <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-industrial-black" />
                 Aktivitas Terbaru
               </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
+              <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
                 Update terbaru dari kelas Anda
               </CardDescription>
             </CardHeader>
@@ -832,29 +827,29 @@ const Dashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * index }}
-                        className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-start space-x-3 p-3 bg-industrial-light border-2 border-industrial-black hover:bg-industrial-white transition-colors"
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`}>
-                          <IconComponent className="w-4 h-4" />
+                        <div className="w-8 h-8 bg-industrial-black border-2 border-industrial-black flex items-center justify-center flex-shrink-0">
+                          <IconComponent className="w-4 h-4 text-industrial-white" />
                         </div>
                         <div className="flex-1 min-w-0 space-y-1">
-                          <p className="text-xs sm:text-sm font-medium text-gray-900 leading-tight line-clamp-2">
+                          <p className="text-xs sm:text-sm font-semibold text-industrial-black leading-tight line-clamp-2">
                             {activity.title}
                           </p>
                           <div className="space-y-0.5">
                             {activity.student && (
-                              <p className="text-xs text-gray-600 truncate flex items-center gap-1">
+                              <p className="text-xs text-industrial-text-secondary truncate flex items-center gap-1">
                                 <Users className="w-3 h-3 flex-shrink-0" />
                                 <span className="truncate">{activity.student}</span>
                               </p>
                             )}
                             {activity.className && !activity.student && (
-                              <p className="text-xs text-gray-600 truncate flex items-center gap-1">
+                              <p className="text-xs text-industrial-text-secondary truncate flex items-center gap-1">
                                 <BookOpen className="w-3 h-3 flex-shrink-0" />
                                 <span className="truncate">{activity.className}</span>
                               </p>
                             )}
-                            <p className="text-xs text-gray-400 flex items-center gap-1">
+                            <p className="text-xs text-industrial-text-muted flex items-center gap-1">
                               <Clock className="w-3 h-3 flex-shrink-0" />
                               <span>{activity.time}</span>
                             </p>
@@ -864,14 +859,14 @@ const Dashboard = () => {
                     );
                   })
                 ) : (
-                  <div className="text-center py-6 sm:py-8 text-gray-500">
-                    <Activity className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-sm sm:text-base">Belum ada aktivitas terbaru</p>
-                    <p className="text-xs text-gray-400 mt-1">Aktivitas akan muncul setelah ada interaksi di kelas</p>
+                  <div className="text-center py-6 sm:py-8 text-industrial-text-secondary">
+                    <Activity className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-industrial-border" />
+                    <p className="text-sm sm:text-base font-semibold text-industrial-black">Belum ada aktivitas terbaru</p>
+                    <p className="text-xs text-industrial-text-secondary mt-1">Aktivitas akan muncul setelah ada interaksi di kelas</p>
                   </div>
                 )}
               </div>
-              <Button variant="outline" className="w-full mt-4 h-9 sm:h-10 text-xs sm:text-sm" size="sm" onClick={handleViewAllActivities}>
+              <Button variant="industrial-secondary" className="w-full mt-4 h-9 sm:h-10 text-xs sm:text-sm" size="sm" onClick={handleViewAllActivities}>
                 <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Lihat Semua Aktivitas
               </Button>
@@ -880,12 +875,12 @@ const Dashboard = () => {
         </AnimatedContainer>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Industrial Minimalism */}
       <AnimatedContainer variant={fadeInUp} delay={0.8}>
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg">Aksi Cepat</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+        <Card variant="industrial">
+          <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+            <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Aksi Cepat</CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-industrial-text-secondary">
               Akses cepat ke fitur yang sering digunakan • Data real-time
             </CardDescription>
           </CardHeader>
@@ -902,7 +897,7 @@ const Dashboard = () => {
                 },
                 { 
                   title: 'Input Nilai', 
-                  icon: Award, 
+                  icon: Trophy, 
                   color: 'bg-green-500',
                   stat: `Rata-rata ${stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : '0'}`,
                   urgent: stats.pendingGrades > 0,
@@ -933,31 +928,29 @@ const Dashboard = () => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button
-                    variant="outline"
-                    className={`h-24 sm:h-28 flex-col justify-between hover:shadow-md transition-all duration-200 w-full relative p-3 ${
-                      action.urgent ? 'border-red-200 bg-red-50' : ''
-                    }`}
+                    variant={action.urgent ? "industrial-danger" : "industrial-secondary"}
+                    className="h-24 sm:h-28 flex-col justify-between hover:shadow-[0_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200 w-full relative p-3"
                     onClick={() => handleQuickAction(action.title)}
                   >
                     {action.urgent && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-industrial-red border-2 border-industrial-black animate-pulse"></div>
                     )}
                     
                     {/* Icon Section */}
-                    <div className={`p-2 rounded-lg ${action.color} text-white flex-shrink-0`}>
+                    <div className="p-2 bg-industrial-black border-2 border-industrial-black text-industrial-white flex-shrink-0">
                       <action.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     
                     {/* Text Section */}
                     <div className="text-center space-y-1 flex-1 flex flex-col justify-end min-h-0">
-                      <span className="text-xs font-medium text-gray-900 leading-tight break-words hyphens-auto">
+                      <span className="text-xs font-semibold text-industrial-black leading-tight break-words hyphens-auto">
                         {action.title}
                       </span>
-                      <p className="text-xs text-gray-500 leading-tight break-words">
+                      <p className="text-xs text-industrial-text-secondary leading-tight break-words">
                         {action.stat}
                       </p>
                       {action.urgent && action.urgentText && (
-                        <p className="text-xs text-red-600 font-medium leading-tight break-words">
+                        <p className="text-xs text-industrial-red font-semibold leading-tight break-words">
                           {action.urgentText}
                         </p>
                       )}
@@ -967,50 +960,50 @@ const Dashboard = () => {
               ))}
             </div>
             
-            {/* Summary Alerts */}
+            {/* Summary Alerts - Industrial Minimalism */}
             <div className="mt-4 sm:mt-6 space-y-3">
               {/* Data Issues Alert */}
               {dataIssues && (
-                <div className="flex items-start gap-3 p-3 sm:p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 sm:p-4 bg-industrial-white border-2 border-industrial-black">
+                  <WarningCircle className="w-4 h-4 text-industrial-red flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0 space-y-2">
-                    <p className="text-xs sm:text-sm text-orange-800 font-medium leading-tight">
+                    <p className="text-xs sm:text-sm text-industrial-black font-semibold leading-tight">
                       Masalah Sinkronisasi Data Terdeteksi
                     </p>
-                    <p className="text-xs text-orange-700 leading-relaxed">
-                      Ditemukan <span className="font-medium">{dataIssues.orphanedGrades} nilai</span> yang mereferensikan tugas yang sudah tidak ada. 
+                    <p className="text-xs text-industrial-text-secondary leading-relaxed">
+                      Ditemukan <span className="font-semibold">{dataIssues.orphanedGrades} nilai</span> yang mereferensikan tugas yang sudah tidak ada. 
                       Ini bisa menyebabkan perhitungan "siswa belum dinilai" tidak akurat.
                     </p>
-                    <p className="text-xs text-orange-600 leading-relaxed">
-                      💡 <strong>Solusi:</strong> Hapus nilai lama yang tidak valid di halaman Nilai, atau buat ulang tugas yang hilang.
+                    <p className="text-xs text-industrial-text-secondary leading-relaxed">
+                      <strong>Solusi:</strong> Hapus nilai lama yang tidak valid di halaman Nilai, atau buat ulang tugas yang hilang.
                     </p>
                   </div>
                 </div>
               )}
               
               {stats.overdueAssignments > 0 && (
-                <div className="flex items-center gap-3 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-red-800 leading-tight">
-                    <span className="font-medium">{stats.overdueAssignments} tugas</span> telah melewati deadline
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-industrial-white border-2 border-industrial-red">
+                  <WarningCircle className="w-4 h-4 text-industrial-red flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-industrial-black leading-tight">
+                    <span className="font-semibold">{stats.overdueAssignments} tugas</span> telah melewati deadline
                   </p>
                 </div>
               )}
               
               {stats.pendingGrades > 0 && (
-                <div className="flex items-center gap-3 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <Clock className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-yellow-800 leading-tight">
-                    <span className="font-medium">{stats.pendingGrades} siswa</span> belum dinilai pada tugas yang ada
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-industrial-white border-2 border-industrial-black">
+                  <Clock className="w-4 h-4 text-industrial-black flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-industrial-black leading-tight">
+                    <span className="font-semibold">{stats.pendingGrades} siswa</span> belum dinilai pada tugas yang ada
                   </p>
                 </div>
               )}
               
               {stats.totalClasses > 0 && stats.totalStudents > 0 && (
-                <div className="flex items-center gap-3 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-green-800 leading-tight">
-                    Sistem berjalan normal • <span className="font-medium">{stats.activeStudents} siswa</span> aktif minggu ini
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-industrial-white border-2 border-industrial-black">
+                  <CheckCircle className="w-4 h-4 text-industrial-black flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-industrial-black leading-tight">
+                    Sistem berjalan normal • <span className="font-semibold">{stats.activeStudents} siswa</span> aktif minggu ini
                   </p>
                 </div>
               )}

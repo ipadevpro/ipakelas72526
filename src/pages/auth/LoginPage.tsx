@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { AnimatedContainer, fadeInUp, slideInFromLeft } from '@/components/ui/motion';
-import { Eye, EyeOff, GraduationCap, Users, BookOpen } from 'lucide-react';
+import { Eye, EyeSlash, GraduationCap, Users, BookOpen } from 'phosphor-react';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -39,9 +39,9 @@ const LoginPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-industrial-white flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
-        {/* Left Side - Branding & Features */}
+        {/* Left Side - Branding & Features - Neo-Brutalism */}
         <AnimatedContainer variant={slideInFromLeft} className="space-y-8">
           <motion.div 
             className="text-center lg:text-left"
@@ -54,22 +54,22 @@ const LoginPage = () => {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-industrial-black border-2 border-industrial-black flex items-center justify-center shadow-brutal">
+                <GraduationCap className="w-6 h-6 text-industrial-white" weight="bold" />
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold text-industrial-black industrial-h1">
                 Kelas Guru
               </h1>
             </motion.div>
             
-            <h2 className="text-2xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl lg:text-4xl font-bold text-industrial-black industrial-h1 mb-4">
               Platform Manajemen Kelas Modern
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+            <p className="text-lg text-industrial-text-secondary mb-8">
               Kelola kelas, siswa, dan aktivitas pembelajaran dengan mudah dan efisien
             </p>
 
-            {/* Features */}
+            {/* Features - Neo-Brutalism */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { icon: Users, title: "Manajemen Siswa", desc: "Kelola data siswa dengan mudah" },
@@ -81,24 +81,25 @@ const LoginPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="text-center p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50"
+                  whileHover={{ y: -2 }}
                 >
-                  <feature.icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{feature.title}</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">{feature.desc}</p>
+                  <Card variant="industrial" className="text-center p-4">
+                    <feature.icon className="w-8 h-8 text-industrial-black mx-auto mb-2" weight="bold" />
+                    <h3 className="font-semibold text-industrial-black text-sm">{feature.title}</h3>
+                    <p className="text-xs text-industrial-text-secondary">{feature.desc}</p>
+                  </Card>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         </AnimatedContainer>
 
-        {/* Right Side - Login Form */}
+        {/* Right Side - Login Form - Neo-Brutalism */}
         <AnimatedContainer variant={fadeInUp} delay={0.3}>
-          <Card className="w-full max-w-md mx-auto shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-2xl font-bold">Masuk ke Akun</CardTitle>
-              <CardDescription>
+          <Card variant="industrial" className="w-full max-w-md mx-auto">
+            <CardHeader className="space-y-1 text-center border-b-2 border-industrial-black">
+              <CardTitle className="text-2xl font-bold text-industrial-black industrial-h2">Masuk ke Akun</CardTitle>
+              <CardDescription className="text-industrial-text-secondary">
                 Masukkan username dan password untuk mengakses dashboard
               </CardDescription>
             </CardHeader>
@@ -106,56 +107,57 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="username" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="username" className="text-sm font-semibold text-industrial-black">
                     Username
                   </label>
                   <Input
+                    variant="industrial"
                     id="username"
                     type="text"
                     placeholder="Masukkan username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="password" className="text-sm font-semibold text-industrial-black">
                     Password
                   </label>
                   <div className="relative">
                     <Input
+                      variant="industrial"
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Masukkan password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pr-10 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted hover:text-industrial-black transition-colors"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeSlash className="w-4 h-4" weight="bold" /> : <Eye className="w-4 h-4" weight="bold" />}
                     </button>
                   </div>
                 </div>
 
-                {/* Demo Credentials */}
+                {/* Demo Credentials - Neo-Brutalism */}
                 <motion.div 
-                  className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                  className="p-3 bg-industrial-blue border-2 border-industrial-black shadow-brutal-sm"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Demo Account:</p>
+                  <p className="text-sm font-semibold text-industrial-black mb-2">Demo Account:</p>
                   {demoUsers.map((user, index) => (
                     <motion.div 
                       key={index}
-                      className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-700 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                      className="flex items-center justify-between p-2 bg-industrial-white border-2 border-industrial-black cursor-pointer hover:bg-industrial-light transition-colors shadow-brutal-sm"
                       onClick={() => {
                         setUsername(user.username);
                         setPassword(user.password);
@@ -164,20 +166,21 @@ const LoginPage = () => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</p>
-                        <Badge variant="secondary" className="text-xs">{user.role}</Badge>
+                        <p className="text-sm font-semibold text-industrial-black">{user.username}</p>
+                        <Badge variant="industrial-secondary" className="text-xs">{user.role}</Badge>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{user.password}</p>
+                      <p className="text-xs text-industrial-text-secondary industrial-mono">{user.password}</p>
                     </motion.div>
                   ))}
                 </motion.div>
               </CardContent>
 
-              <CardFooter>
+              <CardFooter className="border-t-2 border-industrial-black pt-6">
                 <Button
                   type="submit"
+                  variant="industrial-primary"
                   disabled={isLoading}
-                  className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full h-11 font-semibold"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">

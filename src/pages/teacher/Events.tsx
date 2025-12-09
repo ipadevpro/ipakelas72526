@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Calendar, Clock, Pencil, Trash2, Eye, CalendarDays, Users, CheckCircle, X, Save, AlertCircle, RefreshCw, BarChart3 } from 'lucide-react';
+import { Plus, MagnifyingGlass, Calendar, Clock, Pencil, Trash, Eye, CalendarBlank, Users, CheckCircle, X, FloppyDisk, WarningCircle, ArrowClockwise, ChartBar } from 'phosphor-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { classApi, eventApi } from '@/lib/api';
 
 // Interfaces
@@ -72,18 +74,18 @@ const NotificationToast = ({ notification, onClose }: {
   const getIcon = () => {
     switch (notification.type) {
       case 'success': return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
-      case 'error': return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
-      case 'warning': return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
-      case 'info': return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+      case 'error': return <WarningCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+      case 'warning': return <WarningCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+      case 'info': return <WarningCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
     }
   };
 
   const getColors = () => {
     switch (notification.type) {
-      case 'success': return 'bg-green-50 border-green-200 text-green-800';
-      case 'error': return 'bg-red-50 border-red-200 text-red-800';
-      case 'warning': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
-      case 'info': return 'bg-blue-50 border-blue-200 text-blue-800';
+      case 'success': return 'bg-industrial-white border-2 border-industrial-black text-industrial-black';
+      case 'error': return 'bg-industrial-white border-2 border-industrial-red text-industrial-red';
+      case 'warning': return 'bg-industrial-white border-2 border-industrial-black text-industrial-black';
+      case 'info': return 'bg-industrial-white border-2 border-industrial-steel text-industrial-black';
     }
   };
 
@@ -94,16 +96,16 @@ const NotificationToast = ({ notification, onClose }: {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -50, scale: 0.95 }}
         transition={{ duration: 0.2 }}
-        className={`fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 p-3 sm:p-4 rounded-lg border shadow-lg max-w-md ${getColors()}`}
+        className={`fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 p-3 sm:p-4 shadow-[0_4px_8px_rgba(0,0,0,0.15)] max-w-md ${getColors()}`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center min-w-0 flex-1">
             <div className="flex-shrink-0">{getIcon()}</div>
-            <span className="ml-2 font-medium text-sm sm:text-base truncate">{notification.message}</span>
+            <span className="ml-2 font-semibold text-sm sm:text-base truncate">{notification.message}</span>
           </div>
           <button
             onClick={onClose}
-            className="ml-4 text-current opacity-70 hover:opacity-100 transition-opacity flex-shrink-0"
+            className="ml-4 text-industrial-text-secondary hover:text-industrial-black transition-opacity flex-shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -113,24 +115,26 @@ const NotificationToast = ({ notification, onClose }: {
   );
 };
 
-// Loading Skeleton Component
+// Loading Skeleton Component - Industrial Minimalism
 const LoadingSkeleton = () => (
   <div className="space-y-4">
     {[...Array(3)].map((_, i) => (
-      <div key={i} className="bg-white rounded-lg border p-4 sm:p-6">
-        <div className="animate-pulse">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-5 sm:h-6 w-16 sm:w-20 bg-gray-200 rounded-full"></div>
-            <div className="h-5 sm:h-6 w-12 sm:w-16 bg-gray-200 rounded-full"></div>
+      <Card key={i} variant="industrial">
+        <CardContent className="p-4 sm:p-6">
+          <div className="animate-pulse">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-5 sm:h-6 w-16 sm:w-20 bg-industrial-light"></div>
+              <div className="h-5 sm:h-6 w-12 sm:w-16 bg-industrial-light"></div>
+            </div>
+            <div className="h-5 sm:h-6 w-3/4 bg-industrial-light mb-2"></div>
+            <div className="h-3 sm:h-4 w-full bg-industrial-light mb-3"></div>
+            <div className="flex items-center gap-4">
+              <div className="h-3 sm:h-4 w-24 sm:w-32 bg-industrial-light"></div>
+              <div className="h-3 sm:h-4 w-20 sm:w-24 bg-industrial-light"></div>
+            </div>
           </div>
-          <div className="h-5 sm:h-6 w-3/4 bg-gray-200 rounded mb-2"></div>
-          <div className="h-3 sm:h-4 w-full bg-gray-200 rounded mb-3"></div>
-          <div className="flex items-center gap-4">
-            <div className="h-3 sm:h-4 w-24 sm:w-32 bg-gray-200 rounded"></div>
-            <div className="h-3 sm:h-4 w-20 sm:w-24 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     ))}
   </div>
 );
@@ -157,7 +161,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }: {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-industrial-black/80 flex items-center justify-center z-50 p-4"
         onClick={onClose}
       >
         <motion.div
@@ -165,14 +169,14 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }: {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className={`bg-white rounded-xl shadow-2xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden mx-4 flex flex-col`}
+          className={`bg-industrial-white border-2 border-industrial-black shadow-[0_8px_16px_rgba(0,0,0,0.3)] ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden mx-4 flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h3>
+          <div className="flex-shrink-0 bg-industrial-white border-b-2 border-industrial-black px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+            <h3 className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2">{title}</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+              className="text-industrial-text-secondary hover:text-industrial-black transition-colors p-1 hover:bg-industrial-light"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -505,38 +509,39 @@ const EventsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div className="min-h-screen p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Notification */}
         <NotificationToast 
           notification={notification} 
           onClose={() => setNotification(prev => ({ ...prev, visible: false }))} 
         />
 
-        {/* Header */}
+        {/* Header - Industrial Minimalism */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4"
+          className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-4"
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-h1">
               Kegiatan
             </h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">Kelola jadwal dan kegiatan kelas</p>
+            <p className="text-industrial-text-secondary mt-1 text-sm sm:text-base">Kelola jadwal dan kegiatan kelas</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Button
-              variant="outline"
+              variant="industrial-secondary"
               onClick={fetchEvents}
-              className="border-gray-300 hover:bg-gray-50 h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base"
             >
-              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <ArrowClockwise className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Refresh
             </Button>
             <Button
+              variant="industrial-primary"
               onClick={handleCreateEvent}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base"
             >
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Tambah Kegiatan
@@ -544,36 +549,33 @@ const EventsPage = () => {
           </div>
         </motion.div>
 
-        {/* Navigation Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl border border-gray-200 p-1 mb-4 sm:mb-6 inline-flex overflow-x-auto"
-        >
-          <button
-            onClick={() => setActiveTab('events')}
-            className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
-              activeTab === 'events'
-                ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-200'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-            }`}
-          >
-            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-            Daftar Kegiatan
-          </button>
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
-              activeTab === 'reports'
-                ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-200'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-            }`}
-          >
-            <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-            Laporan
-          </button>
-        </motion.div>
+        {/* Navigation Tabs - Industrial Minimalism */}
+        <Card variant="industrial" className="mb-4 sm:mb-6 inline-flex overflow-x-auto">
+          <div className="flex border-b-2 border-industrial-black">
+            <button
+              onClick={() => setActiveTab('events')}
+              className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                activeTab === 'events'
+                  ? 'bg-industrial-black text-industrial-white'
+                  : 'text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
+              }`}
+            >
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              Daftar Kegiatan
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                activeTab === 'reports'
+                  ? 'bg-industrial-black text-industrial-white'
+                  : 'text-industrial-text-secondary hover:text-industrial-black hover:bg-industrial-light'
+              }`}
+            >
+              <ChartBar className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              Laporan
+            </button>
+          </div>
+        </Card>
 
         {activeTab === 'events' && (
           <motion.div
@@ -582,73 +584,77 @@ const EventsPage = () => {
             transition={{ delay: 0.2 }}
             className="space-y-6"
           >
-            {/* Search and Filter */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Cari kegiatan..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 h-10 sm:h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-                    />
+            {/* Search and Filter - Industrial Minimalism */}
+            <Card variant="industrial">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-industrial-text-muted w-4 h-4" />
+                      <Input
+                        variant="industrial"
+                        placeholder="Cari kegiatan..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    <select
+                      value={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                      className="px-3 sm:px-4 py-2 border-2 border-industrial-black bg-industrial-white text-xs sm:text-sm focus:outline-none focus:border-industrial-steel flex-1 sm:flex-none min-w-0"
+                    >
+                      <option value="all">Semua Waktu</option>
+                      <option value="upcoming">Mendatang</option>
+                      <option value="past">Sudah Lewat</option>
+                      {classes.map(cls => (
+                        <option key={cls.id} value={cls.id}>{cls.name}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value)}
+                      className="px-3 sm:px-4 py-2 border-2 border-industrial-black bg-industrial-white text-xs sm:text-sm focus:outline-none focus:border-industrial-steel flex-1 sm:flex-none min-w-0"
+                    >
+                      <option value="all">Semua Jenis</option>
+                      {EVENT_TYPES.map(type => (
+                        <option key={type.value} value={type.value}>{type.label}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:gap-3">
-                  <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 transition-colors flex-1 sm:flex-none min-w-0"
-                  >
-                    <option value="all">Semua Waktu</option>
-                    <option value="upcoming">Mendatang</option>
-                    <option value="past">Sudah Lewat</option>
-                    {classes.map(cls => (
-                      <option key={cls.id} value={cls.id}>{cls.name}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 transition-colors flex-1 sm:flex-none min-w-0"
-                  >
-                    <option value="all">Semua Jenis</option>
-                    {EVENT_TYPES.map(type => (
-                      <option key={type.value} value={type.value}>{type.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* Events List */}
+            {/* Events List - Industrial Minimalism */}
             <div className="space-y-4">
               {filteredEvents.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 sm:p-12 text-center"
-                >
-                  <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Belum ada kegiatan</h3>
-                  <p className="text-gray-500 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
-                    {searchQuery || filter !== 'all' || typeFilter !== 'all' 
-                      ? 'Tidak ada kegiatan yang sesuai dengan filter yang dipilih'
-                      : 'Mulai dengan membuat kegiatan pertama Anda'
-                    }
-                  </p>
-                  {(!searchQuery && filter === 'all' && typeFilter === 'all') && (
-                    <Button 
-                      onClick={handleCreateEvent} 
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-10 sm:h-11 text-sm sm:text-base"
-                    >
-                      <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      Tambah Kegiatan
-                    </Button>
-                  )}
-                </motion.div>
+                <Card variant="industrial">
+                  <CardContent className="p-8 sm:p-12 text-center">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-industrial-black border-2 border-industrial-black flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-industrial-white" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2 mb-2">Belum ada kegiatan</h3>
+                    <p className="text-industrial-text-secondary mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
+                      {searchQuery || filter !== 'all' || typeFilter !== 'all' 
+                        ? 'Tidak ada kegiatan yang sesuai dengan filter yang dipilih'
+                        : 'Mulai dengan membuat kegiatan pertama Anda'
+                      }
+                    </p>
+                    {(!searchQuery && filter === 'all' && typeFilter === 'all') && (
+                      <Button 
+                        variant="industrial-primary"
+                        onClick={handleCreateEvent} 
+                        className="h-10 sm:h-11 text-sm sm:text-base"
+                      >
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                        Tambah Kegiatan
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
               ) : (
                 <motion.div 
                   className="grid gap-4"
@@ -669,34 +675,25 @@ const EventsPage = () => {
                     const upcoming = isEventUpcoming(event.eventDate);
                     
                     return (
-                      <motion.div
-                        key={event.id}
-                        variants={{
-                          hidden: { opacity: 0, y: 20 },
-                          show: { opacity: 1, y: 0 }
-                        }}
-                        className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
-                      >
-                        <div className="p-4 sm:p-6">
-                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <Card key={event.id} variant="industrial" className="group overflow-hidden">
+                        <CardContent className="p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-industrial-black pb-3 mb-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-2 mb-3">
-                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${typeInfo.color}`}>
-                                  {typeInfo.icon} {typeInfo.label}
-                                </span>
-                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                  upcoming ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                }`}>
-                                  {upcoming ? '🔮 Mendatang' : '⏰ Sudah Lewat'}
-                                </span>
+                                <Badge variant="industrial-secondary" className="text-xs">
+                                  {typeInfo.label}
+                                </Badge>
+                                <Badge variant={upcoming ? "industrial-success" : "industrial-secondary"} className="text-xs">
+                                  {upcoming ? 'Mendatang' : 'Sudah Lewat'}
+                                </Badge>
                               </div>
-                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                              <h3 className="text-lg sm:text-xl font-semibold text-industrial-black industrial-h2 mb-2 line-clamp-2">
                                 {event.title}
                               </h3>
-                              <p className="text-gray-600 mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">{event.description}</p>
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500">
+                              <p className="text-industrial-text-secondary mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">{event.description}</p>
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm text-industrial-text-secondary">
                                 <div className="flex items-center">
-                                  <CalendarDays className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                                  <CalendarBlank className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                                   <span className="truncate">{formatDate(event.eventDate)}</span>
                                 </div>
                                 <div className="flex items-center">
@@ -707,33 +704,33 @@ const EventsPage = () => {
                             </div>
                             <div className="flex items-center gap-1 sm:gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                               <Button
-                                variant="outline"
+                                variant="industrial-secondary"
                                 size="sm"
                                 onClick={() => handleViewEvent(event)}
-                                className="text-blue-600 border-blue-200 hover:bg-blue-50 h-8 sm:h-9 px-2 sm:px-3"
+                                className="h-8 sm:h-9 px-2 sm:px-3"
                               >
                                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                               <Button
-                                variant="outline"
+                                variant="industrial-secondary"
                                 size="sm"
                                 onClick={() => handleEditEvent(event)}
-                                className="text-green-600 border-green-200 hover:bg-green-50 h-8 sm:h-9 px-2 sm:px-3"
+                                className="h-8 sm:h-9 px-2 sm:px-3"
                               >
                                 <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                               <Button
-                                variant="outline"
+                                variant="industrial-danger"
                                 size="sm"
                                 onClick={() => handleDeleteEvent(event)}
-                                className="text-red-600 border-red-200 hover:bg-red-50 h-8 sm:h-9 px-2 sm:px-3"
+                                className="h-8 sm:h-9 px-2 sm:px-3"
                               >
-                                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
+                        </CardContent>
+                      </Card>
                     );
                   })}
                 </motion.div>
@@ -744,117 +741,139 @@ const EventsPage = () => {
 
         {activeTab === 'reports' && reportData && (
           <div className="space-y-4 sm:space-y-6">
-            {/* Summary Cards */}
+            {/* Summary Cards - Industrial Minimalism */}
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
-              <div className="bg-white p-4 sm:p-6 rounded-lg border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Total Kegiatan</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{reportData.totalEvents}</p>
+              <Card variant="industrial">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Total Kegiatan</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-mono">{reportData.totalEvents}</p>
+                    </div>
+                    <div className="bg-industrial-black border-2 border-industrial-black p-2 sm:p-3">
+                      <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-white" />
+                    </div>
                   </div>
-                  <div className="bg-blue-100 p-2 sm:p-3 rounded-lg">
-                    <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                </CardContent>
+              </Card>
+              <Card variant="industrial">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Kegiatan Mendatang</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-mono">{reportData.upcomingEvents}</p>
+                    </div>
+                    <div className="bg-industrial-black border-2 border-industrial-black p-2 sm:p-3">
+                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-white" />
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="bg-white p-4 sm:p-6 rounded-lg border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Kegiatan Mendatang</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-green-600">{reportData.upcomingEvents}</p>
+                </CardContent>
+              </Card>
+              <Card variant="industrial">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-semibold text-industrial-text-secondary">Kegiatan Selesai</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-industrial-black industrial-mono">{reportData.pastEvents}</p>
+                    </div>
+                    <div className="bg-industrial-black border-2 border-industrial-black p-2 sm:p-3">
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-industrial-white" />
+                    </div>
                   </div>
-                  <div className="bg-green-100 p-2 sm:p-3 rounded-lg">
-                    <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-4 sm:p-6 rounded-lg border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Kegiatan Selesai</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-purple-600">{reportData.pastEvents}</p>
-                  </div>
-                  <div className="bg-purple-100 p-2 sm:p-3 rounded-lg">
-                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Charts */}
+            {/* Charts - Industrial Minimalism */}
             <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Events by Type */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg border">
-                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Kegiatan per Jenis</h3>
-                <div className="space-y-3">
-                  {reportData.eventsByType.map(({ type, count }) => {
-                    const typeInfo = getEventTypeInfo(type);
-                    const percentage = Math.round((count / reportData.totalEvents) * 100);
-                    return (
-                      <div key={type} className="flex items-center justify-between">
-                        <div className="flex items-center min-w-0 flex-1">
-                          <span className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${typeInfo.color} mr-3 flex-shrink-0`}>
-                            {typeInfo.icon} {typeInfo.label}
-                          </span>
-                        </div>
-                        <div className="flex items-center flex-shrink-0">
-                          <div className="w-16 sm:w-24 bg-gray-200 rounded-full h-2 mr-2 sm:mr-3">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${percentage}%` }}
-                            ></div>
+              <Card variant="industrial">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Kegiatan per Jenis</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3">
+                    {reportData.eventsByType.map(({ type, count }) => {
+                      const typeInfo = getEventTypeInfo(type);
+                      const percentage = Math.round((count / reportData.totalEvents) * 100);
+                      return (
+                        <div key={type} className="flex items-center justify-between">
+                          <div className="flex items-center min-w-0 flex-1">
+                            <Badge variant="industrial-secondary" className="text-xs mr-3 flex-shrink-0">
+                              {typeInfo.label}
+                            </Badge>
                           </div>
-                          <span className="text-xs sm:text-sm font-medium text-gray-900 w-6 sm:w-8">{count}</span>
+                          <div className="flex items-center flex-shrink-0">
+                            <div className="w-16 sm:w-24 bg-industrial-light border-2 border-industrial-black h-2 mr-2 sm:mr-3">
+                              <div 
+                                className="bg-industrial-black h-2" 
+                                style={{ width: `${percentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs sm:text-sm font-semibold text-industrial-black industrial-mono w-6 sm:w-8">{count}</span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Events by Class */}
-              <div className="bg-white p-4 sm:p-6 rounded-lg border">
-                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Kegiatan per Kelas</h3>
-                <div className="space-y-3">
-                  {reportData.eventsByClass.map(({ className, count }) => {
-                    const percentage = Math.round((count / reportData.totalEvents) * 100);
-                    return (
-                      <div key={className} className="flex items-center justify-between">
-                        <div className="flex items-center min-w-0 flex-1">
-                          <span className="text-xs sm:text-sm font-medium text-gray-700 truncate">{className}</span>
-                        </div>
-                        <div className="flex items-center flex-shrink-0">
-                          <div className="w-16 sm:w-24 bg-gray-200 rounded-full h-2 mr-2 sm:mr-3">
-                            <div 
-                              className="bg-green-600 h-2 rounded-full" 
-                              style={{ width: `${percentage}%` }}
-                            ></div>
+              <Card variant="industrial">
+                <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                  <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Kegiatan per Kelas</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3">
+                    {reportData.eventsByClass.map(({ className, count }) => {
+                      const percentage = Math.round((count / reportData.totalEvents) * 100);
+                      return (
+                        <div key={className} className="flex items-center justify-between">
+                          <div className="flex items-center min-w-0 flex-1">
+                            <span className="text-xs sm:text-sm font-semibold text-industrial-black truncate">{className}</span>
                           </div>
-                          <span className="text-xs sm:text-sm font-medium text-gray-900 w-6 sm:w-8">{count}</span>
+                          <div className="flex items-center flex-shrink-0">
+                            <div className="w-16 sm:w-24 bg-industrial-light border-2 border-industrial-black h-2 mr-2 sm:mr-3">
+                              <div 
+                                className="bg-industrial-steel h-2" 
+                                style={{ width: `${percentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs sm:text-sm font-semibold text-industrial-black industrial-mono w-6 sm:w-8">{count}</span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Events by Month */}
-            <div className="bg-white p-4 sm:p-6 rounded-lg border">
-              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Kegiatan per Bulan</h3>
-              <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {reportData.eventsByMonth.map(({ month, count }) => (
-                  <div key={month} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700 truncate">{month}</span>
-                    <span className="text-xs sm:text-sm font-bold text-gray-900 flex-shrink-0 ml-2">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Events by Month - Industrial Minimalism */}
+            <Card variant="industrial">
+              <CardHeader className="p-4 sm:p-6 border-b-2 border-industrial-black">
+                <CardTitle className="text-base sm:text-lg text-industrial-black industrial-h2">Kegiatan per Bulan</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  {reportData.eventsByMonth.map(({ month, count }) => (
+                    <Card key={month} variant="industrial">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs sm:text-sm font-semibold text-industrial-black truncate">{month}</span>
+                          <span className="text-xs sm:text-sm font-bold text-industrial-black industrial-mono flex-shrink-0 ml-2">{count}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Create Event Modal */}
+        {/* Create Event Modal - Industrial Minimalism */}
         <Modal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
@@ -862,13 +881,13 @@ const EventsPage = () => {
         >
           <div className="space-y-4 sm:space-y-6 min-h-0">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Kelas <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Kelas <span className="text-industrial-red">*</span>
               </label>
               <select
                 value={eventForm.classId}
                 onChange={(e) => setEventForm({ ...eventForm, classId: e.target.value })}
-                className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-3 py-2 h-10 sm:h-11 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base"
                 required
               >
                 <option value="">Pilih Kelas</option>
@@ -879,10 +898,11 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Judul Kegiatan <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Judul Kegiatan <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="text"
                 value={eventForm.title}
                 onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
@@ -893,13 +913,13 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
                 Jenis Kegiatan
               </label>
               <select
                 value={eventForm.eventType}
                 onChange={(e) => setEventForm({ ...eventForm, eventType: e.target.value })}
-                className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-3 py-2 h-10 sm:h-11 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base"
               >
                 {EVENT_TYPES.map(type => (
                   <option key={type.value} value={type.value}>
@@ -910,10 +930,11 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tanggal Kegiatan <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Tanggal Kegiatan <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="date"
                 value={eventForm.eventDate}
                 onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
@@ -923,7 +944,7 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
                 Deskripsi
               </label>
               <textarea
@@ -931,31 +952,32 @@ const EventsPage = () => {
                 onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                 placeholder="Masukkan deskripsi kegiatan"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base resize-none"
+                className="w-full px-3 py-2 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base resize-none"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t-2 border-industrial-black">
               <Button
-                variant="outline"
+                variant="industrial-secondary"
                 onClick={() => setShowCreateModal(false)}
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Batal
               </Button>
               <Button
+                variant="industrial-primary"
                 onClick={handleSaveEvent}
                 disabled={saving}
-                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
+                className="w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
               >
                 {saving ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-industrial-white border-t-transparent mr-2"></div>
                     Menyimpan...
                   </>
                 ) : (
                   <>
-                    <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     Simpan
                   </>
                 )}
@@ -964,7 +986,7 @@ const EventsPage = () => {
           </div>
         </Modal>
 
-        {/* Edit Event Modal */}
+        {/* Edit Event Modal - Industrial Minimalism */}
         <Modal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
@@ -972,13 +994,13 @@ const EventsPage = () => {
         >
           <div className="space-y-4 sm:space-y-6 min-h-0">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Kelas <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Kelas <span className="text-industrial-red">*</span>
               </label>
               <select
                 value={eventForm.classId}
                 onChange={(e) => setEventForm({ ...eventForm, classId: e.target.value })}
-                className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-3 py-2 h-10 sm:h-11 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base"
                 required
               >
                 <option value="">Pilih Kelas</option>
@@ -989,10 +1011,11 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Judul Kegiatan <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Judul Kegiatan <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="text"
                 value={eventForm.title}
                 onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
@@ -1003,13 +1026,13 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
                 Jenis Kegiatan
               </label>
               <select
                 value={eventForm.eventType}
                 onChange={(e) => setEventForm({ ...eventForm, eventType: e.target.value })}
-                className="w-full px-3 py-2 h-10 sm:h-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-3 py-2 h-10 sm:h-11 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base"
               >
                 {EVENT_TYPES.map(type => (
                   <option key={type.value} value={type.value}>
@@ -1020,10 +1043,11 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tanggal Kegiatan <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
+                Tanggal Kegiatan <span className="text-industrial-red">*</span>
               </label>
               <Input
+                variant="industrial"
                 type="date"
                 value={eventForm.eventDate}
                 onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
@@ -1033,7 +1057,7 @@ const EventsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-industrial-black mb-2">
                 Deskripsi
               </label>
               <textarea
@@ -1041,31 +1065,32 @@ const EventsPage = () => {
                 onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                 placeholder="Masukkan deskripsi kegiatan"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base resize-none"
+                className="w-full px-3 py-2 border-2 border-industrial-black bg-industrial-white focus:outline-none focus:border-industrial-steel text-sm sm:text-base resize-none"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t-2 border-industrial-black">
               <Button
-                variant="outline"
+                variant="industrial-secondary"
                 onClick={() => setShowEditModal(false)}
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Batal
               </Button>
               <Button
+                variant="industrial-primary"
                 onClick={handleUpdateEvent}
                 disabled={saving}
-                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
+                className="w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
               >
                 {saving ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-industrial-white border-t-transparent mr-2"></div>
                     Menyimpan...
                   </>
                 ) : (
                   <>
-                    <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    <FloppyDisk className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     Simpan Perubahan
                   </>
                 )}
@@ -1074,7 +1099,7 @@ const EventsPage = () => {
           </div>
         </Modal>
 
-        {/* View Event Modal */}
+        {/* View Event Modal - Industrial Minimalism */}
         <Modal
           isOpen={showDetailModal}
           onClose={() => setShowDetailModal(false)}
@@ -1084,24 +1109,24 @@ const EventsPage = () => {
             <div className="space-y-4 sm:space-y-6 min-h-0">
               <div className="grid gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Judul</label>
-                  <p className="text-base sm:text-lg font-semibold text-gray-900">{selectedEvent.title}</p>
+                  <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Judul</label>
+                  <p className="text-base sm:text-lg font-semibold text-industrial-black industrial-h2">{selectedEvent.title}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Kelas</label>
-                    <p className="font-medium text-gray-900">{selectedEvent.className}</p>
+                    <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Kelas</label>
+                    <p className="font-semibold text-industrial-black">{selectedEvent.className}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Jenis</label>
+                    <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Jenis</label>
                     <div className="flex items-center">
                       {(() => {
                         const typeInfo = getEventTypeInfo(selectedEvent.eventType);
                         return (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${typeInfo.color}`}>
-                            {typeInfo.icon} {typeInfo.label}
-                          </span>
+                          <Badge variant="industrial-secondary" className="text-xs">
+                            {typeInfo.label}
+                          </Badge>
                         );
                       })()}
                     </div>
@@ -1109,40 +1134,45 @@ const EventsPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Tanggal</label>
-                  <p className="font-medium text-gray-900">{formatDate(selectedEvent.eventDate)}</p>
-                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                    {isEventUpcoming(selectedEvent.eventDate) ? '🔮 Mendatang' : '⏰ Sudah Lewat'}
+                  <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Tanggal</label>
+                  <p className="font-semibold text-industrial-black">{formatDate(selectedEvent.eventDate)}</p>
+                  <p className="text-xs sm:text-sm text-industrial-text-secondary mt-1">
+                    {isEventUpcoming(selectedEvent.eventDate) ? 'Mendatang' : 'Sudah Lewat'}
                   </p>
                 </div>
 
                 {selectedEvent.description && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Deskripsi</label>
-                    <p className="text-gray-700 whitespace-pre-wrap text-sm sm:text-base">{selectedEvent.description}</p>
+                    <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Deskripsi</label>
+                    <Card variant="industrial">
+                      <CardContent className="p-3">
+                        <p className="text-industrial-black whitespace-pre-wrap text-sm sm:text-base">{selectedEvent.description}</p>
+                      </CardContent>
+                    </Card>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Dibuat</label>
-                  <p className="text-xs sm:text-sm text-gray-600">{formatTime(selectedEvent.createdAt)}</p>
+                  <label className="block text-sm font-semibold text-industrial-text-secondary mb-2">Dibuat</label>
+                  <p className="text-xs sm:text-sm text-industrial-text-secondary">{formatTime(selectedEvent.createdAt)}</p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t-2 border-industrial-black">
                 <Button
-                  variant="outline"
+                  variant="industrial-secondary"
                   onClick={() => setShowDetailModal(false)}
                   className="w-full sm:w-auto order-2 sm:order-1"
                 >
                   Tutup
                 </Button>
                 <Button
+                  variant="industrial-primary"
                   onClick={() => {
                     setShowDetailModal(false);
                     handleEditEvent(selectedEvent);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
+                  className="w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
                 >
                   <Pencil className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Edit
@@ -1152,7 +1182,7 @@ const EventsPage = () => {
           )}
         </Modal>
 
-        {/* Delete Confirmation Modal */}
+        {/* Delete Confirmation Modal - Industrial Minimalism */}
         <Modal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
@@ -1160,38 +1190,39 @@ const EventsPage = () => {
         >
           {selectedEvent && (
             <div className="space-y-4 sm:space-y-6 min-h-0">
-              <div className="flex items-center text-amber-600 mb-4">
-                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                <span className="font-medium text-sm sm:text-base">Peringatan!</span>
+              <div className="flex items-center text-industrial-red mb-4">
+                <WarningCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                <span className="font-semibold text-sm sm:text-base">Peringatan!</span>
               </div>
-              <p className="text-gray-700 text-sm sm:text-base">
+              <p className="text-industrial-black text-sm sm:text-base">
                 Apakah Anda yakin ingin menghapus kegiatan <strong>"{selectedEvent.title}"</strong>?
               </p>
-              <p className="text-xs sm:text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-industrial-text-secondary">
                 Tindakan ini tidak dapat dibatalkan.
               </p>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t-2 border-industrial-black">
                 <Button
-                  variant="outline"
+                  variant="industrial-secondary"
                   onClick={() => setShowDeleteModal(false)}
                   className="w-full sm:w-auto order-2 sm:order-1"
                 >
                   Batal
                 </Button>
                 <Button
+                  variant="industrial-danger"
                   onClick={handleConfirmDelete}
                   disabled={saving}
-                  className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
+                  className="w-full sm:w-auto order-1 sm:order-2 h-10 sm:h-11"
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-industrial-white border-t-transparent mr-2"></div>
                       Menghapus...
                     </>
                   ) : (
                     <>
-                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                      <Trash className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Hapus
                     </>
                   )}
